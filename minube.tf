@@ -2,6 +2,15 @@ provider "aws" {
   region = "eu-central-1"
 }
 
+terraform {
+  backend "s3" {
+    bucket  = "minube-terraform-state"
+    key     = "tfstate"
+    region  = "eu-central-1"
+    encrypt = "true"
+  }
+}
+
 resource "aws_vpc" "minube" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -41,7 +50,7 @@ resource "aws_key_pair" "minube" {
 
 data "aws_ami" "amazon-linux-2" {
   most_recent = true
-  owners = ["amazon"]
+  owners      = ["amazon"]
 
   filter {
     name   = "name"
@@ -86,4 +95,53 @@ resource "aws_route_table_association" "subnet-association" {
 
 output "public_ip" {
   value = aws_eip.minube.public_ip
+}
+
+resource "aws_s3_bucket" "minube" {
+  bucket = "minube-terraform-state"
+  region = "eu-central-1"
+
+  versioning {
+    enabled = true
+  }
+
+  policy = data.aws_iam_policy_document.minube_s3.json
+}
+
+data "aws_iam_policy_document" "minube_s3" {
+  statement {
+    sid       = "DenyIncorrectEncryptionHeader"
+    effect    = "Deny"
+    actions   = ["s3:PutObject"]
+    resources = ["arn:aws:s3:::minube-terraform-state/*"]
+
+    principals {
+      identifiers = ["*"]
+      type        = "*"
+    }
+
+    condition {
+      test     = "StringNotEquals"
+      values   = ["AES256"]
+      variable = "s3:x-amz-server-side-encryption"
+    }
+  }
+
+  statement {
+    sid       = "DenyUnEncryptedObjectUploads"
+    effect    = "Deny"
+    actions   = ["s3:PutObject"]
+    resources = ["arn:aws:s3:::minube-terraform-state/*"]
+
+    principals {
+      identifiers = ["*"]
+      type        = "*"
+    }
+
+    condition {
+      test     = "Null"
+      values   = ["true"]
+      variable = "s3:x-amz-server-side-encryption"
+    }
+  }
 }
