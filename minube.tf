@@ -2,6 +2,10 @@ provider "aws" {
   region = "eu-central-1"
 }
 
+locals {
+  home_ip = "94.76.0.0/16"
+}
+
 terraform {
   backend "s3" {
     bucket  = "minube-terraform-state"
@@ -27,12 +31,31 @@ resource "aws_security_group" "minube" {
   name   = "minube"
   vpc_id = aws_vpc.minube.id
   ingress {
-    cidr_blocks = [
-      "0.0.0.0/0"
-    ]
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
+    cidr_blocks = [local.home_ip]
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+  }
+
+  ingress {
+    cidr_blocks = [local.home_ip]
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+  }
+
+  ingress {
+    cidr_blocks = [local.home_ip]
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+  }
+
+  ingress {
+    cidr_blocks = [local.home_ip]
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
   }
 
   egress {
