@@ -2,8 +2,10 @@ provider "aws" {
   region = "eu-central-1"
 }
 
-locals {
-  home_ip = "94.76.0.0/16"
+variable "home_ip" {}
+
+resource "aws_kms_key" "master" {
+  enable_key_rotation = true
 }
 
 terraform {
@@ -28,31 +30,32 @@ resource "aws_subnet" "minube" {
 }
 
 resource "aws_security_group" "minube" {
-  name   = "minube"
-  vpc_id = aws_vpc.minube.id
+  name        = "minube"
+  description = "SSH, DNS and HTTP"
+  vpc_id      = aws_vpc.minube.id
   ingress {
-    cidr_blocks = [local.home_ip]
+    cidr_blocks = [var.home_ip]
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
   }
 
   ingress {
-    cidr_blocks = [local.home_ip]
+    cidr_blocks = [var.home_ip]
     from_port   = 53
     to_port     = 53
     protocol    = "tcp"
   }
 
   ingress {
-    cidr_blocks = [local.home_ip]
+    cidr_blocks = [var.home_ip]
     from_port   = 53
     to_port     = 53
     protocol    = "udp"
   }
 
   ingress {
-    cidr_blocks = [local.home_ip]
+    cidr_blocks = [var.home_ip]
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -71,23 +74,24 @@ resource "aws_key_pair" "minube" {
   public_key = file("minube.pub")
 }
 
-data "aws_ami" "amazon-linux-2" {
+data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["amazon"]
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
   }
 
   filter {
-    name   = "architecture"
-    values = ["x86_64"]
+    name   = "virtualization-type"
+    values = ["hvm"]
   }
+
+  owners = ["099720109477"]
 }
 
 resource "aws_instance" "minube" {
-  ami             = data.aws_ami.amazon-linux-2.id
+  ami             = "ami-0cc0a36f626a4fdf5"
   instance_type   = "t2.micro"
   key_name        = aws_key_pair.minube.key_name
   security_groups = [aws_security_group.minube.id]
@@ -129,6 +133,20 @@ resource "aws_s3_bucket" "minube" {
   }
 
   policy = data.aws_iam_policy_document.minube_s3.json
+
+  logging {
+    target_bucket = "minube-terraform-state"
+    target_prefix = "log/"
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        kms_master_key_id = aws_kms_key.master.arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
 }
 
 data "aws_iam_policy_document" "minube_s3" {
