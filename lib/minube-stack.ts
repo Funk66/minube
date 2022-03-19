@@ -2,17 +2,17 @@ import { Stack, StackProps } from "aws-cdk-lib";
 import * as path from "path";
 import { Construct } from "constructs";
 import { Asset } from "aws-cdk-lib/aws-s3-assets";
+import { CfnOutput } from "aws-cdk-lib";
 import { Role, ServicePrincipal, ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import {
-  AmazonLinuxCpuType,
-  AmazonLinuxGeneration,
-  AmazonLinuxImage,
-  Instance,
   CfnEIP,
+  CfnEIPAssociation,
+  Instance,
   InstanceClass,
   InstanceSize,
   InstanceType,
-  CfnEIPAssociation,
+  MachineImage,
+  OperatingSystemType,
   Peer,
   Port,
   SecurityGroup,
@@ -42,7 +42,7 @@ export class MinubeStack extends Stack {
     });
     securityGroup.addIngressRule(
       Peer.anyIpv4(),
-      Port.udp(51280),
+      Port.udp(51820),
       "Allow WireGuard Access"
     );
 
@@ -54,10 +54,10 @@ export class MinubeStack extends Stack {
       ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
     );
 
-    const ami = new AmazonLinuxImage({
-      generation: AmazonLinuxGeneration.AMAZON_LINUX_2,
-      cpuType: AmazonLinuxCpuType.X86_64,
-    });
+    const ami = MachineImage.fromSsmParameter(
+      "/aws/service/canonical/ubuntu/server/focal/stable/current/amd64/hvm/ebs-gp2/ami-id",
+      { os: OperatingSystemType.LINUX }
+    );
 
     const ec2Instance = new Instance(this, "Instance", {
       vpc,
@@ -87,5 +87,8 @@ export class MinubeStack extends Stack {
       eip: eip.ref,
       instanceId: ec2Instance.instanceId,
     });
+
+    new CfnOutput(this, "EC2 instance", { value: ec2Instance.instanceId })
+    new CfnOutput(this, "Elastic IP", { value: ec2Instance.instancePublicIp })
   }
 }
