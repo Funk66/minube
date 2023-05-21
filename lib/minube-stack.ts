@@ -55,7 +55,7 @@ export class MinubeStack extends Stack {
     );
 
     const ami = MachineImage.fromSsmParameter(
-      "/aws/service/canonical/ubuntu/server/focal/stable/current/amd64/hvm/ebs-gp2/ami-id",
+      "/aws/service/canonical/ubuntu/server/23.04/stable/current/amd64/hvm/ebs-gp2/ami-id",
       { os: OperatingSystemType.LINUX }
     );
 
