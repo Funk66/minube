@@ -13,11 +13,11 @@ export class DNS extends Construct {
     });
   }
 
-  record(name: string, target: string) {
-    new Route53Record(this, name, {
+  record(name: string, rtype: string, target: string) {
+    new Route53Record(this, `${name}-${rtype}`, {
       name: name,
       zoneId: this.zone.zoneId,
-      type: "A",
+      type: rtype,
       ttl: 300,
       records: [target],
     });

@@ -16,7 +16,8 @@ class Minube extends TerraformStack {
     const vpc = new VPC(this, "vpc");
     const ec2 = new EC2(this, "ec2", { vpc: vpc, backups: buckets.backups });
     const dns = new DNS(this, "dns");
-    dns.record("minube", ec2.ip);
+    dns.record("minube", "A", ec2.ip);
+    dns.record("minube", "AAAA", ec2.ipv6);
   }
 }
 

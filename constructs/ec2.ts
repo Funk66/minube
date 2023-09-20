@@ -17,6 +17,7 @@ interface EC2Config {
 
 export class EC2 extends Construct {
   public readonly ip: string;
+  public readonly ipv6: string;
 
   constructor(scope: Construct, id: string, config: EC2Config) {
     super(scope, id);
@@ -35,6 +36,12 @@ export class EC2 extends Construct {
           cidrBlocks: ["0.0.0.0/0"],
           protocol: "-1",
         },
+        {
+          fromPort: 0,
+          toPort: 0,
+          ipv6CidrBlocks: ["::/0"],
+          protocol: "-1",
+        },
       ],
       ingress: [
         {
@@ -49,6 +56,18 @@ export class EC2 extends Construct {
           cidrBlocks: ["0.0.0.0/0"],
           protocol: "UDP",
         },
+        {
+          fromPort: 22,
+          toPort: 22,
+          ipv6CidrBlocks: ["::/0"],
+          protocol: "TCP",
+        },
+        {
+          fromPort: 51820,
+          toPort: 51820,
+          ipv6CidrBlocks: ["::/0"],
+          protocol: "UDP",
+        },
       ],
     });
 
@@ -57,16 +76,17 @@ export class EC2 extends Construct {
       publicKey: readFileSync("./assets/key.pub", "utf8"),
     });
 
-    const role = new Role(this, "role", {backups: config.backups.arn})
+    const role = new Role(this, "role", { backups: config.backups.arn });
 
     const ec2 = new Instance(this, "ec2", {
       ami: ami,
-      instanceType: "t4g.micro",
+      instanceType: "t4g.nano",
       securityGroups: [sg.id],
       subnetId: config.vpc.subnets[0].id,
       keyName: key.id,
       iamInstanceProfile: role.id,
       userData: readFileSync("assets/userdata.sh", "utf8"),
+      // associatePublicIpAddress: false,
       tags: {
         Name: "minube",
       },
@@ -80,5 +100,6 @@ export class EC2 extends Construct {
     });
 
     this.ip = eip.publicIp;
+    this.ipv6 = ec2.ipv6Addresses[0];
   }
 }
