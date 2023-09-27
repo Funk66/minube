@@ -1,7 +1,11 @@
+import * as path from "path";
 import { Construct } from "constructs";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
+import { S3Object } from "@cdktf/provider-aws/lib/s3-object";
 import { S3BucketVersioningA } from "@cdktf/provider-aws/lib/s3-bucket-versioning";
 import { S3BucketLifecycleConfiguration } from "@cdktf/provider-aws/lib/s3-bucket-lifecycle-configuration";
+
+const assets = path.resolve(__dirname, "../assets");
 
 export class Buckets extends Construct {
   public readonly backups: S3Bucket;
@@ -35,6 +39,20 @@ export class Buckets extends Construct {
           noncurrentVersionExpiration: { noncurrentDays: 30 },
         },
       ],
+    });
+
+    this.backupFile(scope, "/etc/pihole/backup");
+    this.backupFile(scope, "/etc/systemd/system/backup.service");
+    this.backupFile(scope, "/etc/hosts");
+  }
+
+  private backupFile(scope: Construct, filepath: string) {
+    const filename = path.basename(filepath);
+    return new S3Object(scope, filename, {
+      bucket: this.backups.bucket,
+      key: filepath,
+      source: `${assets}/${filename}`,
+      storageClass: "GLACIER_IR",
     });
   }
 }

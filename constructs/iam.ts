@@ -36,10 +36,16 @@ export class Role extends Construct {
         Version: "2012-10-17",
         Statement: [
           {
-            Sid: "GetBackups",
+            Sid: "ReadWriteBackups",
             Effect: "Allow",
             Resource: [`${config.backups}/*`],
-            Action: ["s3:GetObject*"],
+            Action: ["s3:GetObject*", "s3:PutObject*"],
+          },
+          {
+            Sid: "ListBackups",
+            Effect: "Allow",
+            Resource: [`${config.backups}`],
+            Action: ["s3:ListBucket"]
           },
         ],
       }),

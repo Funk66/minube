@@ -1,22 +1,25 @@
 #!/bin/bash
 
-set -x
+set -eux -o pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
-echo "iface eth0 inet6 dhcp" >> /etc/network/interfaces.d/60-default-with-ipv6.cfg
+mkdir -p /etc/network/interfaces.d
+echo "iface eth0 inet6 dhcp" > /etc/network/interfaces.d/60-default-with-ipv6.cfg
 dhclient -6
 
 apt update
 apt upgrade -y
-apt install -y awscli
+apt install -y awscli sqlite3
 hostnamectl set-hostname minube
 
 aws configure set default.s3.use_dualstack_endpoint true
 
+
 INET=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 INET6=$(curl http://169.254.169.254/latest/meta-data/ipv6)
 mkdir /etc/pihole
+aws s3 cp s3://minube-backups/pihole-FTL.db.gz - | gunzip > /etc/pihole/pihole-FTL.db
 cat << EOF > /etc/pihole/setupVars.conf
 WEBPASSWORD=
 PIHOLE_INTERFACE=wg0
@@ -35,6 +38,7 @@ WEBUIBOXEDLAYOUT=traditional
 API_QUERY_LOG_SHOW=all
 API_PRIVACY_MODE=false
 EOF
+echo MAXDBDAYS=1425 > /etc/pihole/pihole-FTL.conf
 git clone --quiet --depth 1 https://github.com/pi-hole/pi-hole.git /tmp/pi-hole
 /tmp/pi-hole/automated\ install/basic-install.sh --unattended
 echo "https://blocklistproject.github.io/Lists/everything.txt" >> /etc/pihole/adlists.list
@@ -64,5 +68,8 @@ EOF
 git clone --quiet --depth 1 https://github.com/pivpn/pivpn /usr/local/src/pivpn
 bash /usr/local/src/pivpn/auto_install/install.sh --unattended /tmp/pivpn.conf
 aws s3 cp --recursive s3://minube-backups/etc/ /etc/
+chmod +x /etc/pihole/backup
+ln -s /etc/pihole/backup /etc/cron.daily/backup
+systemctl enable backup
 
 reboot now
