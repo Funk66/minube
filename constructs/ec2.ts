@@ -13,6 +13,7 @@ import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
 interface EC2Config {
   vpc: VPC;
   backups: S3Bucket;
+  photos: S3Bucket;
 }
 
 export class EC2 extends Construct {
@@ -76,7 +77,10 @@ export class EC2 extends Construct {
       publicKey: readFileSync("./assets/key.pub", "utf8"),
     });
 
-    const role = new Role(this, "role", { backups: config.backups.arn });
+    const role = new Role(this, "role", {
+      backups: config.backups.arn,
+      photos: config.photos.arn,
+    });
 
     const ec2 = new Instance(this, "ec2", {
       ami: ami,

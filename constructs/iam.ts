@@ -5,6 +5,7 @@ import { IamPolicyAttachment } from "@cdktf/provider-aws/lib/iam-policy-attachme
 
 interface RoleConfig {
   backups: string;
+  photos: string;
 }
 
 export class Role extends Construct {
@@ -38,14 +39,14 @@ export class Role extends Construct {
           {
             Sid: "ReadWriteBackups",
             Effect: "Allow",
-            Resource: [`${config.backups}/*`],
+            Resource: [`${config.backups}/*`, `${config.photos}/*`],
             Action: ["s3:GetObject*", "s3:PutObject*"],
           },
           {
             Sid: "ListBackups",
             Effect: "Allow",
-            Resource: [`${config.backups}`],
-            Action: ["s3:ListBucket"]
+            Resource: [`${config.backups}`, `${config.photos}`],
+            Action: ["s3:ListBucket"],
           },
         ],
       }),

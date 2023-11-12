@@ -4,12 +4,14 @@ import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
 import { S3Object } from "@cdktf/provider-aws/lib/s3-object";
 import { S3BucketVersioningA } from "@cdktf/provider-aws/lib/s3-bucket-versioning";
 import { S3BucketLifecycleConfiguration } from "@cdktf/provider-aws/lib/s3-bucket-lifecycle-configuration";
+import { S3BucketServerSideEncryptionConfigurationA } from "@cdktf/provider-aws/lib/s3-bucket-server-side-encryption-configuration";
 
 const assets = path.resolve(__dirname, "../assets");
 
 export class Buckets extends Construct {
   public readonly backups: S3Bucket;
   public readonly storage: S3Bucket;
+  public readonly photos: S3Bucket;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
@@ -20,6 +22,10 @@ export class Buckets extends Construct {
 
     this.storage = new S3Bucket(this, "minube-storage", {
       bucket: "minube-storage",
+    });
+
+    this.photos = new S3Bucket(this, "minube-photos", {
+      bucket: "minube-photos",
     });
 
     new S3BucketVersioningA(this, "backups-versioning", {
@@ -37,6 +43,17 @@ export class Buckets extends Construct {
           status: "Enabled",
           abortIncompleteMultipartUpload: { daysAfterInitiation: 7 },
           noncurrentVersionExpiration: { noncurrentDays: 30 },
+        },
+      ],
+    });
+
+    new S3BucketServerSideEncryptionConfigurationA(this, "backups-encryption", {
+      bucket: this.photos.bucket,
+      rule: [
+        {
+          applyServerSideEncryptionByDefault: {
+            sseAlgorithm: "AES256",
+          },
         },
       ],
     });
