@@ -1,25 +1,23 @@
 import { Construct } from "constructs";
+import { IamInstanceProfile } from "@cdktf/provider-aws/lib/iam-instance-profile";
+import { AutoscalingGroup } from "@cdktf/provider-aws/lib/autoscaling-group";
+import { LaunchTemplate } from "@cdktf/provider-aws/lib/launch-template";
 import { readFileSync } from "fs";
 import { DataAwsSsmParameter } from "@cdktf/provider-aws/lib/data-aws-ssm-parameter";
 import { SecurityGroup } from "@cdktf/provider-aws/lib/security-group";
 import { KeyPair } from "@cdktf/provider-aws/lib/key-pair";
-import { Instance } from "@cdktf/provider-aws/lib/instance";
-import { Eip } from "@cdktf/provider-aws/lib/eip";
-import { EipAssociation } from "@cdktf/provider-aws/lib/eip-association";
 import { VPC } from "./vpc";
 import { Role } from "./iam";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
 
 interface EC2Config {
   vpc: VPC;
+  role: Role;
   backups: S3Bucket;
   photos: S3Bucket;
 }
 
 export class EC2 extends Construct {
-  public readonly ip: string;
-  public readonly ipv6: string;
-
   constructor(scope: Construct, id: string, config: EC2Config) {
     super(scope, id);
 
@@ -77,33 +75,63 @@ export class EC2 extends Construct {
       publicKey: readFileSync("./assets/key.pub", "utf8"),
     });
 
-    const role = new Role(this, "role", {
-      backups: config.backups.arn,
-      photos: config.photos.arn,
+    const profile = new IamInstanceProfile(this, "profile", {
+      name: config.role.id,
+      role: config.role.id,
     });
 
-    const ec2 = new Instance(this, "ec2", {
-      ami: ami,
-      instanceType: "t4g.nano",
-      securityGroups: [sg.id],
-      subnetId: config.vpc.subnets[0].id,
+    const template = new LaunchTemplate(this, "launch-template", {
+      name: "minube",
+      imageId: ami,
+      blockDeviceMappings: [
+        {
+          deviceName: "/dev/sda1",
+          ebs: {
+            volumeSize: 16,
+            volumeType: "gp2",
+            encrypted: "true",
+          },
+        },
+      ],
+      instanceType: "t4g.micro",
       keyName: key.id,
-      iamInstanceProfile: role.id,
-      userData: readFileSync("assets/userdata.sh", "utf8"),
-      // associatePublicIpAddress: false,
+      userData: readFileSync("assets/userdata.sh", "base64"),
+      networkInterfaces: [
+        {
+          associatePublicIpAddress: "true",
+          subnetId: config.vpc.subnets[0].id,
+          securityGroups: [sg.id],
+        },
+      ],
+      iamInstanceProfile: {
+        arn: profile.arn,
+      },
       tags: {
         Name: "minube",
       },
+      metadataOptions: {
+        httpTokens: "required",
+      },
+      tagSpecifications: [
+        {
+          resourceType: "instance",
+          tags: {
+            Name: "minube",
+          },
+        },
+      ],
     });
 
-    const eip = new Eip(this, "eip");
-
-    new EipAssociation(this, "eip-association", {
-      instanceId: ec2.id,
-      allocationId: eip.id,
+    new AutoscalingGroup(this, "asg", {
+      name: "minube",
+      maxSize: 1,
+      minSize: 1,
+      desiredCapacity: 1,
+      launchTemplate: {
+        id: template.id,
+        version: "$Latest",
+      },
+      vpcZoneIdentifier: [config.vpc.subnets[0].id],
     });
-
-    this.ip = eip.publicIp;
-    this.ipv6 = ec2.ipv6Addresses[0];
   }
 }

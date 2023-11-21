@@ -6,6 +6,7 @@ import { IamPolicyAttachment } from "@cdktf/provider-aws/lib/iam-policy-attachme
 interface RoleConfig {
   backups: string;
   photos: string;
+  hostedZone: string;
 }
 
 export class Role extends Construct {
@@ -45,8 +46,23 @@ export class Role extends Construct {
           {
             Sid: "ListBackups",
             Effect: "Allow",
-            Resource: [`${config.backups}`, `${config.photos}`],
+            Resource: [config.backups, config.photos],
             Action: ["s3:ListBucket"],
+          },
+          {
+            Sid: "ListHostedZones",
+            Effect: "Allow",
+            Resource: ["*"],
+            Action: ["route53:ListHostedZones"],
+          },
+          {
+            Sid: "WriteRecordSets",
+            Effect: "Allow",
+            Resource: [config.hostedZone],
+            Action: [
+              "route53:ListResourceRecordSets",
+              "route53:ChangeResourceRecordSets",
+            ],
           },
         ],
       }),
