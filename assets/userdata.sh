@@ -8,16 +8,26 @@ mkdir -p /etc/network/interfaces.d
 echo "iface eth0 inet6 dhcp" > /etc/network/interfaces.d/60-default-with-ipv6.cfg
 dhclient -6
 
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo \
+  "deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  \"$(. /etc/os-release && echo "$VERSION_CODENAME")\" stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
+
 apt update
 apt upgrade -y
-apt install -y awscli sqlite3
+apt install -y awscli sqlite3 docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 hostnamectl set-hostname minube
 
 aws configure set default.s3.use_dualstack_endpoint true
 
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+IPV4=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
+INET=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
+INET6=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/ipv6)
 
-INET=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
-INET6=$(curl http://169.254.169.254/latest/meta-data/ipv6)
 mkdir /etc/pihole
 aws s3 cp s3://minube-backups/pihole-FTL.db.gz - | gunzip > /etc/pihole/pihole-FTL.db
 cat << EOF > /etc/pihole/setupVars.conf
@@ -72,12 +82,15 @@ chmod +x /etc/pihole/backup
 ln -s /etc/pihole/backup /etc/cron.daily/backup
 systemctl enable backup
 
-IPV4=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
 HOSTED_ZONE=$(aws route53 list-hosted-zones | jq -r '.HostedZones[] | select(.Name=="guirao.net.") | .Id')
 RECORDS=$(aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" | jq '.ResourceRecordSets[] | select(.Name=="minube.guirao.net.")')
 ACTION_A=$(if [ -z "$(echo "$RECORDS" | jq 'select(.Type=="A")')" ]; then echo "CREATE"; else echo "UPSERT"; fi)
 ACTION_AAAA=$(if [ -z "$(echo "$RECORDS" | jq 'select(.Type=="AAAA")')" ]; then echo "CREATE"; else echo "UPSERT"; fi)
 aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch "{\"Changes\":[{\"Action\":\"$ACTION_A\",\"ResourceRecordSet\":{\"Name\":\"minube.guirao.net.\",\"Type\":\"A\",\"TTL\":300,\"ResourceRecords\":[{\"Value\":\"$IPV4\"}]}}]}"
 aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch "{\"Changes\":[{\"Action\":\"$ACTION_AAAA\",\"ResourceRecordSet\":{\"Name\":\"minube.guirao.net.\",\"Type\":\"AAAA\",\"TTL\":300,\"ResourceRecords\":[{\"Value\":\"$INET6\"}]}}]}"
+
+docker compose -f /etc/immich/docker-compose.yaml up database -d
+sleep 5
+aws s3 cp s3://minube-photos/immich.sql.gz - | gunzip | docker exec -i immich_postgres psql -U postgres -d immich
 
 reboot now

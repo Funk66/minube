@@ -68,6 +68,9 @@ export class EC2 extends Construct {
           protocol: "UDP",
         },
       ],
+      tags: {
+        Name: "minube",
+      },
     });
 
     const key = new KeyPair(this, "key", {
