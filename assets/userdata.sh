@@ -89,8 +89,4 @@ ACTION_AAAA=$(if [ -z "$(echo "$RECORDS" | jq 'select(.Type=="AAAA")')" ]; then 
 aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch "{\"Changes\":[{\"Action\":\"$ACTION_A\",\"ResourceRecordSet\":{\"Name\":\"minube.guirao.net.\",\"Type\":\"A\",\"TTL\":300,\"ResourceRecords\":[{\"Value\":\"$IPV4\"}]}}]}"
 aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch "{\"Changes\":[{\"Action\":\"$ACTION_AAAA\",\"ResourceRecordSet\":{\"Name\":\"minube.guirao.net.\",\"Type\":\"AAAA\",\"TTL\":300,\"ResourceRecords\":[{\"Value\":\"$INET6\"}]}}]}"
 
-docker compose -f /etc/immich/docker-compose.yaml up database -d
-sleep 5
-aws s3 cp s3://minube-photos/immich.sql.gz - | gunzip | docker exec -i immich_postgres psql -U postgres -d immich
-
 reboot now

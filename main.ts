@@ -16,8 +16,8 @@ class Minube extends TerraformStack {
     const dns = new DNS(this, "dns");
     const buckets = new Buckets(this, "buckets");
     const role = new Role(this, "role", {
-      backups: buckets.backups.arn,
-      photos: buckets.photos.arn,
+      backups: buckets.backups,
+      photos: buckets.photos,
       hostedZone: dns.zone.arn,
     });
     const vpc = new VPC(this, "vpc");
