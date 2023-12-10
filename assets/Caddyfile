@@ -1,0 +1,7 @@
+pi.hole:80 {
+  reverse_proxy :8053
+}
+
+photos.guirao.net {
+  reverse_proxy office:2283
+}

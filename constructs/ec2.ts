@@ -67,6 +67,30 @@ export class EC2 extends Construct {
           ipv6CidrBlocks: ["::/0"],
           protocol: "UDP",
         },
+        {
+          fromPort: 80,
+          toPort: 80,
+          cidrBlocks: ["0.0.0.0/0"],
+          protocol: "TCP",
+        },
+        {
+          fromPort: 80,
+          toPort: 80,
+          ipv6CidrBlocks: ["::/0"],
+          protocol: "TCP",
+        },
+        {
+          fromPort: 443,
+          toPort: 443,
+          cidrBlocks: ["0.0.0.0/0"],
+          protocol: "TCP",
+        },
+        {
+          fromPort: 443,
+          toPort: 443,
+          ipv6CidrBlocks: ["::/0"],
+          protocol: "TCP",
+        },
       ],
       tags: {
         Name: "minube",

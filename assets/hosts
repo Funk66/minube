@@ -8,6 +8,7 @@
 10.10.10.8  air
 10.10.10.9  ipad
 10.10.10.10 iphone
+10.10.10.11 office
 
 # The following lines are desirable for IPv6 capable hosts
 ::1 ip6-localhost ip6-loopback
