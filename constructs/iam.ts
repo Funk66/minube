@@ -122,5 +122,36 @@ export class Role extends Construct {
     new IamAccessKey(this, "office-access-key", {
       user: officeUser.name,
     });
+
+    const casaPolicy = new IamPolicy(this, "casa-policy", {
+      name: "casa",
+      policy: JSON.stringify({
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Sid: "WriteRecordSets",
+            Effect: "Allow",
+            Resource: [config.hostedZone],
+            Action: [
+              "route53:ListResourceRecordSets",
+              "route53:ChangeResourceRecordSets",
+            ],
+          },
+        ],
+      }),
+    });
+
+    const casaUser = new IamUser(this, "casa-user", {
+      name: "casa",
+    });
+
+    new IamUserPolicyAttachment(this, "casa-user-attachment", {
+      user: casaUser.name,
+      policyArn: casaPolicy.arn,
+    });
+
+    new IamAccessKey(this, "casa-access-key", {
+      user: casaUser.name,
+    });
   }
 }
