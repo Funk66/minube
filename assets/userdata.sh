@@ -11,6 +11,7 @@ dhclient -6
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 chmod a+r /etc/apt/keyrings/docker.gpg
 
+# shellcheck disable=SC1091
 echo \
   "deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   \"$(. /etc/os-release && echo "$VERSION_CODENAME")\" stable" | \
@@ -98,7 +99,5 @@ for SUBDOMAIN in minube photos calendar; do
 done
 
 sed -i 's|80|8053|' /etc/lighttpd/lighttpd.conf
-
-
 
 reboot now
