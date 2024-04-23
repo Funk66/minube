@@ -8,24 +8,12 @@ mkdir -p /etc/network/interfaces.d
 echo "iface eth0 inet6 dhcp" > /etc/network/interfaces.d/60-default-with-ipv6.cfg
 dhclient -6
 
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-chmod a+r /etc/apt/keyrings/docker.gpg
-
-# shellcheck disable=SC1091
-echo \
-  "deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  \"$(. /etc/os-release && echo "$VERSION_CODENAME")\" stable" | \
-  tee /etc/apt/sources.list.d/docker.list > /dev/null
-
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
 
 apt update
 apt upgrade -y
-apt install -y awscli sqlite3 \
-  docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin \
-  debian-keyring debian-archive-keyring apt-transport-https caddy \
-  radicale
+apt install -y awscli sqlite3 debian-keyring debian-archive-keyring apt-transport-https caddy
 hostnamectl set-hostname minube
 
 aws configure set default.s3.use_dualstack_endpoint true
