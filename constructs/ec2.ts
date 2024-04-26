@@ -51,7 +51,7 @@ export class EC2 extends Construct {
         },
         {
           fromPort: 51820,
-          toPort: 51820,
+          toPort: 51821,
           cidrBlocks: ["0.0.0.0/0"],
           protocol: "UDP",
         },
@@ -63,7 +63,7 @@ export class EC2 extends Construct {
         },
         {
           fromPort: 51820,
-          toPort: 51820,
+          toPort: 51821,
           ipv6CidrBlocks: ["::/0"],
           protocol: "UDP",
         },
