@@ -4,17 +4,18 @@ set -eux -o pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
-mkdir -p /etc/network/interfaces.d
-echo "iface eth0 inet6 dhcp" > /etc/network/interfaces.d/60-default-with-ipv6.cfg
-dhclient -6
-
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
 
 apt update
 apt upgrade -y
-apt install -y awscli sqlite3 debian-keyring debian-archive-keyring apt-transport-https caddy
+apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https caddy
 hostnamectl set-hostname minube
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+rm -r aws awscliv2.zip
 
 aws configure set default.s3.use_dualstack_endpoint true
 

@@ -42,7 +42,7 @@ export class Buckets extends Construct {
           id: "Trashcan",
           status: "Enabled",
           abortIncompleteMultipartUpload: { daysAfterInitiation: 7 },
-          noncurrentVersionExpiration: { noncurrentDays: 30 },
+          noncurrentVersionExpiration: { noncurrentDays: 90 },
         },
       ],
     });

@@ -3,12 +3,12 @@ import { IamInstanceProfile } from "@cdktf/provider-aws/lib/iam-instance-profile
 import { AutoscalingGroup } from "@cdktf/provider-aws/lib/autoscaling-group";
 import { LaunchTemplate } from "@cdktf/provider-aws/lib/launch-template";
 import { readFileSync } from "fs";
-import { DataAwsSsmParameter } from "@cdktf/provider-aws/lib/data-aws-ssm-parameter";
 import { SecurityGroup } from "@cdktf/provider-aws/lib/security-group";
 import { KeyPair } from "@cdktf/provider-aws/lib/key-pair";
 import { VPC } from "./vpc";
 import { Role } from "./iam";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
+import { DataAwsAmi } from "@cdktf/provider-aws/lib/data-aws-ami";
 
 interface EC2Config {
   vpc: VPC;
@@ -21,9 +21,11 @@ export class EC2 extends Construct {
   constructor(scope: Construct, id: string, config: EC2Config) {
     super(scope, id);
 
-    const ami = new DataAwsSsmParameter(this, "ubuntu", {
-      name: "/aws/service/canonical/ubuntu/server/22.04/stable/current/arm64/hvm/ebs-gp2/ami-id",
-    }).value;
+    const ami = new DataAwsAmi(this, "ubuntu", {
+      mostRecent: true,
+      owners: ["amazon"],
+      nameRegex: "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server",
+    }).id;
 
     const sg = new SecurityGroup(this, "sg", {
       name: "minube",
