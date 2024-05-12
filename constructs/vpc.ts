@@ -6,6 +6,7 @@ import { InternetGateway } from "@cdktf/provider-aws/lib/internet-gateway";
 import { RouteTable } from "@cdktf/provider-aws/lib/route-table";
 import { Route } from "@cdktf/provider-aws/lib/route";
 import { RouteTableAssociation } from "@cdktf/provider-aws/lib/route-table-association";
+import { VpcEndpoint } from "@cdktf/provider-aws/lib/vpc-endpoint";
 
 export class VPC extends Construct {
   public readonly id: string;
@@ -66,6 +67,15 @@ export class VPC extends Construct {
     new RouteTableAssociation(this, "routeTableAssociation", {
       routeTableId: routeTable.id,
       subnetId: this.subnets[0].id,
+    });
+
+    new VpcEndpoint(this, "s3Endpoint", {
+      vpcId: this.id,
+      serviceName: "com.amazonaws.eu-central-1.s3",
+      routeTableIds: [routeTable.id],
+      tags: {
+        Name: "minube-s3-endpoint",
+      },
     });
   }
 }
