@@ -77,6 +77,7 @@ aws s3 cp --recursive s3://minube-backups/etc/ /etc/
 chmod +x /etc/pihole/backup
 ln -s /etc/pihole/backup /etc/cron.daily/backup
 systemctl enable backup
+systemctl enable wg-quick@casa
 
 HOSTED_ZONE=$(aws route53 list-hosted-zones | jq -r '.HostedZones[] | select(.Name=="guirao.net.") | .Id')
 for SUBDOMAIN in minube photos calendar; do
