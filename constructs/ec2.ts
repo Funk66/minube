@@ -134,7 +134,7 @@ export class EC2 extends Construct {
           },
         },
       ],
-      instanceType: "t4g.nano",
+      instanceType: "t4g.micro",
       keyName: key.id,
       userData: readFileSync("assets/userdata.sh", "base64"),
       networkInterfaces: [
