@@ -7,14 +7,18 @@ export DEBIAN_FRONTEND=noninteractive
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
 
+mkdir -p /etc/apt/keyrings/
+wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | tee /etc/apt/keyrings/grafana.gpg > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | tee /etc/apt/sources.list.d/grafana.list
+
 apt update
 apt upgrade -y
-apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https caddy
+apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https caddy alloy
 hostnamectl set-hostname minube
 
 curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
-sudo ./aws/install
+./aws/install
 rm -r aws awscliv2.zip
 
 aws configure set default.s3.use_dualstack_endpoint true
@@ -78,6 +82,7 @@ chmod +x /etc/pihole/backup
 ln -s /etc/pihole/backup /etc/cron.daily/backup
 systemctl enable backup
 systemctl enable wg-quick@casa
+systemctl enable alloy
 
 HOSTED_ZONE=$(aws route53 list-hosted-zones | jq -r '.HostedZones[] | select(.Name=="guirao.net.") | .Id')
 for SUBDOMAIN in minube photos calendar; do
