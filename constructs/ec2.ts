@@ -1,4 +1,5 @@
 import { Construct } from "constructs";
+import { DataAwsEc2ManagedPrefixList } from "@cdktf/provider-aws/lib/data-aws-ec2-managed-prefix-list";
 import { IamInstanceProfile } from "@cdktf/provider-aws/lib/iam-instance-profile";
 import { AutoscalingGroup } from "@cdktf/provider-aws/lib/autoscaling-group";
 import { LaunchTemplate } from "@cdktf/provider-aws/lib/launch-template";
@@ -14,12 +15,15 @@ interface EC2Config {
   vpc: VPC;
   role: Role;
   backups: S3Bucket;
-  photos: S3Bucket;
 }
 
 export class EC2 extends Construct {
   constructor(scope: Construct, id: string, config: EC2Config) {
     super(scope, id);
+
+    const prefixList = new DataAwsEc2ManagedPrefixList(this, "prefix-list", {
+      name: "com.amazonaws.global.cloudfront.origin-facing",
+    });
 
     const ami = new DataAwsAmi(this, "ubuntu", {
       mostRecent: true,
@@ -70,27 +74,9 @@ export class EC2 extends Construct {
           protocol: "UDP",
         },
         {
-          fromPort: 80,
-          toPort: 80,
-          cidrBlocks: ["0.0.0.0/0"],
-          protocol: "TCP",
-        },
-        {
-          fromPort: 80,
-          toPort: 80,
-          ipv6CidrBlocks: ["::/0"],
-          protocol: "TCP",
-        },
-        {
           fromPort: 443,
           toPort: 443,
-          cidrBlocks: ["0.0.0.0/0"],
-          protocol: "TCP",
-        },
-        {
-          fromPort: 443,
-          toPort: 443,
-          ipv6CidrBlocks: ["::/0"],
+          prefixListIds: [prefixList.id],
           protocol: "TCP",
         },
         {

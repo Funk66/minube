@@ -6,14 +6,22 @@ import { S3 } from "./constructs/s3";
 import { Role } from "./constructs/iam";
 import { EC2 } from "./constructs/ec2";
 import { DNS } from "./constructs/dns";
+import { CDN } from "./constructs/cdn";
 
 class Minube extends TerraformStack {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    new AwsProvider(this, "aws", { region: "eu-central-1" });
+    new AwsProvider(this, "aws-eu", {
+      region: "eu-central-1",
+    });
+    const provider = new AwsProvider(this, "aws-us", {
+      region: "us-east-1",
+      alias: "us-east-1",
+    });
 
     const dns = new DNS(this, "dns");
+    new CDN(this, "cdn", dns.zone.id, provider);
     const s3 = new S3(this, "buckets");
     const role = new Role(this, "role", {
       backups: s3.buckets.backups,
@@ -25,7 +33,6 @@ class Minube extends TerraformStack {
       vpc: vpc,
       role: role,
       backups: s3.buckets.backups,
-      photos: s3.buckets.photos,
     });
   }
 }
