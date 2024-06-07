@@ -3,6 +3,11 @@ import { AwsProvider } from "@cdktf/provider-aws/lib/provider";
 import { AcmCertificate } from "@cdktf/provider-aws/lib/acm-certificate";
 import { CloudfrontDistribution } from "@cdktf/provider-aws/lib/cloudfront-distribution";
 import { Route53Record } from "@cdktf/provider-aws/lib/route53-record";
+import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
+import { S3BucketLifecycleConfiguration } from "@cdktf/provider-aws/lib/s3-bucket-lifecycle-configuration";
+import { S3BucketAcl } from "@cdktf/provider-aws/lib/s3-bucket-acl";
+import { DataAwsCanonicalUserId } from "@cdktf/provider-aws/lib/data-aws-canonical-user-id";
+import { DataAwsCloudfrontLogDeliveryCanonicalUserId } from "@cdktf/provider-aws/lib/data-aws-cloudfront-log-delivery-canonical-user-id";
 
 export class CDN extends Construct {
   constructor(
@@ -26,6 +31,51 @@ export class CDN extends Construct {
       type: cert.domainValidationOptions.get(0).resourceRecordType,
       ttl: 60,
       records: [cert.domainValidationOptions.get(0).resourceRecordValue],
+    });
+
+    const bucket = new S3Bucket(this, "logs-bucket", {
+      bucket: "minube-logs",
+    });
+
+    const canonical_user = new DataAwsCanonicalUserId(this, "canonical-user");
+    const cloudfront_user = new DataAwsCloudfrontLogDeliveryCanonicalUserId(
+      this,
+      "cloudfront-user"
+    );
+
+    new S3BucketLifecycleConfiguration(this, "logs-bucket-lifecycle", {
+      bucket: bucket.bucket,
+      rule: [
+        {
+          id: "Logs",
+          status: "Enabled",
+          expiration: { days: 90 },
+          abortIncompleteMultipartUpload: { daysAfterInitiation: 7 },
+        },
+      ],
+    });
+
+    new S3BucketAcl(this, "logs-bucket-acl", {
+      bucket: bucket.bucket,
+      accessControlPolicy: {
+        owner: canonical_user,
+        grant: [
+          {
+            grantee: {
+              id: canonical_user.id,
+              type: "CanonicalUser",
+            },
+            permission: "FULL_CONTROL",
+          },
+          {
+            grantee: {
+              id: cloudfront_user.id,
+              type: "CanonicalUser",
+            },
+            permission: "FULL_CONTROL",
+          },
+        ],
+      },
     });
 
     const distribution = new CloudfrontDistribution(this, "cloudfront", {
@@ -79,6 +129,11 @@ export class CDN extends Construct {
           headers: ["*"],
           queryStringCacheKeys: ["*"],
         },
+      },
+      loggingConfig: {
+        bucket: bucket.bucketDomainName,
+        includeCookies: false,
+        prefix: "cloudfront",
       },
     });
 
