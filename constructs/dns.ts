@@ -11,6 +11,14 @@ export class DNS extends Construct {
     this.zone = new Route53Zone(this, "zone", {
       name: "guirao.net",
     });
+
+    new Route53Record(this, "caa-record", {
+      name: this.zone.name,
+      zoneId: this.zone.zoneId,
+      type: "CAA",
+      ttl: 300,
+      records: ['0 issue "amazon.com"', '0 issuewild "amazon.com"'],
+    });
   }
 
   record(name: string, rtype: string, target: string) {

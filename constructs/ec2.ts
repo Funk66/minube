@@ -56,16 +56,16 @@ export class EC2 extends Construct {
           protocol: "TCP",
         },
         {
-          fromPort: 51820,
-          toPort: 51821,
-          cidrBlocks: ["0.0.0.0/0"],
-          protocol: "UDP",
-        },
-        {
           fromPort: 22,
           toPort: 22,
           ipv6CidrBlocks: ["::/0"],
           protocol: "TCP",
+        },
+        {
+          fromPort: 51820,
+          toPort: 51821,
+          cidrBlocks: ["0.0.0.0/0"],
+          protocol: "UDP",
         },
         {
           fromPort: 51820,
@@ -120,7 +120,7 @@ export class EC2 extends Construct {
           },
         },
       ],
-      instanceType: "t4g.micro",
+      instanceType: "t4g.nano",
       keyName: key.id,
       userData: readFileSync("assets/userdata.sh", "base64"),
       networkInterfaces: [

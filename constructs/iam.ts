@@ -41,13 +41,13 @@ export class Role extends Construct {
           {
             Sid: "ReadWriteBackups",
             Effect: "Allow",
-            Resource: [`${config.backups.arn}/*`, `${config.photos.arn}/*`],
+            Resource: [`${config.backups.arn}/*`],
             Action: ["s3:GetObject*", "s3:PutObject*"],
           },
           {
             Sid: "ListBackups",
             Effect: "Allow",
-            Resource: [config.backups.arn, config.photos.arn],
+            Resource: [config.backups.arn],
             Action: ["s3:ListBucket"],
           },
           {
