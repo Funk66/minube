@@ -13,7 +13,7 @@ export class S3 extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    for (const name of ["backups", "storage", "photos"]) {
+    for (const name of ["backups", "storage", "photos", "mail"]) {
       this.buckets[name] = new S3Bucket(this, `minube-${name}`, {
         bucket: `minube-${name}`,
       });
@@ -38,18 +38,21 @@ export class S3 extends Construct {
       });
     }
 
-    this.backupFile(scope, "/etc/pihole/backup");
-    this.backupFile(scope, "/etc/systemd/system/backup.service");
-    this.backupFile(scope, "/etc/hosts");
-    this.backupFile(scope, "/etc/caddy/Caddyfile");
+    this.backupFile(scope, "/gateway/etc/pihole/backup");
+    this.backupFile(scope, "/gateway/etc/systemd/system/backup.service");
+    this.backupFile(scope, "/gateway/etc/hosts");
+    this.backupFile(scope, "/gateway/etc/caddy/Caddyfile");
+    this.backupFile(scope, "/mail/etc/backup");
+    this.backupFile(scope, "/mail/etc/systemd/system/backup.service");
   }
 
   private backupFile(scope: Construct, filepath: string) {
     const filename = path.basename(filepath);
-    return new S3Object(scope, filename, {
+    const service = path.dirname(filepath).split("/")[1];
+    return new S3Object(scope, `${service}-${filename}`, {
       bucket: this.buckets["backups"].bucket,
       key: filepath,
-      source: `${assets}/${filename}`,
+      source: `${assets}/${service}/${filename}`,
       storageClass: "GLACIER_IR",
     });
   }

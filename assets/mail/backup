@@ -1,0 +1,3 @@
+#!/bin/sh
+
+aws s3 sync --no-progress --delete /opt/stalwart-mail s3://minube-backups/mail/opt/stalwart-mail

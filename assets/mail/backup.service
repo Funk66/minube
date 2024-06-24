@@ -1,0 +1,15 @@
+# vim: set ft=systemd:
+
+[Unit]
+Description=Stalwart backup
+DefaultDependencies=no
+Before=shutdown.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=ubuntu
+ExecStart=/etc/backup-mail
+
+[Install]
+WantedBy=halt.target reboot.target shutdown.target
