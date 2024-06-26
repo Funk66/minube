@@ -36,6 +36,7 @@ interface EC2Config {
   permissions: PermissionsConfig[];
   ports: PortsConfig[];
   key: string;
+  ipv4?: "true" | "false";
 }
 
 export class EC2 extends Construct {
@@ -112,16 +113,16 @@ export class EC2 extends Construct {
           protocol: "TCP",
         },
         {
-          fromPort: 8,
-          toPort: 0,
+          fromPort: -1,
+          toPort: -1,
           cidrBlocks: ["0.0.0.0/0"],
           protocol: "ICMP",
         },
         {
-          fromPort: 8,
-          toPort: 0,
+          fromPort: -1,
+          toPort: -1,
           ipv6CidrBlocks: ["::/0"],
-          protocol: "ICMP",
+          protocol: "ICMPV6",
         },
         ...config.ports,
       ],
@@ -153,7 +154,7 @@ export class EC2 extends Construct {
       userData: readFileSync(`assets/${id}/userdata.sh`, "base64"),
       networkInterfaces: [
         {
-          associatePublicIpAddress: "true",
+          associatePublicIpAddress: config.ipv4 || "false",
           subnetId: config.subnet,
           securityGroups: [sg.id],
         },

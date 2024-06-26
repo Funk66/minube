@@ -29,7 +29,7 @@ INET=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/late
 INET6=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/ipv6)
 
 mkdir /etc/pihole
-aws s3 cp s3://minube-backups/pihole-FTL.db.gz - | gunzip > /etc/pihole/pihole-FTL.db
+aws s3 cp s3://minube-backups/gateway/pihole-FTL.db.gz - | gunzip > /etc/pihole/pihole-FTL.db
 cat << EOF > /etc/pihole/setupVars.conf
 WEBPASSWORD=
 PIHOLE_INTERFACE=wg0
@@ -77,7 +77,7 @@ EOF
 
 git clone --quiet --depth 1 https://github.com/pivpn/pivpn /usr/local/src/pivpn
 bash /usr/local/src/pivpn/auto_install/install.sh --unattended /tmp/pivpn.conf
-aws s3 cp --recursive s3://minube-backups/minube/etc/ /etc/
+aws s3 cp --recursive s3://minube-backups/gateway/etc/ /etc/
 chmod +x /etc/pihole/backup
 ln -s /etc/pihole/backup /etc/cron.daily/backup
 systemctl enable backup
@@ -85,11 +85,8 @@ systemctl enable wg-quick@casa
 systemctl enable alloy
 
 HOSTED_ZONE=$(aws route53 list-hosted-zones | jq -r '.HostedZones[] | select(.Name=="guirao.net.") | .Id')
-RECORDS=$(aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" | jq ".ResourceRecordSets[] | select(.Name==\"minube.guirao.net.\")")
-ACTION_A=$(if [ -z "$(echo "$RECORDS" | jq 'select(.Type=="A")')" ]; then echo "CREATE"; else echo "UPSERT"; fi)
-ACTION_AAAA=$(if [ -z "$(echo "$RECORDS" | jq 'select(.Type=="AAAA")')" ]; then echo "CREATE"; else echo "UPSERT"; fi)
-aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"'"$ACTION_A"'","ResourceRecordSet":{"Name":"minube.guirao.net.","Type":"A","TTL":300,"ResourceRecords":[{"Value":"'"$IPV4"'"}]}}]}'
-aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"'"$ACTION_AAAA"'","ResourceRecordSet":{"Name":"minube.guirao.net.","Type":"AAAA","TTL":300,"ResourceRecords":[{"Value":"'"$INET6"'"}]}}]}'
+aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"minube.guirao.net.","Type":"A","TTL":300,"ResourceRecords":[{"Value":"'"$IPV4"'"}]}}]}'
+aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"minube.guirao.net.","Type":"AAAA","TTL":300,"ResourceRecords":[{"Value":"'"$INET6"'"}]}}]}'
 
 sed -i 's|80|8053|' /etc/lighttpd/lighttpd.conf
 

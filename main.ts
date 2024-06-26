@@ -28,7 +28,7 @@ class Minube extends TerraformStack {
     const s3 = new S3(this, "buckets");
     new IAM(this, "iam", {
       photos: s3.buckets.photos,
-      hostedZone: dns.zone.id,
+      hostedZone: dns.zone.arn,
     });
     const vpc = new VPC(this, "vpc");
 
@@ -45,6 +45,7 @@ class Minube extends TerraformStack {
       vpc: vpc.id,
       subnet: vpc.subnets[0].id,
       key: key.keyName,
+      ipv4: "true",
       permissions: [
         {
           Sid: "ReadWriteBackups",
@@ -100,6 +101,7 @@ class Minube extends TerraformStack {
       vpc: vpc.id,
       subnet: vpc.subnets[0].id,
       key: key.keyName,
+      ipv4: "true",
       permissions: [
         {
           Sid: "ReadWriteBackups",
@@ -137,56 +139,12 @@ class Minube extends TerraformStack {
           },
         },
       ],
-      ports: [
-        {
-          fromPort: 25,
-          toPort: 25,
-          cidrBlocks: ["0.0.0.0/0"],
-          protocol: "TCP",
-        },
-        {
-          fromPort: 25,
-          toPort: 25,
-          ipv6CidrBlocks: ["::/0"],
-          protocol: "TCP",
-        },
-        {
-          fromPort: 443,
-          toPort: 443,
-          cidrBlocks: ["0.0.0.0/0"],
-          protocol: "TCP",
-        },
-        {
-          fromPort: 443,
-          toPort: 443,
-          ipv6CidrBlocks: ["::/0"],
-          protocol: "TCP",
-        },
-        {
-          fromPort: 465,
-          toPort: 465,
-          cidrBlocks: ["0.0.0.0/0"],
-          protocol: "TCP",
-        },
-        {
-          fromPort: 465,
-          toPort: 465,
-          ipv6CidrBlocks: ["::/0"],
-          protocol: "TCP",
-        },
-        {
-          fromPort: 993,
-          toPort: 993,
-          cidrBlocks: ["0.0.0.0/0"],
-          protocol: "TCP",
-        },
-        {
-          fromPort: 993,
-          toPort: 993,
-          ipv6CidrBlocks: ["::/0"],
-          protocol: "TCP",
-        },
-      ],
+      ports: [25, 443, 465, 993].map((port) => ({
+        fromPort: port,
+        toPort: port,
+        ipv6CidrBlocks: ["::/0"],
+        protocol: "TCP",
+      })),
     });
   }
 }
