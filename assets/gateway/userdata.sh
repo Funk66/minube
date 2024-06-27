@@ -16,6 +16,13 @@ apt upgrade -y
 apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https caddy alloy
 hostnamectl set-hostname minube
 
+fallocate -l 1G /swap
+chmod 600 /swap
+mkswap /swap
+swapon /swap
+echo '/swap none swap sw 0 0' >> /etc/fstab
+echo 'vm.swappiness=10' >> /etc/sysctl.conf
+
 curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 ./aws/install
