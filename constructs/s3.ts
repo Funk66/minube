@@ -38,21 +38,18 @@ export class S3 extends Construct {
       });
     }
 
-    this.backupFile(scope, "/gateway/etc/pihole/backup");
-    this.backupFile(scope, "/gateway/etc/systemd/system/backup.service");
-    this.backupFile(scope, "/gateway/etc/hosts");
-    this.backupFile(scope, "/gateway/etc/caddy/Caddyfile");
-    this.backupFile(scope, "/mail/etc/backup");
-    this.backupFile(scope, "/mail/etc/systemd/system/backup.service");
+    this.backupFile(scope, "/etc/pihole/backup");
+    this.backupFile(scope, "/etc/systemd/system/backup.service");
+    this.backupFile(scope, "/etc/hosts");
+    this.backupFile(scope, "/etc/caddy/Caddyfile");
   }
 
   private backupFile(scope: Construct, filepath: string) {
     const filename = path.basename(filepath);
-    const service = path.dirname(filepath).split("/")[1];
-    return new S3Object(scope, `${service}-${filename}`, {
+    return new S3Object(scope, filename, {
       bucket: this.buckets["backups"].bucket,
       key: filepath,
-      source: `${assets}/${service}/${filename}`,
+      source: `${assets}/${filename}`,
       storageClass: "GLACIER_IR",
     });
   }

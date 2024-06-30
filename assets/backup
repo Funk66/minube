@@ -1,0 +1,6 @@
+#!/bin/sh
+
+sqlite3 /etc/pihole/pihole-FTL.db ".backup /tmp/pihole-FTL.db"
+gzip /tmp/pihole-FTL.db
+aws s3 cp /tmp/pihole-FTL.db.gz s3://minube-backups/pihole-FTL.db.gz
+rm /tmp/pihole-FTL.db.gz

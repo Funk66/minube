@@ -7,6 +7,7 @@ import { IamAccessKey } from "@cdktf/provider-aws/lib/iam-access-key";
 
 interface RoleConfig {
   photos: S3Bucket;
+  domain: string;
   hostedZone: string;
 }
 
@@ -20,7 +21,7 @@ export class IAM extends Construct {
         Version: "2012-10-17",
         Statement: [
           {
-            Sid: "ReadWriteBackups",
+            Sid: "ReadWritePhotosBackups",
             Effect: "Allow",
             Resource: [`${config.photos.arn}/*`],
             Action: [
@@ -37,6 +38,26 @@ export class IAM extends Construct {
             Effect: "Allow",
             Resource: [config.photos.arn],
             Action: ["s3:ListBucket"],
+          },
+          {
+            Sid: "ListRecordSets",
+            Effect: "Allow",
+            Resource: [config.hostedZone],
+            Action: ["route53:ListResourceRecordSets"],
+          },
+          {
+            Sid: "WriteRecordSets",
+            Effect: "Allow",
+            Resource: [config.hostedZone],
+            Action: ["route53:ChangeResourceRecordSets"],
+            Condition: {
+              "ForAnyValue:StringEquals": {
+                "route53:ChangeResourceRecordSetsNormalizedRecordNames": [
+                  `office.${config.domain}`,
+                  `mail.${config.domain}`,
+                ],
+              },
+            },
           },
         ],
       }),
@@ -61,13 +82,21 @@ export class IAM extends Construct {
         Version: "2012-10-17",
         Statement: [
           {
+            Sid: "ListRecordSets",
+            Effect: "Allow",
+            Resource: [config.hostedZone],
+            Action: ["route53:ListResourceRecordSets"],
+          },
+          {
             Sid: "WriteRecordSets",
             Effect: "Allow",
             Resource: [config.hostedZone],
-            Action: [
-              "route53:ListResourceRecordSets",
-              "route53:ChangeResourceRecordSets",
-            ],
+            Action: ["route53:ChangeResourceRecordSets"],
+            Condition: {
+              StringEquals: {
+                "route53:ChangeResourceRecordSetsNormalizedRecordNames": `casa.${config.domain}`,
+              },
+            },
           },
         ],
       }),

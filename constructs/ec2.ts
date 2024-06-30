@@ -1,42 +1,21 @@
 import { readFileSync } from "fs";
 import { Construct } from "constructs";
-import { IamRole } from "@cdktf/provider-aws/lib/iam-role";
+import { AutoscalingGroup } from "@cdktf/provider-aws/lib/autoscaling-group";
+import { IamInstanceProfile } from "@cdktf/provider-aws/lib/iam-instance-profile";
 import { IamPolicy } from "@cdktf/provider-aws/lib/iam-policy";
 import { IamPolicyAttachment } from "@cdktf/provider-aws/lib/iam-policy-attachment";
-import { IamInstanceProfile } from "@cdktf/provider-aws/lib/iam-instance-profile";
-import { AutoscalingGroup } from "@cdktf/provider-aws/lib/autoscaling-group";
+import { IamRole } from "@cdktf/provider-aws/lib/iam-role";
+import { KeyPair } from "@cdktf/provider-aws/lib/key-pair";
 import { LaunchTemplate } from "@cdktf/provider-aws/lib/launch-template";
 import { SecurityGroup } from "@cdktf/provider-aws/lib/security-group";
 import { DataAwsAmi } from "@cdktf/provider-aws/lib/data-aws-ami";
-
-interface PermissionsConfig {
-  Sid: string;
-  Effect: string;
-  Resource: string[];
-  Action: string[];
-  Condition?: {
-    [test: string]: {
-      [variable: string]: string;
-    };
-  };
-}
-
-interface PortsConfig {
-  fromPort: number;
-  toPort: number;
-  cidrBlocks?: string[];
-  prefixListIds?: string[];
-  ipv6CidrBlocks?: string[];
-  protocol: string;
-}
+import { DataAwsEc2ManagedPrefixList } from "@cdktf/provider-aws/lib/data-aws-ec2-managed-prefix-list";
 
 interface EC2Config {
   vpc: string;
   subnet: string;
-  permissions: PermissionsConfig[];
-  ports: PortsConfig[];
-  key: string;
-  ipv4?: "true" | "false";
+  backups: string;
+  hostedZone: string;
 }
 
 export class EC2 extends Construct {
@@ -61,7 +40,35 @@ export class EC2 extends Construct {
       name: id,
       policy: JSON.stringify({
         Version: "2012-10-17",
-        Statement: config.permissions,
+        Statement: [
+          {
+            Sid: "ReadWriteBackups",
+            Effect: "Allow",
+            Resource: [`${config.backups}/gateway/*`],
+            Action: ["s3:GetObject*", "s3:PutObject*"],
+          },
+          {
+            Sid: "ListBackups",
+            Effect: "Allow",
+            Resource: [config.backups],
+            Action: ["s3:ListBucket"],
+          },
+          {
+            Sid: "ListHostedZones",
+            Effect: "Allow",
+            Resource: ["*"],
+            Action: ["route53:ListHostedZones"],
+          },
+          {
+            Sid: "WriteRecordSets",
+            Effect: "Allow",
+            Resource: [config.hostedZone],
+            Action: [
+              "route53:ListResourceRecordSets",
+              "route53:ChangeResourceRecordSets",
+            ],
+          },
+        ],
       }),
     });
 
@@ -81,6 +88,10 @@ export class EC2 extends Construct {
       owners: ["amazon"],
       nameRegex: "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server",
     }).id;
+
+    const prefixList = new DataAwsEc2ManagedPrefixList(this, "prefix-list", {
+      name: "com.amazonaws.global.cloudfront.origin-facing",
+    });
 
     const sg = new SecurityGroup(this, "sg", {
       name: id,
@@ -124,7 +135,24 @@ export class EC2 extends Construct {
           ipv6CidrBlocks: ["::/0"],
           protocol: "ICMPV6",
         },
-        ...config.ports,
+        {
+          fromPort: 51820,
+          toPort: 51821,
+          cidrBlocks: ["0.0.0.0/0"],
+          protocol: "UDP",
+        },
+        {
+          fromPort: 51820,
+          toPort: 51821,
+          ipv6CidrBlocks: ["::/0"],
+          protocol: "UDP",
+        },
+        {
+          fromPort: 443,
+          toPort: 443,
+          prefixListIds: [prefixList.id],
+          protocol: "TCP",
+        },
       ],
       tags: {
         Name: id,
@@ -134,6 +162,11 @@ export class EC2 extends Construct {
     const profile = new IamInstanceProfile(this, "profile", {
       name: ec2Role.id,
       role: ec2Role.id,
+    });
+
+    const key = new KeyPair(this, "key", {
+      keyName: "ggaguilar",
+      publicKey: readFileSync("./assets/key.pub", "utf8"),
     });
 
     const template = new LaunchTemplate(this, "launch-template", {
@@ -150,11 +183,11 @@ export class EC2 extends Construct {
         },
       ],
       instanceType: "t4g.nano",
-      keyName: config.key,
-      userData: readFileSync(`assets/${id}/userdata.sh`, "base64"),
+      keyName: key.keyName,
+      userData: readFileSync(`assets/userdata.sh`, "base64"),
       networkInterfaces: [
         {
-          associatePublicIpAddress: config.ipv4 || "false",
+          associatePublicIpAddress: "true",
           subnetId: config.subnet,
           securityGroups: [sg.id],
         },
