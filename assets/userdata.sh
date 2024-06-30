@@ -85,13 +85,14 @@ EOF
 git clone --quiet --depth 1 https://github.com/pivpn/pivpn /usr/local/src/pivpn
 bash /usr/local/src/pivpn/auto_install/install.sh --unattended /tmp/pivpn.conf
 aws s3 cp --recursive s3://minube-backups/etc/ /etc/
+aws s3 cp s3://minube-backups/usr/bin/caddy /usr/bin/caddy
 chmod +x /etc/pihole/backup
 ln -s /etc/pihole/backup /etc/cron.daily/backup
 systemctl enable backup
 systemctl enable wg-quick@casa
 systemctl enable alloy
 
-HOSTED_ZONE=$(aws route53 list-hosted-zones | jq -r '.HostedZones[] | select(.Name=="guirao.net.") | .Id')
+HOSTED_ZONE=$(aws route53 list-hosted-zones-by-name --dns-name guirao.net | jq -r '.HostedZones[0].Id')
 aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"minube.guirao.net.","Type":"A","TTL":300,"ResourceRecords":[{"Value":"'"$IPV4"'"}]}}]}'
 aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"minube.guirao.net.","Type":"AAAA","TTL":300,"ResourceRecords":[{"Value":"'"$INET6"'"}]}}]}'
 

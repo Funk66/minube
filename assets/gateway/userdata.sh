@@ -13,7 +13,7 @@ echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stab
 
 apt update
 apt upgrade -y
-apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https caddy alloy
+apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https caddy alloy python3-certbot-dns-route53
 hostnamectl set-hostname minube
 
 fallocate -l 1G /swap

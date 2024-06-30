@@ -9,7 +9,6 @@ import { KeyPair } from "@cdktf/provider-aws/lib/key-pair";
 import { LaunchTemplate } from "@cdktf/provider-aws/lib/launch-template";
 import { SecurityGroup } from "@cdktf/provider-aws/lib/security-group";
 import { DataAwsAmi } from "@cdktf/provider-aws/lib/data-aws-ami";
-import { DataAwsEc2ManagedPrefixList } from "@cdktf/provider-aws/lib/data-aws-ec2-managed-prefix-list";
 
 interface EC2Config {
   vpc: string;
@@ -44,7 +43,7 @@ export class EC2 extends Construct {
           {
             Sid: "ReadWriteBackups",
             Effect: "Allow",
-            Resource: [`${config.backups}/gateway/*`],
+            Resource: [`${config.backups}/*`],
             Action: ["s3:GetObject*", "s3:PutObject*"],
           },
           {
@@ -57,7 +56,10 @@ export class EC2 extends Construct {
             Sid: "ListHostedZones",
             Effect: "Allow",
             Resource: ["*"],
-            Action: ["route53:ListHostedZones"],
+            Action: [
+              "route53:ListHostedZones",
+              "route53:ListHostedZonesByName",
+            ],
           },
           {
             Sid: "WriteRecordSets",
@@ -67,6 +69,12 @@ export class EC2 extends Construct {
               "route53:ListResourceRecordSets",
               "route53:ChangeResourceRecordSets",
             ],
+          },
+          {
+            Sid: "GetChange",
+            Effect: "Allow",
+            Resource: ["arn:aws:route53:::change/*"],
+            Action: ["route53:GetChange"],
           },
         ],
       }),
@@ -88,10 +96,6 @@ export class EC2 extends Construct {
       owners: ["amazon"],
       nameRegex: "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server",
     }).id;
-
-    const prefixList = new DataAwsEc2ManagedPrefixList(this, "prefix-list", {
-      name: "com.amazonaws.global.cloudfront.origin-facing",
-    });
 
     const sg = new SecurityGroup(this, "sg", {
       name: id,
@@ -150,7 +154,13 @@ export class EC2 extends Construct {
         {
           fromPort: 443,
           toPort: 443,
-          prefixListIds: [prefixList.id],
+          ipv6CidrBlocks: ["::/0"],
+          protocol: "TCP",
+        },
+        {
+          fromPort: 443,
+          toPort: 443,
+          cidrBlocks: ["0.0.0.0/0"],
           protocol: "TCP",
         },
       ],

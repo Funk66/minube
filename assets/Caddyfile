@@ -1,23 +1,31 @@
 {
-  servers {
-    metrics
-  }
+	servers {
+		metrics
+	}
 }
 
 pi.hole:80 {
-  reverse_proxy :8053
+	reverse_proxy :8053
 }
 
-http://photos.guirao.net {
-  reverse_proxy office:2283
-  log {
-      output file /var/log/caddy/photos.log
-    }
+photos.guirao.net {
+	reverse_proxy office:2283
+	tls {
+		dns route53 {
+			region us-east-1
+	}
+	log {
+		output file /var/log/caddy/photos.log
+	}
 }
 
-http://calendar.guirao.net {
-  reverse_proxy office:5232
-  log {
-      output file /var/log/caddy/calendar.log
-    }
+calendar.guirao.net {
+	reverse_proxy office:5232
+	tls {
+		dns route53 {
+			region us-east-1
+	}
+	log {
+		output file /var/log/caddy/calendar.log
+	}
 }
