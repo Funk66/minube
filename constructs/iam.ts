@@ -40,24 +40,28 @@ export class IAM extends Construct {
             Action: ["s3:ListBucket"],
           },
           {
+            Sid: "ListHostedZones",
+            Effect: "Allow",
+            Resource: ["*"],
+            Action: ["route53:ListHostedZones"],
+          },
+          {
             Sid: "ListRecordSets",
             Effect: "Allow",
             Resource: [config.hostedZone],
             Action: ["route53:ListResourceRecordSets"],
           },
           {
+            Sid: "GetChange",
+            Effect: "Allow",
+            Resource: ["arn:aws:route53:::change/*"],
+            Action: ["route53:GetChange"],
+          },
+          {
             Sid: "WriteRecordSets",
             Effect: "Allow",
             Resource: [config.hostedZone],
             Action: ["route53:ChangeResourceRecordSets"],
-            Condition: {
-              "ForAnyValue:StringEquals": {
-                "route53:ChangeResourceRecordSetsNormalizedRecordNames": [
-                  `office.${config.domain}`,
-                  `mail.${config.domain}`,
-                ],
-              },
-            },
           },
         ],
       }),

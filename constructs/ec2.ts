@@ -14,6 +14,7 @@ interface EC2Config {
   vpc: string;
   subnet: string;
   backups: string;
+  mail: string;
   hostedZone: string;
 }
 
@@ -50,6 +51,18 @@ export class EC2 extends Construct {
             Sid: "ListBackups",
             Effect: "Allow",
             Resource: [config.backups],
+            Action: ["s3:ListBucket"],
+          },
+          {
+            Sid: "ReadWriteMail",
+            Effect: "Allow",
+            Resource: [`${config.mail}/*`],
+            Action: ["s3:PutObject*"],
+          },
+          {
+            Sid: "ListMail",
+            Effect: "Allow",
+            Resource: [config.mail],
             Action: ["s3:ListBucket"],
           },
           {
@@ -154,13 +167,13 @@ export class EC2 extends Construct {
         {
           fromPort: 443,
           toPort: 443,
-          ipv6CidrBlocks: ["::/0"],
+          cidrBlocks: ["0.0.0.0/0"],
           protocol: "TCP",
         },
         {
           fromPort: 443,
           toPort: 443,
-          cidrBlocks: ["0.0.0.0/0"],
+          ipv6CidrBlocks: ["::/0"],
           protocol: "TCP",
         },
       ],

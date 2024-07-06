@@ -29,3 +29,27 @@ calendar.guirao.net {
 		output file /var/log/caddy/calendar.log
 	}
 }
+
+mail.guirao.net:25 {
+	reverse_proxy office:25
+}
+
+mail.guirao.net:465 {
+	reverse_proxy office:465
+}
+
+mail.guirao.net:993 {
+	reverse_proxy office:993
+}
+
+mail.guirao.net {
+	reverse_proxy office:443
+	tls {
+		dns route53 {
+			region us-east-1
+		}
+	}
+	log {
+		output file /var/log/caddy/mail.log
+	}
+}

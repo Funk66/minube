@@ -34,6 +34,7 @@ class Minube extends TerraformStack {
       vpc: vpc.id,
       subnet: vpc.subnets[0].id,
       backups: s3.buckets.backups.arn,
+      mail: s3.buckets.mail.arn,
       hostedZone: dns.zone.arn,
     });
   }
