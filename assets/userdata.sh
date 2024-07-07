@@ -4,16 +4,13 @@ set -eux -o pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
-
 mkdir -p /etc/apt/keyrings/
 wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | tee /etc/apt/keyrings/grafana.gpg > /dev/null
 echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | tee /etc/apt/sources.list.d/grafana.list
 
 apt update
 apt upgrade -y
-apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https caddy alloy
+apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https nginx libnginx-mod-stream python3-certbot-dns-route53 alloy
 hostnamectl set-hostname minube
 
 fallocate -l 1G /swap
@@ -85,7 +82,6 @@ EOF
 git clone --quiet --depth 1 https://github.com/pivpn/pivpn /usr/local/src/pivpn
 bash /usr/local/src/pivpn/auto_install/install.sh --unattended /tmp/pivpn.conf
 aws s3 cp --recursive s3://minube-backups/etc/ /etc/
-aws s3 cp s3://minube-backups/usr/bin/caddy /usr/bin/caddy
 chmod +x /etc/pihole/backup
 ln -s /etc/pihole/backup /etc/cron.daily/backup
 systemctl enable backup
@@ -99,5 +95,9 @@ for SUBDOMAIN in minube mail; do
 done
 
 sed -i 's|80|8053|' /etc/lighttpd/lighttpd.conf
+
+echo "certbot certonly --dns-route53 -m postmaster@guirao.net -d minube.guirao.net,mail.guirao.net,photos.guirao.net,calendar.guirao.net --agree-tos --non-interactive" > /etc/cron.weekly/certbot
+chmod +x /etc/cron.weekly/certbot
+/etc/cron.weekly/certbot
 
 reboot now

@@ -7,6 +7,7 @@ import { IamAccessKey } from "@cdktf/provider-aws/lib/iam-access-key";
 
 interface RoleConfig {
   photos: S3Bucket;
+  mail: S3Bucket;
   domain: string;
   hostedZone: string;
 }
@@ -38,6 +39,12 @@ export class IAM extends Construct {
             Effect: "Allow",
             Resource: [config.photos.arn],
             Action: ["s3:ListBucket"],
+          },
+          {
+            Sid: "ReadWriteMail",
+            Effect: "Allow",
+            Resource: [config.mail.arn, `${config.mail.arn}/*`],
+            Action: ["s3:*"],
           },
           {
             Sid: "ListHostedZones",
