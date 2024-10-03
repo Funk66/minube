@@ -13,7 +13,7 @@ export class S3 extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    for (const name of ["backups", "storage", "photos", "mail"]) {
+    for (const name of ["backups", "storage", "photos", "mail", "docs"]) {
       this.buckets[name] = new S3Bucket(this, `minube-${name}`, {
         bucket: `minube-${name}`,
       });
