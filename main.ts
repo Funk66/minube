@@ -25,6 +25,7 @@ class Minube extends TerraformStack {
     const s3 = new S3(this, "buckets");
     new IAM(this, "iam", {
       photos: s3.buckets.photos,
+      docs: s3.buckets.docs,
       mail: s3.buckets.mail,
       domain: dns.zone.name,
       hostedZone: dns.zone.arn,

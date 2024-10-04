@@ -7,6 +7,7 @@ import { IamAccessKey } from "@cdktf/provider-aws/lib/iam-access-key";
 
 interface RoleConfig {
   photos: S3Bucket;
+  docs: S3Bucket;
   mail: S3Bucket;
   domain: string;
   hostedZone: string;
@@ -22,9 +23,9 @@ export class IAM extends Construct {
         Version: "2012-10-17",
         Statement: [
           {
-            Sid: "ReadWritePhotosBackups",
+            Sid: "ReadWriteAssetBackups",
             Effect: "Allow",
-            Resource: [`${config.photos.arn}/*`],
+            Resource: [`${config.photos.arn}/*`, `${config.docs.arn}/*`],
             Action: [
               "s3:DeleteObject",
               "s3:GetObject",
@@ -35,9 +36,9 @@ export class IAM extends Construct {
             ],
           },
           {
-            Sid: "ListBackups",
+            Sid: "ListAssets",
             Effect: "Allow",
-            Resource: [config.photos.arn],
+            Resource: [config.photos.arn, config.docs.arn],
             Action: ["s3:ListBucket"],
           },
           {
