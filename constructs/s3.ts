@@ -1,4 +1,5 @@
 import * as path from "path";
+import { Fn } from "cdktf";
 import { Construct } from "constructs";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
 import { S3Object } from "@cdktf/provider-aws/lib/s3-object";
@@ -46,11 +47,13 @@ export class S3 extends Construct {
 
   private backupFile(scope: Construct, filepath: string) {
     const filename = path.basename(filepath);
+    const source = `${assets}/${filename}`;
     return new S3Object(scope, filename, {
       bucket: this.buckets["backups"].bucket,
       key: filepath,
-      source: `${assets}/${filename}`,
+      source: source,
       storageClass: "GLACIER_IR",
+      etag: Fn.filemd5(source),
     });
   }
 }
