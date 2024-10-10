@@ -156,19 +156,5 @@ export class CDN extends Construct {
       type: "AAAA",
       alias: alias,
     });
-
-    new Route53Record(this, "calendar-A", {
-      name: "calendar.guirao.net",
-      zoneId: zoneId,
-      type: "A",
-      alias: alias,
-    });
-
-    new Route53Record(this, "calendar-AAAA", {
-      name: "calendar.guirao.net",
-      zoneId: zoneId,
-      type: "AAAA",
-      alias: alias,
-    });
   }
 }
