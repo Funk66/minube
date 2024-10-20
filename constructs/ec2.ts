@@ -94,7 +94,7 @@ export class EC2 extends Construct {
     const ami = new DataAwsAmi(this, "ubuntu", {
       mostRecent: true,
       owners: ["amazon"],
-      nameRegex: "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server",
+      nameRegex: "ubuntu/images/hvm-ssd-gp3/ubuntu-oracular-24.10-arm64-server",
     }).id;
 
     const sg = new SecurityGroup(this, "sg", {
