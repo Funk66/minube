@@ -10,7 +10,7 @@ echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stab
 
 apt update
 apt upgrade -y
-apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https nginx libnginx-mod-stream python3-certbot-dns-route53 alloy
+apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https nginx libnginx-mod-stream python3-certbot-dns-route53 alloy fail2ban
 hostnamectl set-hostname minube
 
 fallocate -l 1G /swap
@@ -84,9 +84,9 @@ bash /usr/local/src/pivpn/auto_install/install.sh --unattended /tmp/pivpn.conf
 aws s3 cp --recursive s3://minube-backups/etc/ /etc/
 chmod +x /etc/pihole/backup
 ln -s /etc/pihole/backup /etc/cron.daily/backup
-systemctl enable backup
-systemctl enable wg-quick@casa
-systemctl enable alloy
+for SERVICE in backup wg-quick@casa alloy fail2ban fail2ban_exporter; do
+	systemctl enable "$SERVICE"
+done
 
 HOSTED_ZONE=$(aws route53 list-hosted-zones-by-name --dns-name guirao.net | jq -r '.HostedZones[0].Id')
 for SUBDOMAIN in minube mail calendar; do
@@ -99,5 +99,7 @@ sed -i 's|80|8053|' /etc/lighttpd/lighttpd.conf
 echo "certbot certonly --dns-route53 -m postmaster@guirao.net -d minube.guirao.net,mail.guirao.net,photos.guirao.net,calendar.guirao.net --agree-tos --non-interactive" > /etc/cron.weekly/certbot
 chmod +x /etc/cron.weekly/certbot
 /etc/cron.weekly/certbot
+
+curl -L https://gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/-/releases/v0.10.1/downloads/fail2ban_exporter_0.10.1_linux_arm64.tar.gz | tar --wildcards -xz -C /usr/bin 'fail2ban_exporter'
 
 reboot now

@@ -43,6 +43,9 @@ export class S3 extends Construct {
     this.backupFile(scope, "/etc/systemd/system/backup.service");
     this.backupFile(scope, "/etc/hosts");
     this.backupFile(scope, "/etc/nginx/nginx.conf");
+    this.backupFile(scope, "/etc/fail2ban/jail.local");
+    this.backupFile(scope, "/etc/fail2ban/filter.d/nginx-default.conf");
+    this.backupFile(scope, "/etc/systemd/system/fail2ban_exporter.service");
   }
 
   private backupFile(scope: Construct, filepath: string) {
