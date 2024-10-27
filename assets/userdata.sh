@@ -100,6 +100,9 @@ echo "certbot certonly --dns-route53 -m postmaster@guirao.net -d *.guirao.net --
 chmod +x /etc/cron.weekly/certbot
 /etc/cron.weekly/certbot
 
+echo "find /var/log/nginx -type f -mtime +7 -exec rm {} \;" >/etc/cron.daily/cleanlogs
+chmod +x /etc/cron.daily/cleanlogs
+
 curl -L https://gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/-/releases/v0.10.1/downloads/fail2ban_exporter_0.10.1_linux_arm64.tar.gz | tar --wildcards -xz -C /usr/bin 'fail2ban_exporter'
 
 reboot now
