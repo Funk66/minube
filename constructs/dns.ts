@@ -41,22 +41,22 @@ export class DNS extends Construct {
     });
 
     new Route53Record(this, "dkim-ecc-record", {
-      name: "202406e._domainkey." + this.zone.name,
+      name: "202410e._domainkey." + this.zone.name,
       zoneId: this.zone.zoneId,
       type: "TXT",
       ttl: 300,
       records: [
-        "v=DKIM1; k=ed25519; h=sha256; p=Zl8i7Oh2t73cP2aMJzh2mIPgF/Eqv3fgWChf6L4k4g4=",
+        "v=DKIM1; k=ed25519; h=sha256; p=vEk1THcUadgUtHrdPacNtfxGkGyLA9fQaJr2lfRbJNE=",
       ],
     });
 
     new Route53Record(this, "dkim-rsa-record", {
-      name: "202406r._domainkey." + this.zone.name,
+      name: "202410r._domainkey." + this.zone.name,
       zoneId: this.zone.zoneId,
       type: "TXT",
       ttl: 300,
       records: [
-        'v=DKIM1; k=rsa; h=sha256; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAui5IGvQl8J9SuUUGh/c/KHD7PH6fUm5lsNqilzBW0qHUzojCwSgA2tTYwbhYwI/eJ7hk8Z+2p1ShYVdTjaTHPSxODupDeuvB/""ecWs4XP8SUJYhTNc81h9IvFyliiFwyYqIF8SrvbTxwApOnRSjxbtxJNldpknnehosrrn5i314dpw5LcwY/13r48b6niHGyn2SkvCN5FMdosayOPvZ/wBSvuxvT1mk1FuT/fQQ3TIrvmHxy0N8ZQV4V+8HvjHcY17H7i02l9iqCZPIiVGeyLVGG10n/ePLbBzwp9Vudz40rs+pkvepblHcAtXH4UiIg5gYsXDMDVC6ZCZORnZTY2WwIDAQAB',
+        'v=DKIM1; k=rsa; h=sha256; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0My9m8t0q/k4Tz8I36Jmcn8H1vULiH+ORxPUrRKfELj2AecV9oWyEpZBGK72JJwhFzsZ/emXcmIzQaNAgdJ4w0dNWneExw/12GodfVq1pQb1Aazw6ZDvrSlRPfC50u7vqbBkVxWUuns873BYDWFQQR9n9mv3rWHMq/0mzoK9Ge+n3zWPCE/N+nA""DzHT9KHRwL/pMVsdTtqtJp55+up/elQ3I/QdJJWZdmNab50TVgK3DTg2qaYm12aiLZUv/gxjpQqrcQCBSHPf1at5xlUcTfpxigYoyKdf9+kzUTNeuO9+4pW8TN/uHiSfvm5q5JT4v8ebHGWAlnnp1QN+MB06C6QIDAQAB',
       ],
     });
 
@@ -65,15 +65,15 @@ export class DNS extends Construct {
       zoneId: this.zone.zoneId,
       type: "TXT",
       ttl: 300,
-      records: ["v=spf1 mx ra=postmaster -all"],
+      records: ["v=spf1 a:office.guirao.net ra=postmaster ~all"],
     });
 
-    new Route53Record(this, "spf-a-record", {
-      name: "mail." + this.zone.name,
+    new Route53Record(this, "srv-jmap-record", {
+      name: "_jmap._tcp." + this.zone.name,
       zoneId: this.zone.zoneId,
-      type: "TXT",
+      type: "SRV",
       ttl: 300,
-      records: ["v=spf1 a ra=postmaster -all"],
+      records: ["0 1 443 mail." + this.zone.name],
     });
 
     new Route53Record(this, "srv-imaps-record", {
@@ -138,6 +138,22 @@ export class DNS extends Construct {
       type: "CNAME",
       ttl: 300,
       records: ["mail." + this.zone.name],
+    });
+
+    new Route53Record(this, "cname-mta-sts-record", {
+      name: "mta-sts." + this.zone.name,
+      zoneId: this.zone.zoneId,
+      type: "CNAME",
+      ttl: 300,
+      records: ["mail." + this.zone.name],
+    });
+
+    new Route53Record(this, "txt-mta-sts-record", {
+      name: "_mta-sts." + this.zone.name,
+      zoneId: this.zone.zoneId,
+      type: "TXT",
+      ttl: 300,
+      records: ["v=STSv1; id=8777202045385525987"],
     });
 
     new Route53Record(this, "txt-dmarc-record", {
