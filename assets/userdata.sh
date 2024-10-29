@@ -89,14 +89,14 @@ for SERVICE in backup wg-quick@casa alloy fail2ban fail2ban_exporter; do
 done
 
 HOSTED_ZONE=$(aws route53 list-hosted-zones-by-name --dns-name guirao.net | jq -r '.HostedZones[0].Id')
-for SUBDOMAIN in minube mail calendar; do
-  aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$SUBDOMAIN"'.guirao.net.","Type":"A","TTL":300,"ResourceRecords":[{"Value":"'"$IPV4"'"}]}}]}'
-  aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$SUBDOMAIN"'.guirao.net.","Type":"AAAA","TTL":300,"ResourceRecords":[{"Value":"'"$INET6"'"}]}}]}'
+for SUBDOMAIN in minube mail calendar docs; do
+	aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$SUBDOMAIN"'.guirao.net.","Type":"A","TTL":300,"ResourceRecords":[{"Value":"'"$IPV4"'"}]}}]}'
+	aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$SUBDOMAIN"'.guirao.net.","Type":"AAAA","TTL":300,"ResourceRecords":[{"Value":"'"$INET6"'"}]}}]}'
 done
 
 sed -i 's|80|8053|' /etc/lighttpd/lighttpd.conf
 
-echo "certbot certonly --dns-route53 -m postmaster@guirao.net -d minube.guirao.net,mail.guirao.net,photos.guirao.net,calendar.guirao.net --agree-tos --non-interactive" > /etc/cron.weekly/certbot
+echo "certbot certonly --dns-route53 -m postmaster@guirao.net -d *.guirao.net --agree-tos --non-interactive" > /etc/cron.weekly/certbot
 chmod +x /etc/cron.weekly/certbot
 /etc/cron.weekly/certbot
 
