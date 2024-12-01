@@ -78,7 +78,7 @@ export class CDN extends Construct {
       },
     });
 
-    const distribution = new CloudfrontDistribution(this, "cloudfront", {
+     new CloudfrontDistribution(this, "cloudfront", {
       enabled: true,
       isIpv6Enabled: true,
       aliases: ["photos.guirao.net", "calendar.guirao.net"],
@@ -137,24 +137,24 @@ export class CDN extends Construct {
       },
     });
 
-    const alias = {
-      evaluateTargetHealth: true,
-      name: distribution.domainName,
-      zoneId: distribution.hostedZoneId,
-    };
-
-    new Route53Record(this, "photos-A", {
-      name: "photos.guirao.net",
-      zoneId: zoneId,
-      type: "A",
-      alias: alias,
-    });
-
-    new Route53Record(this, "photos-AAAA", {
-      name: "photos.guirao.net",
-      zoneId: zoneId,
-      type: "AAAA",
-      alias: alias,
-    });
+    // const alias = {
+    //   evaluateTargetHealth: true,
+    //   name: distribution.domainName,
+    //   zoneId: distribution.hostedZoneId,
+    // };
+    //
+    // new Route53Record(this, "photos-A", {
+    //   name: "photos.guirao.net",
+    //   zoneId: zoneId,
+    //   type: "A",
+    //   alias: alias,
+    // });
+    //
+    // new Route53Record(this, "photos-AAAA", {
+    //   name: "photos.guirao.net",
+    //   zoneId: zoneId,
+    //   type: "AAAA",
+    //   alias: alias,
+    // });
   }
 }

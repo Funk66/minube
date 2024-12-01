@@ -56,7 +56,6 @@ export class VPC extends Construct {
         vpcId: this.id,
         cidrBlock: Fn.cidrsubnet(vpc.cidrBlock, 2, 0),
         ipv6CidrBlock: Fn.cidrsubnet(vpc.ipv6CidrBlock, 8, 0),
-        mapPublicIpOnLaunch: true,
         assignIpv6AddressOnCreation: true,
         tags: {
           Name: "minube",

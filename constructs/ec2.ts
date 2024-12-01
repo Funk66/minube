@@ -1,19 +1,25 @@
 import { readFileSync } from "fs";
 import { Construct } from "constructs";
-import { AutoscalingGroup } from "@cdktf/provider-aws/lib/autoscaling-group";
 import { IamInstanceProfile } from "@cdktf/provider-aws/lib/iam-instance-profile";
 import { IamPolicy } from "@cdktf/provider-aws/lib/iam-policy";
 import { IamPolicyAttachment } from "@cdktf/provider-aws/lib/iam-policy-attachment";
 import { IamRole } from "@cdktf/provider-aws/lib/iam-role";
+import { Instance } from "@cdktf/provider-aws/lib/instance";
 import { KeyPair } from "@cdktf/provider-aws/lib/key-pair";
-import { LaunchTemplate } from "@cdktf/provider-aws/lib/launch-template";
 import { SecurityGroup } from "@cdktf/provider-aws/lib/security-group";
 import { DataAwsAmi } from "@cdktf/provider-aws/lib/data-aws-ami";
+import { EbsVolume } from "@cdktf/provider-aws/lib/ebs-volume";
+import { VolumeAttachment } from "@cdktf/provider-aws/lib/volume-attachment";
+import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
 
 interface EC2Config {
   vpc: string;
   subnet: string;
-  backups: string;
+  buckets: {
+    backups: S3Bucket,
+    photos: S3Bucket;
+    docs: S3Bucket;
+      };
   hostedZone: string;
 }
 
@@ -43,13 +49,32 @@ export class EC2 extends Construct {
           {
             Sid: "ReadWriteBackups",
             Effect: "Allow",
-            Resource: [`${config.backups}/*`],
+            Resource: [`${config.buckets.backups.arn}/*`],
             Action: ["s3:GetObject*", "s3:PutObject*"],
           },
           {
             Sid: "ListBackups",
             Effect: "Allow",
-            Resource: [config.backups],
+            Resource: [config.buckets.backups.arn],
+            Action: ["s3:ListBucket"],
+          },
+          {
+            Sid: "ReadWriteAssetBackups",
+            Effect: "Allow",
+            Resource: [`${config.buckets.photos.arn}/*`, `${config.buckets.docs.arn}/*`],
+            Action: [
+              "s3:DeleteObject",
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:PutObject",
+              "s3:PutObjectTagging",
+              "s3:AbortMultipartUpload",
+            ],
+          },
+          {
+            Sid: "ListAssets",
+            Effect: "Allow",
+            Resource: [config.buckets.photos.arn, config.buckets.docs.arn],
             Action: ["s3:ListBucket"],
           },
           {
@@ -239,58 +264,41 @@ export class EC2 extends Construct {
       publicKey: readFileSync("./assets/key.pub", "utf8"),
     });
 
-    const template = new LaunchTemplate(this, "launch-template", {
-      name: id,
-      imageId: ami,
-      blockDeviceMappings: [
-        {
-          deviceName: "/dev/sda1",
-          ebs: {
-            volumeSize: 16,
-            volumeType: "gp2",
-            encrypted: "true",
-          },
-        },
-      ],
-      instanceType: "t4g.nano",
+    const instance = new Instance(this, "instance", {
+      ami: ami,
+      instanceType: "t4g.small",
       keyName: key.keyName,
       userData: readFileSync(`assets/userdata.sh`, "base64"),
-      networkInterfaces: [
-        {
-          associatePublicIpAddress: "true",
-          subnetId: config.subnet,
-          securityGroups: [sg.id],
-        },
-      ],
-      iamInstanceProfile: {
-        arn: profile.arn,
-      },
+      subnetId: config.subnet,
+      vpcSecurityGroupIds: [sg.id],
+      iamInstanceProfile: profile.id,
+      availabilityZone: "eu-central-1b",
       tags: {
         Name: id,
+      },
+      rootBlockDevice: {
+        volumeSize: 16,
+        volumeType: "gp2",
+        encrypted: true,
       },
       metadataOptions: {
         httpTokens: "required",
       },
-      tagSpecifications: [
-        {
-          resourceType: "instance",
-          tags: {
-            Name: id,
-          },
-        },
-      ],
     });
 
-    new AutoscalingGroup(this, "asg", {
-      name: id,
-      maxSize: 1,
-      minSize: 1,
-      desiredCapacity: 1,
-      launchTemplate: {
-        id: template.id,
-        version: "$Latest",
+    const volume = new EbsVolume(this, "volume", {
+      availabilityZone: "eu-central-1b",
+      size: 60,
+      encrypted: true,
+      tags: {
+        Name: "data",
       },
-      vpcZoneIdentifier: [config.subnet],
+    });
+
+    new VolumeAttachment(this, "attachment", {
+      deviceName: "/dev/sdf",
+      volumeId: volume.id,
+      instanceId: instance.id,
     });
   }
 }

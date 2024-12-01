@@ -10,10 +10,16 @@ echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stab
 
 apt update
 apt upgrade -y
-apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https nginx libnginx-mod-stream python3-certbot-dns-route53 alloy fail2ban
+
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu oracular stable" > /etc/apt/sources.list.d/docker.list
+
+apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https nginx libnginx-mod-stream python3-certbot-dns-route53 alloy fail2ban docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 hostnamectl set-hostname minube
 
-fallocate -l 1G /swap
+fallocate -l 2G /swap
 chmod 600 /swap
 mkswap /swap
 swapon /swap
@@ -27,8 +33,9 @@ rm -r aws awscliv2.zip
 
 aws configure set default.s3.use_dualstack_endpoint true
 
+usermod -a -G docker ubuntu
+
 TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
-IPV4=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
 INET=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
 INET6=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/ipv6)
 
@@ -84,13 +91,12 @@ bash /usr/local/src/pivpn/auto_install/install.sh --unattended /tmp/pivpn.conf
 aws s3 cp --recursive s3://minube-backups/etc/ /etc/
 chmod +x /etc/pihole/backup
 ln -s /etc/pihole/backup /etc/cron.daily/backup
-for SERVICE in backup wg-quick@casa alloy fail2ban fail2ban_exporter; do
+for SERVICE in docker backup wg-quick@casa alloy fail2ban fail2ban_exporter; do
 	systemctl enable "$SERVICE"
 done
 
 HOSTED_ZONE=$(aws route53 list-hosted-zones-by-name --dns-name guirao.net | jq -r '.HostedZones[0].Id')
-for SUBDOMAIN in minube mail calendar docs; do
-	aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$SUBDOMAIN"'.guirao.net.","Type":"A","TTL":300,"ResourceRecords":[{"Value":"'"$IPV4"'"}]}}]}'
+for SUBDOMAIN in minube mail calendar docs photos; do
 	aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$SUBDOMAIN"'.guirao.net.","Type":"AAAA","TTL":300,"ResourceRecords":[{"Value":"'"$INET6"'"}]}}]}'
 done
 
@@ -104,5 +110,12 @@ echo "find /var/log/nginx -type f -mtime +7 -exec rm {} \;" >/etc/cron.daily/cle
 chmod +x /etc/cron.daily/cleanlogs
 
 curl -L https://gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/-/releases/v0.10.1/downloads/fail2ban_exporter_0.10.1_linux_arm64.tar.gz | tar --wildcards -xz -C /usr/bin 'fail2ban_exporter'
+
+echo 'UUID="bb61a946-053e-432e-96bc-02d07c30a820" /data xfs defaults,nofail' >> /etc/fstab
+mount -a
+echo 'set -o vi' >> /etc/profile
+
+aws s3 cp --recursive s3://minube-backups/home/ /home/
+docker compose -f /data/immich/docker-compose.yaml up -d
 
 reboot now

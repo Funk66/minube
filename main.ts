@@ -35,7 +35,11 @@ class Minube extends TerraformStack {
     new EC2(this, "minube", {
       vpc: vpc.id,
       subnet: vpc.subnets[0].id,
-      backups: s3.buckets.backups.arn,
+      buckets: {
+        backups: s3.buckets.backups,
+        photos: s3.buckets.photos,
+        docs: s3.buckets.docs,
+      },
       hostedZone: dns.zone.arn,
     });
   }

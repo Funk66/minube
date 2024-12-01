@@ -29,6 +29,7 @@ export class DNS extends Construct {
         '0 issue "amazon.com"',
         '0 issuewild "amazon.com"',
         '0 issue "letsencrypt.org"',
+        '0 issuewild "letsencrypt.org"',
       ],
     });
 
