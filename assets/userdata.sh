@@ -40,7 +40,6 @@ INET=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/late
 INET6=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/ipv6)
 
 mkdir /etc/pihole
-aws s3 cp s3://minube-backups/pihole-FTL.db.gz - | gunzip > /etc/pihole/pihole-FTL.db
 cat << EOF > /etc/pihole/setupVars.conf
 WEBPASSWORD=
 PIHOLE_INTERFACE=wg0
@@ -59,7 +58,10 @@ WEBUIBOXEDLAYOUT=traditional
 API_QUERY_LOG_SHOW=all
 API_PRIVACY_MODE=false
 EOF
-echo MAXDBDAYS=1425 > /etc/pihole/pihole-FTL.conf
+cat << EOF > /etc/pihole/pihole-FTL.conf
+MAXDBDAYS=1425
+DBFILE=/data/pihole/pihole-FTL.db
+EOF
 git clone --quiet --depth 1 https://github.com/pi-hole/pi-hole.git /tmp/pi-hole
 /tmp/pi-hole/automated\ install/basic-install.sh --unattended
 echo "https://blocklistproject.github.io/Lists/everything.txt" >> /etc/pihole/adlists.list
@@ -100,7 +102,7 @@ for SUBDOMAIN in minube mail calendar docs photos; do
 	aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE" --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$SUBDOMAIN"'.guirao.net.","Type":"AAAA","TTL":300,"ResourceRecords":[{"Value":"'"$INET6"'"}]}}]}'
 done
 
-sed -i 's|80|8053|' /etc/lighttpd/lighttpd.conf
+sed -i 's|= 80|= 8053|' /etc/lighttpd/lighttpd.conf
 
 echo "certbot certonly --dns-route53 -m postmaster@guirao.net -d *.guirao.net --agree-tos --non-interactive" > /etc/cron.weekly/certbot
 chmod +x /etc/cron.weekly/certbot
