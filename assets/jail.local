@@ -6,6 +6,7 @@ bantime  = 3600
 filter   = %(__name__)s
 maxretry = 1
 port     = http,https
+ignoreip = 10.10.10.0/26 fd11:5ee:bad:c0de::/64
 
 [sshd]
 enabled = true
