@@ -5,7 +5,7 @@ set -eux -o pipefail
 export DEBIAN_FRONTEND=noninteractive
 
 mkdir -p /etc/apt/keyrings/
-wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | tee /etc/apt/keyrings/grafana.gpg > /dev/null
+wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | tee /etc/apt/keyrings/grafana.gpg >/dev/null
 echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | tee /etc/apt/sources.list.d/grafana.list
 
 apt update
@@ -14,7 +14,7 @@ apt upgrade -y
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 chmod a+r /etc/apt/keyrings/docker.asc
-echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu oracular stable" > /etc/apt/sources.list.d/docker.list
+echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu oracular stable" >/etc/apt/sources.list.d/docker.list
 
 apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https nginx libnginx-mod-stream python3-certbot-dns-route53 alloy fail2ban docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 hostnamectl set-hostname minube
@@ -23,8 +23,8 @@ fallocate -l 2G /swap
 chmod 600 /swap
 mkswap /swap
 swapon /swap
-echo '/swap none swap sw 0 0' >> /etc/fstab
-echo 'vm.swappiness=10' >> /etc/sysctl.conf
+echo '/swap none swap sw 0 0' >>/etc/fstab
+echo 'vm.swappiness=10' >>/etc/sysctl.conf
 
 curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
@@ -40,7 +40,7 @@ INET=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/late
 INET6=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/ipv6)
 
 mkdir /etc/pihole
-cat << EOF > /etc/pihole/setupVars.conf
+cat <<EOF >/etc/pihole/setupVars.conf
 WEBPASSWORD=
 PIHOLE_INTERFACE=wg0
 IPV4_ADDRESS=$INET/26
@@ -58,15 +58,15 @@ WEBUIBOXEDLAYOUT=traditional
 API_QUERY_LOG_SHOW=all
 API_PRIVACY_MODE=false
 EOF
-cat << EOF > /etc/pihole/pihole-FTL.conf
+cat <<EOF >/etc/pihole/pihole-FTL.conf
 MAXDBDAYS=1425
 DBFILE=/data/pihole/pihole-FTL.db
 EOF
 git clone --quiet --depth 1 https://github.com/pi-hole/pi-hole.git /tmp/pi-hole
 /tmp/pi-hole/automated\ install/basic-install.sh --unattended
-echo "https://blocklistproject.github.io/Lists/everything.txt" >> /etc/pihole/adlists.list
+echo "https://blocklistproject.github.io/Lists/everything.txt" >>/etc/pihole/adlists.list
 
-cat << EOF > /tmp/pivpn.conf
+cat <<EOF >/tmp/pivpn.conf
 IPv4dev=ens5
 IPv6dev=ens5
 install_user=ubuntu
@@ -104,7 +104,7 @@ done
 
 sed -i 's|= 80|= 8053|' /etc/lighttpd/lighttpd.conf
 
-echo "certbot certonly --dns-route53 -m postmaster@guirao.net -d *.guirao.net --agree-tos --non-interactive" > /etc/cron.weekly/certbot
+echo "certbot certonly --dns-route53 -m postmaster@guirao.net -d *.guirao.net --agree-tos --non-interactive" >/etc/cron.weekly/certbot
 chmod +x /etc/cron.weekly/certbot
 /etc/cron.weekly/certbot
 
@@ -113,9 +113,9 @@ chmod +x /etc/cron.daily/cleanlogs
 
 curl -L https://gitlab.com/hectorjsmith/fail2ban-prometheus-exporter/-/releases/v0.10.2/downloads/fail2ban_exporter_0.10.2_linux_arm64.tar.gz | tar --wildcards -xz -C /usr/bin 'fail2ban_exporter'
 
-echo 'UUID="bb61a946-053e-432e-96bc-02d07c30a820" /data xfs defaults,nofail' >> /etc/fstab
+echo 'UUID="bb61a946-053e-432e-96bc-02d07c30a820" /data xfs defaults,nofail' >>/etc/fstab
 mount -a
-echo 'set -o vi' >> /etc/profile
+echo 'set -o vi' >>/etc/profile
 
 aws s3 cp --recursive s3://minube-backups/home/ /home/
 docker compose -f /data/immich/docker-compose.yaml up -d
