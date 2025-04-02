@@ -12,11 +12,8 @@ apt update
 apt upgrade -y
 
 install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-chmod a+r /etc/apt/keyrings/docker.asc
-echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu oracular stable" >/etc/apt/sources.list.d/docker.list
 
-apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https nginx libnginx-mod-stream python3-certbot-dns-route53 alloy fail2ban docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+apt install -y unzip sqlite3 debian-keyring debian-archive-keyring apt-transport-https nginx libnginx-mod-stream python3-certbot-dns-route53 alloy fail2ban podman podman-compose
 hostnamectl set-hostname minube
 
 fallocate -l 2G /swap
@@ -32,8 +29,6 @@ unzip awscliv2.zip
 rm -r aws awscliv2.zip
 
 aws configure set default.s3.use_dualstack_endpoint true
-
-usermod -a -G docker ubuntu
 
 TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 INET=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
@@ -93,7 +88,7 @@ bash /usr/local/src/pivpn/auto_install/install.sh --unattended /tmp/pivpn.conf
 aws s3 cp --recursive s3://minube-backups/etc/ /etc/
 chmod +x /etc/pihole/backup
 ln -s /etc/pihole/backup /etc/cron.daily/backup
-for SERVICE in docker backup wg-quick@casa alloy fail2ban fail2ban_exporter; do
+for SERVICE in podman backup wg-quick@casa alloy fail2ban fail2ban_exporter; do
 	systemctl enable "$SERVICE"
 done
 
@@ -118,6 +113,6 @@ mount -a
 echo 'set -o vi' >>/etc/profile
 
 aws s3 cp --recursive s3://minube-backups/home/ /home/
-docker compose -f /data/immich/docker-compose.yaml up -d
+podman-compose -f /data/immich/docker-compose.yaml up -d
 
 reboot now
