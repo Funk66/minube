@@ -2,6 +2,10 @@
 
 set -eux -o pipefail
 
+aws() {
+	podman run --rm -v "/home:/home" -v "/etc:/etc" -e AWS_USE_DUALSTACK=true amazon/aws-cli "$@"
+}
+
 export DEBIAN_FRONTEND=noninteractive
 
 mkdir -p /etc/apt/keyrings/
@@ -22,13 +26,6 @@ mkswap /swap
 swapon /swap
 echo '/swap none swap sw 0 0' >>/etc/fstab
 echo 'vm.swappiness=10' >>/etc/sysctl.conf
-
-curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-./aws/install
-rm -r aws awscliv2.zip
-
-aws configure set default.s3.use_dualstack_endpoint true
 
 TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 INET=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
