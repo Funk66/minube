@@ -1,0 +1,5 @@
+# vim: set ft=systemd:
+
+[Network]
+Gateway=10.100.0.1
+Subnet=10.100.0.0/26
