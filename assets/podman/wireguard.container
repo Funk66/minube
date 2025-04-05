@@ -1,0 +1,38 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Wireguard VPN server
+After=network-online.target
+
+[Container]
+ContainerName=wireguard
+Image=lscr.io/linuxserver/wireguard:latest
+Network=minube.network
+IP=10.100.0.2
+PublishPort=51820:51820/udp
+Volume=/data/wireguard:/config
+Volume=/lib/modules:/lib/modules
+Environment=PUID=1000
+Environment=PGID=1000
+Environment=TZ=Europe/Berlin
+# TODO: SERVERURL
+Environment=SERVERURL=test.guirao.net
+Environment=SERVERPORT=51820
+Environment=PEERS=MBP-M3,iPhone,iPad,office,rpi,router
+Environment=PEERDNS=10.100.0.3
+Environment=INTERNAL_SUBNET=10.10.10.0/26
+Environment=ALLOWEDIPS=10.10.10.0/26,10.100.0.0/26
+Environment=LOG_CONFS=true
+Environment=PERSISTENTKEEPALIVE_PEERS=
+AddCapability=NET_ADMIN
+AddCapability=NET_RAW
+AddCapability=SYS_MODULE
+Sysctl=net.ipv4.conf.all.src_valid_mark=1
+Sysctl=net.ipv4.ip_forward=1
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target
