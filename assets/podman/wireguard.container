@@ -18,7 +18,7 @@ Environment=TZ=Europe/Berlin
 # TODO: SERVERURL
 Environment=SERVERURL=test.guirao.net
 Environment=SERVERPORT=51820
-Environment=PEERS=MBP-M3,iPhone,iPad,office,rpi,router
+Environment=PEERS=MBP,iPhone,iPad,office,rpi,router
 Environment=PEERDNS=10.100.0.3
 Environment=INTERNAL_SUBNET=10.10.10.0/26
 Environment=ALLOWEDIPS=10.10.10.0/26,10.100.0.0/26
