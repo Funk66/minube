@@ -23,7 +23,7 @@
     "@cdktf/provider-aws": "^21",
     "@typescript-eslint/eslint-plugin": "^8",
     "cdktf": "^0.21",
-    "cdktf-cli": "^0.20",
+    "cdktf-cli": "^0.21",
     "constructs": "^10"
   },
   "devDependencies": {
