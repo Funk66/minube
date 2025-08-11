@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@types/jest": "^30",
-    "@types/node": "^22",
+    "@types/node": "^24",
     "jest": "^30",
     "ts-jest": "^29",
     "ts-node": "^10",
