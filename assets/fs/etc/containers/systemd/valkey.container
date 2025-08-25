@@ -1,0 +1,13 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Redis
+
+[Container]
+ContainerName=redis
+Image=docker.io/valkey/valkey:8-bookworm
+HealthCmd=redis-cli ping || exit 1
+RestartPolicy=always
+
+[Install]
+WantedBy=default.target

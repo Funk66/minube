@@ -1,5 +1,4 @@
 import { readFileSync } from "fs";
-import * as path from "path"; // Added import
 import { Construct } from "constructs";
 import { IamInstanceProfile } from "@cdktf/provider-aws/lib/iam-instance-profile";
 import { IamPolicy } from "@cdktf/provider-aws/lib/iam-policy";
@@ -268,74 +267,11 @@ export class EC2 extends Construct {
       publicKey: readFileSync("./assets/key.pub", "utf8"),
     });
 
-    const existingUserdataScriptPath = path.join("assets", "userdata.sh"); // Assuming assets is at project root
-    const existingUserdataScriptContent = readFileSync(
-      existingUserdataScriptPath,
-      "utf8"
-    );
-
-    // Example: Add a new config file. Create this file in your assets directory.
-    // e.g., assets/my-app-config.json
-    // { "setting": "value", "another_setting": 123 }
-    let newAppConfigContent = "";
-    try {
-      const newAppConfigPath = path.join("assets", "my-app-config.json");
-      newAppConfigContent = readFileSync(newAppConfigPath, "utf8");
-    } catch (error) {
-      console.warn(
-        "Warning: Could not read assets/my-app-config.json. It will not be included in userdata."
-      );
-      // newAppConfigContent remains ""
-    }
-
-    const indentContent = (content: string, indentation: string) => {
-      return content
-        .split("\n")
-        .map((line) => `${indentation}${line}`)
-        .join("\n");
-    };
-
-    let cloudConfigParts = ["#cloud-config"];
-    if (newAppConfigContent) {
-      cloudConfigParts.push("write_files:");
-      cloudConfigParts.push(`\
-  - path: /etc/my-app/my-app-config.json
-    permissions: '0644'
-    owner: root:root
-    content: |
-${indentContent(newAppConfigContent, "      ")}`);
-    }
-    // Add more files to write_files here if needed
-
-    const cloudConfigYaml = cloudConfigParts.join("\n");
-
-    const multipartUserData = `\
-Content-Type: multipart/mixed; boundary="//BOUNDARY"
-MIME-Version: 1.0
-
---//BOUNDARY
-Content-Type: text/cloud-config; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="cloud-config.yaml"
-
-${cloudConfigYaml}
-
---//BOUNDARY
-Content-Type: text/x-shellscript; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="userdata.sh"
-
-${existingUserdataScriptContent}
-
---//BOUNDARY--`;
-
     const instance = new Instance(this, "instance", {
       ami: ami,
       instanceType: "t4g.small",
       keyName: key.keyName,
-      userData: multipartUserData,
+      userData: readFileSync(`assets/userdata.sh`, "base64"),
       subnetId: config.subnet,
       vpcSecurityGroupIds: [sg.id],
       iamInstanceProfile: profile.id,

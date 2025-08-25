@@ -10,16 +10,13 @@ Image=docker.io/pihole/pihole:latest
 Network=minube.network
 IP=10.100.0.3
 Volume=/data/pihole/etc:/etc/pihole
-Volume=/data/pihole/dnsmasq.d:/etc/dnsmasq.d
 Environment=TZ=Europe/Berlin
-Environment=FTLCONF_LOCAL_IPV4=10.100.0.3
-Environment=ServerIP=10.100.0.3
-Environment=DNS1=10.0.0.2
 Environment=FTLCONF_dns_upstreams=10.0.0.2
-Environment=WEBTHEME=default
 Environment=FTLCONF_webserver_api_password=
+Environment=PIHOLE_PTR=HOSTNAMEFQDN
 Label="io.containers.autoupdate=registry"
 Label=pihole
+HostName=pi-hole
 
 [Service]
 Restart=always

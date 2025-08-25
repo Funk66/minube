@@ -3,7 +3,11 @@
 set -eux -o pipefail
 
 aws() {
-	podman run --rm docker.io/amazon/aws-cli "$@"
+	if [[ "$1" == "-v" ]]; then
+		podman run --rm -v "$2" docker.io/amazon/aws-cli "${@:3}"
+	else
+		podman run --rm docker.io/amazon/aws-cli "$@"
+	fi
 }
 
 export DEBIAN_FRONTEND=noninteractive
@@ -35,6 +39,8 @@ loginctl enable-linger ubuntu
 # TODO: create for user?
 # mkdir -p ~/.config/containers/systemd/
 systemctl --user enable podman-auto-update.service # run as user
+
+aws -v /:/host s3 sync s3://minube-fs/ /host/
 
 # TODO: enable minube-network pihole wireguard?
 # TODO: copy quadlets and .env from S3

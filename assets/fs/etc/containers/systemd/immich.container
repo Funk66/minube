@@ -1,0 +1,18 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Immich
+Wants=valkey.service postgres.service
+After=valkey.service postgres.service
+
+[Container]
+ContainerName=immich
+Image=ghcr.io/immich-app/immich-server:release
+EnvironmentFile=.env
+Volume=/data/immich:/usr/src/app/upload
+Volume=/etc/localtime:/etc/localtime:ro
+Port=2283:2283
+RestartPolicy=always
+
+[Install]
+WantedBy=default.target

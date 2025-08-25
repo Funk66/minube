@@ -1,0 +1,18 @@
+# vim: ft=systemd
+
+[Unit]
+Description=PostgreSQL
+
+[Container]
+ContainerName=postgres
+Image=ghcr.io/immich-app/postgres:14-vectorchord0.4.1-pgvectors0.2.0
+EnvironmentFile=.env
+Environment=POSTGRES_PASSWORD=${DB_PASSWORD}
+Environment=POSTGRES_USER=${DB_USERNAME}
+Environment=POSTGRES_DB=${DB_DATABASE_NAME}
+Environment=POSTGRES_INITDB_ARGS=--data-checksums
+Volume=/data/postgres:/var/lib/postgresql/data
+RestartPolicy=always
+
+[Install]
+WantedBy=default.target
