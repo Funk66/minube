@@ -7,7 +7,7 @@ After=network-online.target wireguard.service
 [Container]
 ContainerName=pihole
 Image=docker.io/pihole/pihole:latest
-Network=minube.network
+Network=private.network
 IP=10.100.0.3
 Volume=/data/pihole/etc:/etc/pihole
 Environment=TZ=Europe/Berlin

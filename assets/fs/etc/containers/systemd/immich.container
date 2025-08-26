@@ -8,11 +8,20 @@ After=valkey.service postgres.service
 [Container]
 ContainerName=immich
 Image=ghcr.io/immich-app/immich-server:release
-EnvironmentFile=.env
+Network=public.network
+EnvironmentFile=/data/immich/immich.env
 Volume=/data/immich:/usr/src/app/upload
 Volume=/etc/localtime:/etc/localtime:ro
-Port=2283:2283
-RestartPolicy=always
+HealthCmd=["/bin/bash", "immich-healthcheck"]
+HealthStartPeriod=3m
+HealthInterval=10s
+HealthTimeout=30s
+HealthRetries=10
+Notify=healthy
+
+[Service]
+ExecStartPre=sleep 30
+Restart=always
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target

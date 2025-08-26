@@ -1,0 +1,18 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Caddy
+
+[Container]
+ContainerName=caddy
+Exec=/usr/bin/caddy run --config /etc/caddy/Caddyfile
+Image=docker.io/library/caddy
+Network=public.network
+Notify=true
+Volume=/opt/caddy:/etc/caddy:Z
+Volume=/data/caddy:/var/log/caddy
+PublishPort=80
+PublishPort=443
+
+[Service]
+ExecReload=podman exec caddy /usr/bin/caddy reload --config /etc/caddy/Caddyfile --address unix//run/admin.sock --force

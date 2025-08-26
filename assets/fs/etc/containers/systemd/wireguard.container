@@ -1,13 +1,13 @@
 # vim: ft=systemd
 
 [Unit]
-Description=Wireguard VPN server
+Description=Wireguard
 After=network-online.target
 
 [Container]
 ContainerName=wireguard
 Image=lscr.io/linuxserver/wireguard:latest
-Network=minube.network
+Network=private.network
 IP=10.100.0.2
 PublishPort=51820:51820/udp
 Volume=/data/wireguard:/config

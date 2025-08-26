@@ -1,0 +1,12 @@
+{
+	servers {
+      metrics
+    }
+}
+
+photos.guirao.net {
+  reverse_proxy immich:2283
+	log {
+    output file /var/log/caddy/photos.log
+  }
+}

@@ -6,13 +6,20 @@ Description=PostgreSQL
 [Container]
 ContainerName=postgres
 Image=ghcr.io/immich-app/postgres:14-vectorchord0.4.1-pgvectors0.2.0
-EnvironmentFile=.env
+Network=public.network
 Environment=POSTGRES_PASSWORD=${DB_PASSWORD}
 Environment=POSTGRES_USER=${DB_USERNAME}
 Environment=POSTGRES_DB=${DB_DATABASE_NAME}
 Environment=POSTGRES_INITDB_ARGS=--data-checksums
+EnvironmentFile=/data/immich/immich.env
+Volume=/opt/immich/postgres-healthcheck.sh:/health.sh:z
 Volume=/data/postgres:/var/lib/postgresql/data
-RestartPolicy=always
+HealthCmd=["/bin/bash", "/health.sh"]
+HealthStartPeriod=5m
+HealthInterval=30s
+HealthTimeout=5s
+HealthRetries=5
+Notify=healthy
 
-[Install]
-WantedBy=default.target
+[Service]
+Restart=always
