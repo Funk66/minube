@@ -1,0 +1,27 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Immich
+Wants=valkey.service postgres.service
+After=valkey.service postgres.service
+
+[Container]
+ContainerName=immich
+Image=ghcr.io/immich-app/immich-server:release
+Network=public.network
+EnvironmentFile=/data/immich/env
+Volume=/data/immich:/usr/src/app/upload
+Volume=/etc/localtime:/etc/localtime:ro
+HealthCmd=["/bin/bash", "immich-healthcheck"]
+HealthStartPeriod=3m
+HealthInterval=10s
+HealthTimeout=30s
+HealthRetries=10
+Notify=healthy
+
+[Service]
+ExecStartPre=sleep 30
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

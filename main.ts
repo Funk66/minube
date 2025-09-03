@@ -27,6 +27,7 @@ class Minube extends TerraformStack {
       photos: s3.buckets.photos,
       docs: s3.buckets.docs,
       mail: s3.buckets.mail,
+      fs: s3.buckets.fs,
       domain: dns.zone.name,
       hostedZone: dns.zone.arn,
     });
@@ -39,6 +40,7 @@ class Minube extends TerraformStack {
         backups: s3.buckets.backups,
         photos: s3.buckets.photos,
         docs: s3.buckets.docs,
+        fs: s3.buckets.fs,
       },
       hostedZone: dns.zone.arn,
     });

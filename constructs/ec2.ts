@@ -8,6 +8,7 @@ import { Instance } from "@cdktf/provider-aws/lib/instance";
 import { KeyPair } from "@cdktf/provider-aws/lib/key-pair";
 import { SecurityGroup } from "@cdktf/provider-aws/lib/security-group";
 import { DataAwsAmi } from "@cdktf/provider-aws/lib/data-aws-ami";
+import { Eip } from "@cdktf/provider-aws/lib/eip";
 import { EbsVolume } from "@cdktf/provider-aws/lib/ebs-volume";
 import { VolumeAttachment } from "@cdktf/provider-aws/lib/volume-attachment";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
@@ -16,10 +17,11 @@ interface EC2Config {
   vpc: string;
   subnet: string;
   buckets: {
-    backups: S3Bucket,
+    backups: S3Bucket;
     photos: S3Bucket;
     docs: S3Bucket;
-      };
+    fs: S3Bucket;
+  };
   hostedZone: string;
 }
 
@@ -49,19 +51,25 @@ export class EC2 extends Construct {
           {
             Sid: "ReadWriteBackups",
             Effect: "Allow",
-            Resource: [`${config.buckets.backups.arn}/*`],
+            Resource: [
+              `${config.buckets.backups.arn}/*`,
+              `${config.buckets.fs.arn}/*`,
+            ],
             Action: ["s3:GetObject*", "s3:PutObject*"],
           },
           {
             Sid: "ListBackups",
             Effect: "Allow",
-            Resource: [config.buckets.backups.arn],
+            Resource: [config.buckets.backups.arn, config.buckets.fs.arn],
             Action: ["s3:ListBucket"],
           },
           {
             Sid: "ReadWriteAssetBackups",
             Effect: "Allow",
-            Resource: [`${config.buckets.photos.arn}/*`, `${config.buckets.docs.arn}/*`],
+            Resource: [
+              `${config.buckets.photos.arn}/*`,
+              `${config.buckets.docs.arn}/*`,
+            ],
             Action: [
               "s3:DeleteObject",
               "s3:GetObject",
@@ -286,8 +294,16 @@ export class EC2 extends Construct {
       },
     });
 
+    new Eip(this, "eip", {
+      instance: instance.id,
+      tags: {
+        Name: id,
+      },
+    });
+
     const volume = new EbsVolume(this, "volume", {
       availabilityZone: "eu-central-1b",
+      type: "gp3",
       size: 60,
       encrypted: true,
       tags: {

@@ -9,6 +9,7 @@ interface RoleConfig {
   photos: S3Bucket;
   docs: S3Bucket;
   mail: S3Bucket;
+  fs: S3Bucket;
   domain: string;
   hostedZone: string;
 }

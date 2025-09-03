@@ -1,0 +1,27 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Pi-hole DNS server
+After=network-online.target wireguard.service
+
+[Container]
+ContainerName=pihole
+Image=docker.io/pihole/pihole:latest
+Network=private.network
+IP=10.100.0.3
+Volume=/data/pihole/pihole-FTL.db:/etc/pihole/pihole-FTL.db:Z
+Environment=TZ=Europe/Berlin
+Environment=FTLCONF_dns_upstreams=10.0.0.2
+Environment=FTLCONF_webserver_api_password=
+Environment=FTLCONF_database_maxDBdays=1425
+Environment=FTLCONF_dns_domainNeeded=true
+Label="io.containers.autoupdate=registry"
+Label=pihole
+HostName=pi-hole
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target
