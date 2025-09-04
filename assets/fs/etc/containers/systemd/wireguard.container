@@ -11,13 +11,14 @@ Network=private.network
 IP=10.100.0.2
 PublishPort=51820:51820/udp
 Volume=/data/wireguard:/config
+Volume=/opt/wireguard/server.conf:/config/templates/server.conf:ro,Z
 Volume=/lib/modules:/lib/modules
 Environment=PUID=1000
 Environment=PGID=1000
 Environment=TZ=Europe/Berlin
 Environment=SERVERURL=minube.guirao.net
 Environment=SERVERPORT=51820
-Environment=PEERS=MBP,iPhone,iPad,rpi,office,router
+Environment=PEERS=MBP,iPhone,iPad,rpi,office,router,oneplus,tablet,mac
 Environment=PEERDNS=10.100.0.3
 Environment=INTERNAL_SUBNET=10.10.10.0/26
 Environment=ALLOWEDIPS=10.10.10.0/26,10.100.0.0/26

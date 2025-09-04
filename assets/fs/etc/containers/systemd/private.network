@@ -4,3 +4,5 @@
 Gateway=10.100.0.1
 Subnet=10.100.0.0/26
 NetworkName=minube-private
+Driver=macvlan
+Options=parent=ens5

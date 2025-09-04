@@ -15,6 +15,10 @@ Environment=FTLCONF_dns_upstreams=10.0.0.2
 Environment=FTLCONF_webserver_api_password=
 Environment=FTLCONF_database_maxDBdays=1425
 Environment=FTLCONF_dns_domainNeeded=true
+Environment=FTLCONF_dns_listeningMode=ALL
+Environment="FTLCONF_dns_hosts=10.10.10.2 MBP;10.10.10.3 iPhone;10.10.10.4 iPad;10.10.10.5 rpi;10.10.10.6 office;10.10.10.7 router;10.10.10.8 oneplus;10.10.10.9 tablet;10.10.10.10 mac"
+AddCapability=NET_ADMIN
+AddCapability=NET_RAW
 Label="io.containers.autoupdate=registry"
 Label=pihole
 HostName=pi-hole
@@ -22,6 +26,7 @@ HostName=pi-hole
 [Service]
 Restart=always
 TimeoutStartSec=900
+ExecStartPost=/usr/bin/podman exec %N ip route add 10.10.10.0/26 via 10.100.0.2
 
 [Install]
 WantedBy=multi-user.target
