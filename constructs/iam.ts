@@ -4,6 +4,7 @@ import { IamUser } from "@cdktf/provider-aws/lib/iam-user";
 import { IamPolicy } from "@cdktf/provider-aws/lib/iam-policy";
 import { IamUserPolicyAttachment } from "@cdktf/provider-aws/lib/iam-user-policy-attachment";
 import { IamAccessKey } from "@cdktf/provider-aws/lib/iam-access-key";
+import { Route53Zone } from "@cdktf/provider-aws/lib/route53-zone";
 
 interface RoleConfig {
   photos: S3Bucket;
@@ -11,7 +12,7 @@ interface RoleConfig {
   mail: S3Bucket;
   fs: S3Bucket;
   domain: string;
-  hostedZone: string;
+  hostedZone: Route53Zone;
 }
 
 export class IAM extends Construct {
@@ -57,7 +58,7 @@ export class IAM extends Construct {
           {
             Sid: "ListRecordSets",
             Effect: "Allow",
-            Resource: [config.hostedZone],
+            Resource: [config.hostedZone.arn],
             Action: ["route53:ListResourceRecordSets"],
           },
           {
@@ -69,7 +70,7 @@ export class IAM extends Construct {
           {
             Sid: "WriteRecordSets",
             Effect: "Allow",
-            Resource: [config.hostedZone],
+            Resource: [config.hostedZone.arn],
             Action: ["route53:ChangeResourceRecordSets"],
           },
         ],
@@ -97,13 +98,13 @@ export class IAM extends Construct {
           {
             Sid: "ListRecordSets",
             Effect: "Allow",
-            Resource: [config.hostedZone],
+            Resource: [config.hostedZone.arn],
             Action: ["route53:ListResourceRecordSets"],
           },
           {
             Sid: "WriteRecordSets",
             Effect: "Allow",
-            Resource: [config.hostedZone],
+            Resource: [config.hostedZone.arn],
             Action: ["route53:ChangeResourceRecordSets"],
             Condition: {
               StringEquals: {

@@ -12,6 +12,8 @@ import { Eip } from "@cdktf/provider-aws/lib/eip";
 import { EbsVolume } from "@cdktf/provider-aws/lib/ebs-volume";
 import { VolumeAttachment } from "@cdktf/provider-aws/lib/volume-attachment";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
+import { Route53Zone } from "@cdktf/provider-aws/lib/route53-zone";
+import { Route53Record } from "@cdktf/provider-aws/lib/route53-record";
 
 interface EC2Config {
   vpc: string;
@@ -22,7 +24,7 @@ interface EC2Config {
     docs: S3Bucket;
     fs: S3Bucket;
   };
-  hostedZone: string;
+  hostedZone: Route53Zone;
 }
 
 export class EC2 extends Construct {
@@ -97,7 +99,7 @@ export class EC2 extends Construct {
           {
             Sid: "WriteRecordSets",
             Effect: "Allow",
-            Resource: [config.hostedZone],
+            Resource: [config.hostedZone.arn],
             Action: [
               "route53:ListResourceRecordSets",
               "route53:ChangeResourceRecordSets",
@@ -294,7 +296,7 @@ export class EC2 extends Construct {
       },
     });
 
-    new Eip(this, "eip", {
+    const eip = new Eip(this, "eip", {
       instance: instance.id,
       tags: {
         Name: id,
@@ -316,5 +318,23 @@ export class EC2 extends Construct {
       volumeId: volume.id,
       instanceId: instance.id,
     });
+
+    for (const subdomain of ["docs", "photos", "minube"]) {
+      new Route53Record(this, `${subdomain}-a-record`, {
+        name: `${subdomain}.${config.hostedZone.name}`,
+        zoneId: config.hostedZone.id,
+        type: "A",
+        ttl: 300,
+        records: [eip.publicIp],
+      });
+
+      new Route53Record(this, `${subdomain}-aaaa-record`, {
+        name: `${subdomain}.${config.hostedZone.name}`,
+        zoneId: config.hostedZone.id,
+        type: "AAAA",
+        ttl: 300,
+        records: instance.ipv6Addresses,
+      });
+    }
   }
 }

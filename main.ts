@@ -29,7 +29,7 @@ class Minube extends TerraformStack {
       mail: s3.buckets.mail,
       fs: s3.buckets.fs,
       domain: dns.zone.name,
-      hostedZone: dns.zone.arn,
+      hostedZone: dns.zone,
     });
     const vpc = new VPC(this, "vpc");
 
@@ -42,7 +42,7 @@ class Minube extends TerraformStack {
         docs: s3.buckets.docs,
         fs: s3.buckets.fs,
       },
-      hostedZone: dns.zone.arn,
+      hostedZone: dns.zone,
     });
   }
 }
