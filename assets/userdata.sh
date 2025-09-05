@@ -36,4 +36,6 @@ systemctl daemon-reload
 mount -a
 echo 'set -o vi' >>/etc/profile
 
+mkdir /var/lib/alloy
+
 reboot now

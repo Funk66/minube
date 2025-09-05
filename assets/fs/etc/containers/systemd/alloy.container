@@ -1,0 +1,20 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Alloy
+After=network-online.target
+
+[Container]
+ContainerName=alloy
+Image=docker.io/grafana/alloy:latest
+Network=public.network
+EnvironmentFile=/data/alloy/env
+Volume=/:/host:ro
+Volume=/var/log:/var/log:ro
+Volume=/opt/alloy/config.alloy:/etc/alloy/config.alloy:ro,Z
+Volume=/var/lib/alloy:/var/lib/alloy:Z
+HostName=minube
+
+[Install]
+ExecStartPre=mkdir -p /var/lib/alloy
+WantedBy=multi-user.target
