@@ -10,9 +10,12 @@ Image=docker.io/library/caddy
 Network=public.network
 Notify=true
 Volume=/opt/caddy:/etc/caddy:Z
-Volume=/data/caddy/logs:/var/log/caddy
+Volume=/data/caddy:/data/caddy
+PublishPort=0.0.0.0:80:80
 PublishPort=[::]:80:80
+PublishPort=0.0.0.0:443:443
 PublishPort=[::]:443:443
+PublishPort=0.0.0.0:443:443/udp
 PublishPort=[::]:443:443/udp
 Label="io.containers.autoupdate=registry"
 

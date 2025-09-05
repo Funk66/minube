@@ -1,6 +1,7 @@
 # vim: set ft=systemd:
 
 [Network]
+NetworkName=minube-public
 Gateway=10.100.1.1
 Subnet=10.100.1.0/26
-NetworkName=minube-public
+IPv6=true

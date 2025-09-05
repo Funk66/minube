@@ -13,7 +13,7 @@ photos.guirao.net {
 }
 
 docs.guirao.net {
-	reverse_proxy office:8000
+	reverse_proxy 10.10.10.6:8000
 	log {
 		output file /var/log/caddy/docs.log
 	}
