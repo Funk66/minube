@@ -1,0 +1,20 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Immich ML
+After=immich.service
+
+[Container]
+ContainerName=immich-ml
+Image=ghcr.io/immich-app/immich-machine-learning:release
+Network=public.network
+EnvironmentFile=/data/immich/env
+Volume=model-cache:/cache
+Volume=/etc/localtime:/etc/localtime:ro
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

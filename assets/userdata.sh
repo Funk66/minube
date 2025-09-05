@@ -14,7 +14,7 @@ apt install -y podman
 
 timedatectl set-timezone Europe/Berlin
 
-fallocate -l 2G /swap
+fallocate -l 4G /swap
 chmod 600 /swap
 mkswap /swap
 swapon /swap

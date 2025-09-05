@@ -20,7 +20,6 @@ HealthRetries=10
 Notify=healthy
 
 [Service]
-ExecStartPre=sleep 30
 Restart=always
 
 [Install]
