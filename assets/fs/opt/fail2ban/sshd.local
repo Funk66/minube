@@ -1,0 +1,5 @@
+# vim: set ft=dosini:
+
+[Definition]
+_daemon = sshd(?:-session)?
+# TODO: unnecessary in version 1.1.1

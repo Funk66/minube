@@ -7,6 +7,7 @@ import { EC2 } from "./constructs/ec2";
 import { DNS } from "./constructs/dns";
 import { CDN } from "./constructs/cdn";
 import { IAM } from "./constructs/iam";
+import { ECR } from "./constructs/ecr";
 
 class Minube extends TerraformStack {
   constructor(scope: Construct, id: string) {
@@ -44,6 +45,8 @@ class Minube extends TerraformStack {
       },
       hostedZone: dns.zone,
     });
+
+    new ECR(this, "ecr", provider);
   }
 }
 

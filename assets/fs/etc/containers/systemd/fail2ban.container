@@ -1,0 +1,28 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Fail2ban
+After=network-online.target
+
+[Container]
+ContainerName=fail2ban
+Image=lscr.io/linuxserver/fail2ban:latest
+Network=host
+Volume=/opt/fail2ban/jail.local:/config/fail2ban/jail.local:Z
+Volume=/opt/fail2ban/fail2ban.local:/config/fail2ban/fail2ban.local:Z
+Volume=/opt/fail2ban/sshd.local:/config/fail2ban/filter.d/sshd.local:Z
+Volume=/var/log:/remotelogs:ro
+Volume=/var/log/fail2ban:/var/log/fail2ban:Z
+Volume=/var/run/fail2ban:/var/run/fail2ban:Z
+SecurityLabelDisable=true
+AddCapability=NET_ADMIN
+AddCapability=NET_RAW
+Environment=TZ=Europe/Berlin
+Label="io.containers.autoupdate=registry"
+
+[Service]
+ExecStartPre=mkdir -p /var/run/fail2ban && mkdir -p /var/log/fail2ban
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

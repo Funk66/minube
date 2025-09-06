@@ -123,3 +123,20 @@ loki.source.file "logs_integrations_integrations_node_exporter_direct_scrape" {
   targets    = local.file_match.logs_integrations_integrations_node_exporter_direct_scrape.targets
   forward_to = [loki.write.grafana_cloud_loki.receiver]
 }
+
+discovery.relabel "metrics_integrations_fail2ban" {
+  targets = [{
+    __address__ = "fail2ban-exporter:9191",
+  }]
+
+  rule {
+    target_label = "instance"
+    replacement  = constants.hostname
+  }
+}
+
+prometheus.scrape "metrics_integrations_fail2ban" {
+  targets    = discovery.relabel.metrics_integrations_fail2ban.output
+  forward_to = [prometheus.remote_write.metrics_service.receiver]
+  job_name   = "integrations/fail2ban"
+}

@@ -3,18 +3,15 @@
 	metrics {
 		per_host
 	}
+	log {
+		output file /var/log/caddy/server.log
+	}
 }
 
 photos.guirao.net {
 	reverse_proxy immich:2283
 	log {
+		format transform "{common_log}"
 		output file /var/log/caddy/photos.log
-	}
-}
-
-docs.guirao.net {
-	reverse_proxy 10.10.10.6:8000
-	log {
-		output file /var/log/caddy/docs.log
 	}
 }

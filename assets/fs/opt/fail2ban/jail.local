@@ -1,0 +1,45 @@
+# vim: set ft=dosini:
+
+[DEFAULT]
+backend           = auto
+bantime           = 1h
+bantime.increment = true
+bantime.factor    = 24
+bantime.maxtime   = 5w
+findtime          = 24h
+filter            = %(__name__)s
+maxretry          = 1
+port              = http,https
+ignoreip          = 10.10.10.0/26
+
+[sshd]
+enabled = true
+port    = ssh
+chain   = INPUT
+logpath = /remotelogs/auth.log
+backend = auto
+
+[http-auth]
+enabled   = true
+chain     = FORWARD
+logpath   = /remotelogs/caddy/photos.log
+filter    = nginx-http-auth
+
+[bad-request]
+enabled   = true
+chain     = FORWARD
+logpath   = /remotelogs/caddy/photos.log
+maxretry  = 3
+filter    = nginx-bad-request
+
+[unauthorized]
+enabled  = true
+chain    = FORWARD
+logpath  = /remotelogs/caddy/photos.log
+filter   = nginx-unauthorized
+
+[botsearch]
+enabled  = true
+chain    = FORWARD
+logpath  = /remotelogs/caddy/photos.log
+filter   = nginx-botsearch

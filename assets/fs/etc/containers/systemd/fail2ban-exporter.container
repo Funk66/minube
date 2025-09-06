@@ -1,0 +1,19 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Fail2ban exporter
+After=network-online.target
+
+[Container]
+ContainerName=fail2ban-exporter
+Image=registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:latest
+Network=public.network
+Volume=/var/run/fail2ban:/var/run/fail2ban:ro
+Label="io.containers.autoupdate=registry"
+HealthCmd=["/app/health"]
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

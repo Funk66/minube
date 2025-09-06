@@ -1,0 +1,5 @@
+# vim: set ft=dosini:
+
+[Definition]
+dbfile = /var/run/fail2ban/fail2ban.sqlite3
+logtarget = /var/log/fail2ban/fail2ban.log
