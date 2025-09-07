@@ -278,7 +278,7 @@ export class EC2 extends Construct {
       ami: ami,
       instanceType: "t4g.small",
       keyName: key.keyName,
-      userData: readFileSync(`assets/userdata.sh`, "base64"),
+      userData: readFileSync("assets/userdata.sh", "utf-8"),
       subnetId: config.subnet,
       vpcSecurityGroupIds: [sg.id],
       iamInstanceProfile: profile.id,

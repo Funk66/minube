@@ -33,8 +33,13 @@ export class S3 extends Construct {
           {
             id: "Trashcan",
             status: "Enabled",
-            abortIncompleteMultipartUpload: { daysAfterInitiation: 7 },
-            noncurrentVersionExpiration: { noncurrentDays: 90 },
+            abortIncompleteMultipartUpload: [{ daysAfterInitiation: 7 }],
+            noncurrentVersionExpiration: [{ noncurrentDays: 90 }],
+            filter: [
+              {
+                prefix: "",
+              },
+            ],
           },
         ],
       });

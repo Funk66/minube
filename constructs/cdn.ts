@@ -49,8 +49,13 @@ export class CDN extends Construct {
         {
           id: "Logs",
           status: "Enabled",
-          expiration: { days: 90 },
-          abortIncompleteMultipartUpload: { daysAfterInitiation: 7 },
+          expiration: [{ days: 90 }],
+          abortIncompleteMultipartUpload: [{ daysAfterInitiation: 7 }],
+          filter: [
+            {
+              prefix: "",
+            },
+          ],
         },
       ],
     });
@@ -78,7 +83,7 @@ export class CDN extends Construct {
       },
     });
 
-     new CloudfrontDistribution(this, "cloudfront", {
+    new CloudfrontDistribution(this, "cloudfront", {
       enabled: true,
       isIpv6Enabled: true,
       aliases: ["photos.guirao.net", "calendar.guirao.net"],
