@@ -36,4 +36,6 @@ systemctl daemon-reload
 mount -a
 echo 'set -o vi' >>/etc/profile
 
+systemctl enable podman-auto-update.timer
+
 reboot now
