@@ -8,6 +8,10 @@ aws() {
 
 export DEBIAN_FRONTEND=noninteractive
 
+hostnamectl set-hostname minube
+echo "127.0.0.1 minube" >>/etc/hosts
+sed -i 's/preserve_hostname: false/preserve_hostname: true/' /etc/cloud/cloud.cfg
+
 apt update
 apt upgrade -y
 apt install -y podman
