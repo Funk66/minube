@@ -1,0 +1,26 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Radicale
+After=network-online.target
+
+[Container]
+ContainerName=radicale
+Image=docker.io/tomsquest/docker-radicale
+Volume=/data/radicale:/data:Z
+Network=public.network
+AddCapability=CHOWN
+AddCapability=SETUID
+AddCapability=SETGID
+AddCapability=KILL
+PidsLimit=50
+Memory=256M
+ReadOnly=true
+RunInit=true
+HealthCmd="curl --fail http://localhost:5232 || exit 1"
+HealthInterval=30s
+HealthRetries=3
+Label="io.containers.autoupdate=registry"
+
+[Install]
+WantedBy=multi-user.target

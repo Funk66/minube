@@ -1,0 +1,8 @@
+# vim: ft=dosini
+
+[INCLUDES]
+before = common.conf
+
+[Definition]
+datepattern = \[%%d/%%b/%%Y:%%H:%%M:%%S(?: %%z)?\]
+failregex   = ^<HOST>.*"(GET|POST|DELETE|HEAD).*" (401|403) .*$

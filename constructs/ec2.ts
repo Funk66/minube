@@ -319,7 +319,7 @@ export class EC2 extends Construct {
       instanceId: instance.id,
     });
 
-    for (const subdomain of ["photos", "minube"]) {
+    for (const subdomain of ["photos", "calendar", "minube"]) {
       new Route53Record(this, `${subdomain}-a-record`, {
         name: `${subdomain}.${config.hostedZone.name}`,
         zoneId: config.hostedZone.id,

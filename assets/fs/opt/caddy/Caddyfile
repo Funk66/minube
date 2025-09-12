@@ -15,3 +15,11 @@ photos.guirao.net {
 		output file /var/log/caddy/photos.log
 	}
 }
+
+calendar.guirao.net {
+	reverse_proxy radicale:5232
+	log {
+		format transform "{common_log}"
+		output file /var/log/caddy/calendar.log
+	}
+}

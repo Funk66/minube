@@ -11,6 +11,7 @@ Network=host
 Volume=/opt/fail2ban/jail.local:/config/fail2ban/jail.local:Z
 Volume=/opt/fail2ban/fail2ban.local:/config/fail2ban/fail2ban.local:Z
 Volume=/opt/fail2ban/sshd.local:/config/fail2ban/filter.d/sshd.local:Z
+Volume=/opt/fail2ban/nginx-unauthorized.local:/config/fail2ban/filter.d/nginx-unauthorized.local:Z
 Volume=/var/log:/remotelogs:ro
 Volume=/var/log/fail2ban:/var/log/fail2ban:Z
 Volume=/var/run/fail2ban:/var/run/fail2ban:Z
