@@ -11,6 +11,7 @@ Network=public.network
 EnvironmentFile=/data/immich/env
 Volume=model-cache:/cache
 Volume=/etc/localtime:/etc/localtime:ro
+Label="io.containers.autoupdate=registry"
 
 [Service]
 Restart=always

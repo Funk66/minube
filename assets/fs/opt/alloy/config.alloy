@@ -124,10 +124,18 @@ loki.source.file "logs_integrations_integrations_node_exporter_direct_scrape" {
 	forward_to = [loki.write.grafana_cloud_loki.receiver]
 }
 
-discovery.relabel "metrics_integrations_fail2ban" {
-	targets = [{
-		__address__ = "fail2ban-exporter:9191",
-	}]
+discovery.relabel "static_integrations" {
+	targets = [
+		{
+			__address__ = "fail2ban-exporter:9191",
+			"job"       = "integrations/fail2ban",
+		},
+		{
+			"__address__"      = "caddy:2019",
+			"__metrics_path__" = "/metrics",
+			"job"              = "integrations/caddy",
+		},
+	]
 
 	rule {
 		target_label = "instance"
@@ -135,8 +143,57 @@ discovery.relabel "metrics_integrations_fail2ban" {
 	}
 }
 
-prometheus.scrape "metrics_integrations_fail2ban" {
-	targets    = discovery.relabel.metrics_integrations_fail2ban.output
+prometheus.scrape "static_integrations" {
+	targets    = discovery.relabel.static_integrations.output
+	forward_to = [
+		prometheus.relabel.metrics_integrations_integrations_caddy.receiver,
+		prometheus.relabel.metrics_integrations_integrations_fail2ban.receiver,
+	]
+}
+
+prometheus.relabel "metrics_integrations_integrations_caddy" {
 	forward_to = [prometheus.remote_write.metrics_service.receiver]
-	job_name   = "integrations/fail2ban"
+
+	rule {
+		source_labels = ["__name__"]
+		regex         = "up|caddy_http_request_duration_seconds_bucket|caddy_http_request_duration_seconds_count|caddy_http_requests_in_flight|caddy_http_requests_total"
+		action        = "keep"
+	}
+}
+
+prometheus.relabel "metrics_integrations_integrations_fail2ban" {
+	forward_to = [prometheus.remote_write.metrics_service.receiver]
+
+	rule {
+		source_labels = ["job"]
+		regex         = "integrations/fail2ban"
+		action        = "keep"
+	}
+}
+
+local.file_match "caddy_logs" {
+	path_targets = [{
+		__address__ = "localhost",
+		__path__    = "/var/log/caddy/*.log",
+		job         = "integrations/caddy",
+		instance    = constants.hostname,
+	}]
+}
+
+loki.source.file "caddy_logs" {
+	targets    = local.file_match.caddy_logs.targets
+	forward_to = [loki.process.caddy_logs.receiver]
+}
+
+loki.process "caddy_logs" {
+	forward_to = [loki.write.grafana_cloud_loki.receiver]
+
+	stage.regex {
+		expression = "^(?P<remote_addr>\\S+) - (?P<remote_user>\\S+) \\[(?P<time_local>.+)\\] \"(?P<request>.+)\" (?P<status>\\d+) (?P<bytes_sent>\\d+)"
+	}
+
+	stage.timestamp {
+		source = "time_local"
+		format = "02/Jan/2006:15:04:05 -0700"
+	}
 }

@@ -10,7 +10,7 @@ Network=public.network
 Environment=POSTGRES_INITDB_ARGS=--data-checksums
 Volume=/opt/immich/postgres-healthcheck.sh:/health.sh:z
 Volume=/data/postgres:/var/lib/postgresql/data
-HealthCmd="pg_isready -q || exit 1"
+HealthCmd="pg_isready -q -U postgres || exit 1"
 HealthStartPeriod=5m
 HealthInterval=30s
 HealthTimeout=5s

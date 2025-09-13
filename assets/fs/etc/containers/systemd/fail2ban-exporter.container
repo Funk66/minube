@@ -11,6 +11,7 @@ Network=public.network
 Volume=/var/run/fail2ban:/var/run/fail2ban:ro
 Label="io.containers.autoupdate=registry"
 HealthCmd=["/app/health"]
+Label="io.containers.autoupdate=registry"
 
 [Service]
 Restart=always
