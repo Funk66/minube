@@ -1,6 +1,6 @@
 {
 	email admin@guirao.net
-  admin :2019
+	admin :2019
 	metrics {
 		per_host
 	}
@@ -23,4 +23,8 @@ calendar.guirao.net {
 		format transform "{common_log}"
 		output file /var/log/caddy/calendar.log
 	}
+}
+
+http://, https:// {
+	abort
 }
