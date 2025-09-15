@@ -16,6 +16,9 @@ Volume=/var/lib/alloy:/var/lib/alloy:Z
 HostName=minube
 Label="io.containers.autoupdate=registry"
 
-[Install]
+[Service]
 ExecStartPre=mkdir -p /var/lib/alloy
+Restart=always
+
+[Install]
 WantedBy=multi-user.target
