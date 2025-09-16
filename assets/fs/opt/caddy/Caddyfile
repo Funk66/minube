@@ -25,6 +25,14 @@ calendar.guirao.net {
 	}
 }
 
+mail.guirao.net {
+	reverse_proxy stalwart:8080
+	log {
+		format transform "{common_log}"
+		output file /var/log/caddy/mail.log
+	}
+}
+
 http://, https:// {
 	abort
 }

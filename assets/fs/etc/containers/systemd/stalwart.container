@@ -1,0 +1,31 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Stalwart
+Wants=valkey.service postgres.service
+After=valkey.service postgres.service
+
+[Container]
+ContainerName=stalwart
+Image=docker.io/stalwartlabs/stalwart:latest
+Network=public.network
+Volume=/opt/stalwart/config.toml:/opt/stalwart/config.toml:Z
+Volume=/var/log/stalwart:/opt/stalwart/logs:Z
+Volume=/data/stalwart/data:/opt/stalwart/data:Z
+PublishPort=0.0.0.0:25:25
+PublishPort=[::]:25:25
+PublishPort=0.0.0.0:110:110
+PublishPort=[::]:110:110
+PublishPort=0.0.0.0:465:465
+PublishPort=[::]:465:465
+PublishPort=0.0.0.0:993:993
+PublishPort=[::]:993:993
+EnvironmentFile=/data/stalwart/env
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+ExecStartPre=mkdir -p /var/log/stalwart
+
+[Install]
+WantedBy=multi-user.target
