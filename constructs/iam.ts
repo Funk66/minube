@@ -40,14 +40,8 @@ export class IAM extends Construct {
           {
             Sid: "ListAssets",
             Effect: "Allow",
-            Resource: [config.photos.arn, config.docs.arn],
+            Resource: [config.docs.arn],
             Action: ["s3:ListBucket"],
-          },
-          {
-            Sid: "ReadWriteMail",
-            Effect: "Allow",
-            Resource: [config.mail.arn, `${config.mail.arn}/*`],
-            Action: ["s3:*"],
           },
           {
             Sid: "ListHostedZones",
@@ -88,6 +82,34 @@ export class IAM extends Construct {
 
     new IamAccessKey(this, "office-access-key", {
       user: officeUser.name,
+    });
+
+    const stalwartPolicy = new IamPolicy(this, "stalwart-policy", {
+      name: "stalwart",
+      policy: JSON.stringify({
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Sid: "ReadWriteMail",
+            Effect: "Allow",
+            Resource: [config.mail.arn, `${config.mail.arn}/*`],
+            Action: ["s3:*"],
+          },
+        ],
+      }),
+    });
+
+    const stalwartUser = new IamUser(this, "stalwart-user", {
+      name: "stalwart",
+    });
+
+    new IamUserPolicyAttachment(this, "stalwart-user-attachment", {
+      user: stalwartUser.name,
+      policyArn: stalwartPolicy.arn,
+    });
+
+    new IamAccessKey(this, "stalwart-access-key", {
+      user: stalwartUser.name,
     });
 
     const casaPolicy = new IamPolicy(this, "casa-policy", {

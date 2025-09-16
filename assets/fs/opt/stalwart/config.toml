@@ -1,0 +1,104 @@
+[config]
+local-keys = [
+  "!server.allowed-ip.*",
+  "!server.blocked-ip.*",
+  "acme.*",
+  "authentication.fallback-admin.user",
+  "certificate.*",
+  "cluster.*",
+  "config.local-keys.*",
+  "directory.*",
+  "metrics.*",
+  "server.*",
+  "storage.blob",
+  "storage.data",
+  "storage.directory",
+  "storage.fts",
+  "storage.lookup",
+  "store.*",
+  "tracer.*",
+]
+
+[authentication.fallback-admin]
+user = "admin"
+
+[server]
+hostname = "mail.guirao.net"
+
+[server.auto-ban]
+abuse.rate = "5/1h"
+auth.rate = "1/1h"
+loin.rate = "5/1h"
+scan.rate = "1/1d"
+
+[server.listener.smtp]
+bind = ["[::]:25"]
+protocol = "smtp"
+
+[server.listener.submissions]
+bind = ["[::]:465"]
+protocol = "smtp"
+tls.implicit = true
+
+[server.listener.imaptls]
+bind = ["[::]:993"]
+protocol = "imap"
+tls.implicit = true
+
+[server.listener.http]
+protocol = "http"
+bind = ["[::]:8080"]
+
+[storage]
+data = "postgres"
+fts = "postgres"
+blob = "s3"
+lookup = "valkey"
+directory = "internal"
+
+[store.postgres]
+type = "postgresql"
+host = "postgres"
+port = 5432
+database = "stalwart"
+user = "stalwart"
+password = "%{env:POSTGRES_PASSWORD}%"
+
+[store.s3]
+type = "s3"
+bucket = "minube-mail"
+endpoint = "s3.dualstack.eu-central-1.amazonaws.com"
+region = "eu-central-1"
+access-key = "%{env:AWS_ACCESS_KEY_ID}%"
+secret-key = "%{env:AWS_ACCESS_KEY_SECRET}%"
+
+[store.valkey]
+type = "redis"
+redis-type = "single"
+urls = "valkey://valkey"
+
+[directory.internal]
+type = "internal"
+store = "postgres"
+
+[acme.letsencrypt]
+directory = "https://acme-v02.api.letsencrypt.org/directory"
+challenge = "http-01"
+contact = ["admin@guirao.net"]
+domains = ["mail.guirao.net"]
+cache = "%{BASE_PATH}%/data/acme"
+renew-before = "30d"
+
+[metrics.prometheus]
+enable = true
+auth.username = "alloy"
+auth.secret = "%{env:METRICS_SECRET}%"
+
+[tracer.log]
+type = "log"
+level = "info"
+path = "/opt/stalwart/logs"
+prefix = "stalwart.log"
+rotate = "daily"
+ansi = false
+enable = true

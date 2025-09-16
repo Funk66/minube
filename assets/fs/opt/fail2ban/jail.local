@@ -24,6 +24,7 @@ enabled   = true
 chain     = FORWARD
 logpath   = /remotelogs/caddy/photos.log
             /remotelogs/caddy/calendar.log
+            /remotelogs/caddy/mail.log
 filter    = nginx-http-auth
 
 [bad-request]
@@ -31,6 +32,7 @@ enabled   = true
 chain     = FORWARD
 logpath   = /remotelogs/caddy/photos.log
             /remotelogs/caddy/calendar.log
+            /remotelogs/caddy/mail.log
 maxretry  = 3
 filter    = nginx-bad-request
 
@@ -39,6 +41,7 @@ enabled  = true
 chain    = FORWARD
 logpath  = /remotelogs/caddy/photos.log
            /remotelogs/caddy/calendar.log
+           /remotelogs/caddy/mail.log
 filter   = nginx-unauthorized
 
 [botsearch]
@@ -46,4 +49,5 @@ enabled  = true
 chain    = FORWARD
 logpath  = /remotelogs/caddy/photos.log
            /remotelogs/caddy/calendar.log
+           /remotelogs/caddy/mail.log
 filter   = nginx-botsearch

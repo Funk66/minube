@@ -171,6 +171,41 @@ prometheus.relabel "metrics_integrations_integrations_fail2ban" {
 	}
 }
 
+discovery.relabel "stalwart_integration" {
+	targets = [
+		{
+			"__address__"      = "stalwart:8080",
+			"__metrics_path__" = "/metrics/prometheus",
+			"job"              = "integrations/stalwart",
+		},
+	]
+
+	rule {
+		target_label = "instance"
+		replacement  = constants.hostname
+	}
+}
+
+prometheus.scrape "stalwart_integration" {
+	targets    = discovery.relabel.stalwart_integration.output
+	forward_to = [prometheus.relabel.stalwart_integration.receiver]
+
+	basic_auth {
+		username = "alloy"
+		password = sys.env("METRICS_SECRET")
+	}
+}
+
+prometheus.relabel "stalwart_integration" {
+	forward_to = [prometheus.remote_write.metrics_service.receiver]
+
+	rule {
+		source_labels = ["job"]
+		regex         = "integrations/stalwart"
+		action        = "keep"
+	}
+}
+
 local.file_match "caddy_logs" {
 	path_targets = [{
 		__address__ = "localhost",
