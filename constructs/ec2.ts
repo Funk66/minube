@@ -307,7 +307,16 @@ export class EC2 extends Construct {
       instanceId: instance.id,
     });
 
-    for (const subdomain of ["photos", "calendar", "mail", "minube"]) {
+    // TODO: configure IPv6 subnet for Wireguard
+    new Route53Record(this, `minube-a-record`, {
+      name: `minube.${config.hostedZone.name}`,
+      zoneId: config.hostedZone.id,
+      type: "A",
+      ttl: 300,
+      records: [eip.publicIp],
+    });
+
+    for (const subdomain of ["photos", "calendar", "mail"]) {
       new Route53Record(this, `${subdomain}-a-record`, {
         name: `${subdomain}.${config.hostedZone.name}`,
         zoneId: config.hostedZone.id,
