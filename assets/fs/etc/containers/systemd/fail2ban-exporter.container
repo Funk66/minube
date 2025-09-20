@@ -8,6 +8,7 @@ After=network-online.target
 ContainerName=fail2ban-exporter
 Image=registry.gitlab.com/hctrdev/fail2ban-prometheus-exporter:latest
 Network=public.network
+IP=10.100.1.9
 Volume=/var/run/fail2ban:/var/run/fail2ban:ro
 Label="io.containers.autoupdate=registry"
 HealthCmd=["/app/health"]

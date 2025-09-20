@@ -7,6 +7,7 @@ Description=PostgreSQL
 ContainerName=postgres
 Image=ghcr.io/immich-app/postgres:14-vectorchord0.4.1-pgvectors0.2.0
 Network=public.network
+IP=10.100.1.6
 Environment=POSTGRES_INITDB_ARGS=--data-checksums
 Volume=/opt/immich/postgres-healthcheck.sh:/health.sh:z
 Volume=/data/postgres:/var/lib/postgresql/data

@@ -9,6 +9,7 @@ ContainerName=radicale
 Image=docker.io/tomsquest/docker-radicale
 Volume=/data/radicale:/data:Z
 Network=public.network
+IP=10.100.1.10
 AddCapability=CHOWN
 AddCapability=SETUID
 AddCapability=SETGID
