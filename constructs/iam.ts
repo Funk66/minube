@@ -95,6 +95,12 @@ export class IAM extends Construct {
             Resource: [config.mail.arn, `${config.mail.arn}/*`],
             Action: ["s3:*"],
           },
+          {
+            Sid: "AmazonSesSendingAccess",
+            Effect: "Allow",
+            Resource: ["*"],
+            Action: ["ses:SendRawEmail"],
+          },
         ],
       }),
     });

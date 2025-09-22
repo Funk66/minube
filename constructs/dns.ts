@@ -61,22 +61,6 @@ export class DNS extends Construct {
       ],
     });
 
-    new Route53Record(this, "spf-mail-record", {
-      name: "mail." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "TXT",
-      ttl: 300,
-      records: ["v=spf1 a ra=postmaster -all"],
-    });
-
-    new Route53Record(this, "spf-mx-record", {
-      name: this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "TXT",
-      ttl: 300,
-      records: ["v=spf1 mx ra=postmaster -all"],
-    });
-
     new Route53Record(this, "srv-jmap-record", {
       name: "_jmap._tcp." + this.zone.name,
       zoneId: this.zone.zoneId,
