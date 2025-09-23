@@ -9,28 +9,33 @@
 	}
 }
 
-photos.guirao.net {
-	reverse_proxy immich:2283
+(proxy) {
+	reverse_proxy {args[0]}:{args[1]}
 	log {
 		format transform "{common_log}"
-		output file /var/log/caddy/photos.log
+		output file /var/log/caddy/{args[0]}.log
 	}
+
+	@blockedPaths {
+		path */.git*
+		path */.env*
+		path */*.php
+		path */db.sqlite3*
+		path */.htaccess*
+	}
+	abort @blockedPaths
+}
+
+photos.guirao.net {
+	import proxy immich 2283
 }
 
 calendar.guirao.net {
-	reverse_proxy radicale:5232
-	log {
-		format transform "{common_log}"
-		output file /var/log/caddy/calendar.log
-	}
+	import proxy radicale 5232
 }
 
 mail.guirao.net {
-	reverse_proxy stalwart:8080
-	log {
-		format transform "{common_log}"
-		output file /var/log/caddy/mail.log
-	}
+	import proxy stalwart 8080
 }
 
 http://, https:// {
