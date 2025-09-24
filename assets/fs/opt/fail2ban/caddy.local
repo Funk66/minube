@@ -1,0 +1,6 @@
+# vim: set ft=dosini:
+
+[Definition]
+failregex = "client_ip":"<HOST>"(.*)"status":(401|403)
+datepattern = "ts":<DATE>\.
+ignoreregex =

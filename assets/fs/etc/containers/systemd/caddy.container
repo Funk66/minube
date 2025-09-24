@@ -6,7 +6,7 @@ Description=Caddy
 [Container]
 ContainerName=caddy
 Exec=/usr/bin/caddy run --config /etc/caddy/Caddyfile
-Image=public.ecr.aws/z8e7t6h2/caddy:latest
+Image=docker.io/caddy:latest
 Network=public.network
 IP=10.100.1.2
 Notify=true

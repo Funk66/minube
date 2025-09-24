@@ -12,7 +12,6 @@
 (proxy) {
 	reverse_proxy {args[0]}:{args[1]}
 	log {
-		format transform "{common_log}"
 		output file /var/log/caddy/{args[0]}.log
 	}
 
