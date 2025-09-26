@@ -1,0 +1,10 @@
+[Unit]
+Description=Immich backup timer
+
+[Timer]
+OnCalendar=weekly
+RandomizedDelaySec=10m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
