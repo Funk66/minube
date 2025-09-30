@@ -3,7 +3,6 @@ import { SesDomainIdentity } from "@cdktf/provider-aws/lib/ses-domain-identity";
 import { Route53Zone } from "@cdktf/provider-aws/lib/route53-zone";
 import { Route53Record } from "@cdktf/provider-aws/lib/route53-record";
 import { SesDomainMailFrom } from "@cdktf/provider-aws/lib/ses-domain-mail-from";
-// import { SesDomainDkim } from "@cdktf/provider-aws/lib/ses-domain-dkim";
 
 interface SesConfig {
   hostedZone: Route53Zone;
