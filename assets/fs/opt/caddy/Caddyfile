@@ -29,6 +29,10 @@ photos.guirao.net {
 	import proxy immich 2283
 }
 
+docs.guirao.net {
+  import proxy paperless 8000
+}
+
 calendar.guirao.net {
 	import proxy radicale 5232
 }

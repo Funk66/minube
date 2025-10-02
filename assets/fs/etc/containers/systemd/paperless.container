@@ -1,0 +1,33 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Paperless
+Wants=valkey.service postgres.service
+After=valkey.service postgres.service
+
+[Container]
+ContainerName=paperless
+Image=ghcr.io/paperless-ngx/paperless-ngx:latest
+Network=public.network
+IP=10.100.1.11
+Environment=PAPERLESS_TIME_ZONE=Europe/Berlin
+Environment=PAPERLESS_REDIS=redis://valkey:6379/2
+Environment=PAPERLESS_DBHOST=postgres
+Environment=PAPERLESS_LOGGING_DIR=/usr/src/paperless/log
+Environment=PAPERLESS_URL=https://docs.guirao.net
+Environment=PAPERLESS_TRUSTED_PROXIES=10.100.1.2
+Environment=PAPERLESS_OCR_LANGUAGE=deu+eng
+Environment=PAPERLESS_DATE_PARSER_LANGUAGES=de+en
+Environment=PAPERLESS_CONSUMER_DISABLE=1
+EnvironmentFile=/data/paperless/env
+Volume=/data/paperless/data:/usr/src/paperless/data:Z
+Volume=/data/paperless/media:/usr/src/paperless/media:Z
+Volume=/data/paperless/export:/usr/src/paperless/export:Z
+Volume=/var/log/paperless:/usr/src/paperless/log:Z
+
+[Service]
+Restart=always
+ExecStartPre=mkdir -p /var/log/paperless
+
+[Install]
+WantedBy=multi-user.target

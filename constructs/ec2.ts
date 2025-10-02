@@ -316,7 +316,7 @@ export class EC2 extends Construct {
       records: [eip.publicIp],
     });
 
-    for (const subdomain of ["photos", "calendar", "mail"]) {
+    for (const subdomain of ["photos", "docs", "calendar", "mail"]) {
       new Route53Record(this, `${subdomain}-a-record`, {
         name: `${subdomain}.${config.hostedZone.name}`,
         zoneId: config.hostedZone.id,
