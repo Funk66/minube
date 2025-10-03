@@ -24,6 +24,7 @@ Volume=/data/paperless/data:/usr/src/paperless/data:Z
 Volume=/data/paperless/media:/usr/src/paperless/media:Z
 Volume=/data/paperless/export:/usr/src/paperless/export:Z
 Volume=/var/log/paperless:/usr/src/paperless/log:Z
+Label="io.containers.autoupdate=registry"
 
 [Service]
 Restart=always

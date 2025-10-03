@@ -42,6 +42,6 @@ systemctl daemon-reload
 mount -a
 echo 'set -o vi' >>/etc/profile
 
-systemctl enable {podman-auto-update,immich-backup,stalwart-backup}.timer
+systemctl enable {podman-auto-update,immich-backup,stalwart-backup,paperless-backup}.timer
 
 reboot now

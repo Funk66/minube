@@ -75,7 +75,7 @@ secret-key = "%{env:AWS_ACCESS_KEY_SECRET}%"
 [store.valkey]
 type = "redis"
 redis-type = "single"
-urls = "valkey://valkey"
+urls = "valkey://valkey/1"
 
 [directory.internal]
 type = "internal"

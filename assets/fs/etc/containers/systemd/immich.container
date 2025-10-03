@@ -11,6 +11,10 @@ Image=ghcr.io/immich-app/immich-server:release
 Network=public.network
 IP=10.100.1.7
 EnvironmentFile=/data/immich/env
+Environment=REDIS_HOSTNAME=valkey
+Environment=DB_HOSTNAME=postgres
+Environment=UPLOAD_LOCATION=/data/immich/library
+Environment=TZ=Europe/Berlin
 Volume=/data/immich:/usr/src/app/upload
 Volume=/etc/localtime:/etc/localtime:ro
 HealthCmd=["/bin/bash", "immich-healthcheck"]
