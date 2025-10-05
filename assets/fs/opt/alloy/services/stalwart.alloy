@@ -1,0 +1,36 @@
+declare "main" {
+	argument "prometheus" { }
+
+	discovery.relabel "stalwart" {
+		targets = [{
+			"__address__"      = "stalwart:8080",
+			"__metrics_path__" = "/metrics/prometheus",
+			"job"              = "integrations/stalwart",
+		}]
+
+		rule {
+			target_label = "instance"
+			replacement  = constants.hostname
+		}
+	}
+
+	prometheus.scrape "stalwart" {
+		targets    = discovery.relabel.stalwart.output
+		forward_to = [prometheus.relabel.stalwart.receiver]
+
+		basic_auth {
+			username = "alloy"
+			password = sys.env("METRICS_SECRET")
+		}
+	}
+
+	prometheus.relabel "stalwart" {
+		forward_to = [argument.prometheus.value]
+
+		rule {
+			source_labels = ["job"]
+			regex         = "integrations/stalwart"
+			action        = "keep"
+		}
+	}
+}

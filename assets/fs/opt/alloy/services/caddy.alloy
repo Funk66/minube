@@ -1,0 +1,76 @@
+declare "main" {
+	argument "prometheus" { }
+
+	argument "loki" { }
+
+	discovery.relabel "caddy" {
+		targets = [{
+			"__address__"      = "caddy:2019",
+			"__metrics_path__" = "/metrics",
+			"job"              = "integrations/caddy",
+		}]
+
+		rule {
+			target_label = "instance"
+			replacement  = constants.hostname
+		}
+	}
+
+	prometheus.scrape "caddy" {
+		targets    = discovery.relabel.caddy.output
+		forward_to = [prometheus.relabel.caddy.receiver]
+	}
+
+	prometheus.relabel "caddy" {
+		forward_to = [argument.prometheus.value]
+
+		rule {
+			source_labels = ["job"]
+			regex         = "integrations/caddy"
+			action        = "keep"
+		}
+
+		rule {
+			source_labels = ["__name__"]
+			regex         = "up|caddy_http_request_duration_seconds_bucket|caddy_http_request_duration_seconds_count|caddy_http_requests_in_flight|caddy_http_requests_total"
+			action        = "keep"
+		}
+	}
+
+	local.file_match "caddy" {
+		path_targets = [{
+			__address__ = "localhost",
+			__path__    = "/var/log/caddy/*.log",
+			job         = "integrations/caddy",
+			instance    = constants.hostname,
+		}]
+	}
+
+	loki.source.file "caddy" {
+		targets    = local.file_match.caddy.targets
+		forward_to = [loki.process.caddy.receiver]
+	}
+
+	loki.process "caddy" {
+		forward_to = [argument.loki.value]
+
+		stage.json {
+			expressions = {
+				"level" = "level",
+				"ts"    = "ts",
+				"msg"   = "msg",
+			}
+		}
+
+		stage.labels {
+			values = {
+				"level" = "",
+			}
+		}
+
+		stage.timestamp {
+			source = "ts"
+			format = "Unix"
+		}
+	}
+}

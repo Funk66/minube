@@ -14,7 +14,7 @@ Volume=/:/host:ro
 Volume=/var/log:/var/log:ro
 Volume=/opt/alloy/config.alloy:/etc/alloy/config.alloy:ro,Z
 Volume=/var/lib/alloy:/var/lib/alloy:Z
-HostName=minube
+HostName=%H
 Label="io.containers.autoupdate=registry"
 
 [Service]

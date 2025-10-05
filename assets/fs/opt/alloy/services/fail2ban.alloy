@@ -1,0 +1,30 @@
+declare "main" {
+	argument "prometheus" { }
+
+	discovery.relabel "fail2ban" {
+		targets = [{
+			"__address__" = "fail2ban-exporter:9191",
+			"job"         = "integrations/fail2ban",
+		}]
+
+		rule {
+			target_label = "instance"
+			replacement  = constants.hostname
+		}
+	}
+
+	prometheus.scrape "fail2ban" {
+		targets    = discovery.relabel.fail2ban.output
+		forward_to = [prometheus.relabel.fail2ban.receiver]
+	}
+
+	prometheus.relabel "fail2ban" {
+		forward_to = [argument.prometheus.value]
+
+		rule {
+			source_labels = ["job"]
+			regex         = "integrations/fail2ban"
+			action        = "keep"
+		}
+	}
+}
