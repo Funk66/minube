@@ -40,6 +40,14 @@ postgres.main "postgres" {
 	prometheus = prometheus.remote_write.grafana.receiver
 }
 
+import.file "valkey" {
+	filename = "/etc/alloy/services/valkey.alloy"
+}
+
+valkey.main "valkey" {
+	prometheus = prometheus.remote_write.grafana.receiver
+}
+
 import.file "stalwart" {
 	filename = "/etc/alloy/services/stalwart.alloy"
 }

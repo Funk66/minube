@@ -1,0 +1,37 @@
+declare "main" {
+	argument "prometheus" { }
+
+	discovery.relabel "valkey" {
+		targets = [{
+			"__address__"      = "valkey-exporter:9121",
+			"__metrics_path__" = "/metrics",
+			"job"              = "integrations/valkey",
+		}]
+
+		rule {
+			target_label = "instance"
+			replacement  = constants.hostname
+		}
+	}
+
+	prometheus.scrape "valkey" {
+		targets    = discovery.relabel.valkey.output
+		forward_to = [prometheus.relabel.valkey.receiver]
+	}
+
+	prometheus.relabel "valkey" {
+		forward_to = [argument.prometheus.value]
+
+		rule {
+			source_labels = ["job"]
+			regex         = "integrations/valkey"
+			action        = "keep"
+		}
+
+		rule {
+			source_labels = ["__name__"]
+			regex         = "redis_up|redis_uptime_in_seconds|redis_connected_clients|redis_db_keys|redis_memory_used_bytes|redis_pubsub_*"
+			action        = "keep"
+		}
+	}
+}

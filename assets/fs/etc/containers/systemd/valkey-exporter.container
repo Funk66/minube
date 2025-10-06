@@ -1,0 +1,18 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Valkey exporter
+
+[Container]
+ContainerName=valkey-exporter
+Image=docker.io/oliver006/redis_exporter:latest
+Network=public.network
+IP=10.100.1.13
+Environment=REDIS_ADDR=redis://valkey
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
