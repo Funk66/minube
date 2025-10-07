@@ -3,7 +3,7 @@ declare "main" {
 
 	discovery.relabel "stalwart" {
 		targets = [{
-			"__address__"      = "stalwart:8080",
+			"__address__"      = "mail.guirao.net",
 			"__metrics_path__" = "/metrics/prometheus",
 			"job"              = "integrations/stalwart",
 		}]

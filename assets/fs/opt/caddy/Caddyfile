@@ -10,7 +10,12 @@
 }
 
 (proxy) {
-	reverse_proxy {args[0]}:{args[1]}
+	reverse_proxy {args[0]}:{args[1]} {
+		transport http {
+			proxy_protocol v2
+		}
+	}
+
 	log {
 		output file /var/log/caddy/{args[0]}.log
 	}
@@ -30,7 +35,7 @@ photos.guirao.net {
 }
 
 docs.guirao.net {
-  import proxy paperless 8000
+	import proxy paperless 8000
 }
 
 calendar.guirao.net {
