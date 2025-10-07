@@ -5,7 +5,10 @@ import { Construct } from "constructs";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
 import { S3Object } from "@cdktf/provider-aws/lib/s3-object";
 import { S3BucketVersioningA } from "@cdktf/provider-aws/lib/s3-bucket-versioning";
-import { S3BucketLifecycleConfiguration } from "@cdktf/provider-aws/lib/s3-bucket-lifecycle-configuration";
+import {
+  S3BucketLifecycleConfiguration,
+  S3BucketLifecycleConfigurationRule,
+} from "@cdktf/provider-aws/lib/s3-bucket-lifecycle-configuration";
 
 const assets = path.resolve(__dirname, "../assets");
 
@@ -27,21 +30,30 @@ export class S3 extends Construct {
         },
       });
 
+      let lifecycleRules: S3BucketLifecycleConfigurationRule[] = [
+        {
+          id: "Trashcan",
+          status: "Enabled",
+          abortIncompleteMultipartUpload: [{ daysAfterInitiation: 7 }],
+          noncurrentVersionExpiration: [{ noncurrentDays: 90 }],
+          filter: [{ prefix: "" }],
+        },
+      ];
+
+      if (name == "backups") {
+        lifecycleRules = lifecycleRules.concat([
+          {
+            id: "Backups",
+            status: "Enabled",
+            expiration: [{ days: 14 }],
+            filter: [{ prefix: "stalwart/" }],
+          },
+        ]);
+      }
+
       new S3BucketLifecycleConfiguration(this, `${name}-lifecycle`, {
         bucket: this.buckets[name].bucket,
-        rule: [
-          {
-            id: "Trashcan",
-            status: "Enabled",
-            abortIncompleteMultipartUpload: [{ daysAfterInitiation: 7 }],
-            noncurrentVersionExpiration: [{ noncurrentDays: 90 }],
-            filter: [
-              {
-                prefix: "",
-              },
-            ],
-          },
-        ],
+        rule: lifecycleRules,
       });
     }
 
