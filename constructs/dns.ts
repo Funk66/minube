@@ -1,11 +1,18 @@
+import { AwsProvider } from "@cdktf/provider-aws/lib/provider";
 import { Construct } from "constructs";
-import { Route53Zone } from "@cdktf/provider-aws/lib/route53-zone";
+import { DataAwsCallerIdentity } from "@cdktf/provider-aws/lib/data-aws-caller-identity";
+import { DataAwsIamPolicyDocument } from "@cdktf/provider-aws/lib/data-aws-iam-policy-document";
+import { KmsAlias } from "@cdktf/provider-aws/lib/kms-alias";
+import { KmsKey } from "@cdktf/provider-aws/lib/kms-key";
+import { Route53HostedZoneDnssec } from "@cdktf/provider-aws/lib/route53-hosted-zone-dnssec";
+import { Route53KeySigningKey } from "@cdktf/provider-aws/lib/route53-key-signing-key";
 import { Route53Record } from "@cdktf/provider-aws/lib/route53-record";
+import { Route53Zone } from "@cdktf/provider-aws/lib/route53-zone";
 
 export class DNS extends Construct {
   zone: Route53Zone;
 
-  constructor(scope: Construct, name: string) {
+  constructor(scope: Construct, name: string, provider: AwsProvider) {
     super(scope, name);
 
     this.zone = new Route53Zone(this, "zone", {
@@ -23,6 +30,71 @@ export class DNS extends Construct {
         '0 issue "letsencrypt.org"',
         '0 issuewild "letsencrypt.org"',
       ],
+    });
+
+    const callerIdentity = new DataAwsCallerIdentity(this, "current");
+
+    const dnssecKeyPolicy = new DataAwsIamPolicyDocument(
+      this,
+      "dnssec-policy",
+      {
+        statement: [
+          {
+            actions: [
+              "kms:DescribeKey",
+              "kms:GetPublicKey",
+              "kms:Sign",
+              "kms:Verify",
+            ],
+            effect: "Allow",
+            principals: [
+              {
+                type: "Service",
+                identifiers: ["dnssec-route53.amazonaws.com"],
+              },
+            ],
+            resources: ["*"],
+            sid: "Allow administration of the key",
+          },
+          {
+            actions: ["kms:*"],
+            effect: "Allow",
+            principals: [
+              {
+                type: "AWS",
+                identifiers: [`arn:aws:iam::${callerIdentity.accountId}:root`],
+              },
+            ],
+            resources: ["*"],
+            sid: "Allow IAM user permissions",
+          },
+        ],
+      }
+    );
+
+    const kmsKey = new KmsKey(this, "kms-key", {
+      provider: provider,
+      description: `KMS key for DNSSEC in ${this.zone.name}`,
+      customerMasterKeySpec: "ECC_NIST_P256",
+      deletionWindowInDays: 7,
+      keyUsage: "SIGN_VERIFY",
+      policy: dnssecKeyPolicy.json,
+    });
+
+    new KmsAlias(this, "kms-key-alias", {
+      provider: provider,
+      name: "alias/dnssec",
+      targetKeyId: kmsKey.keyId,
+    });
+
+    const keySigningKey = new Route53KeySigningKey(this, "key-signing-key", {
+      hostedZoneId: this.zone.zoneId,
+      keyManagementServiceArn: kmsKey.arn,
+      name: "guirao-net-dnssec",
+    });
+
+    new Route53HostedZoneDnssec(this, "dnssec", {
+      hostedZoneId: keySigningKey.hostedZoneId,
     });
 
     new Route53Record(this, "mx-record", {

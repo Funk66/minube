@@ -51,6 +51,6 @@ postgres() {
 }
 EOF
 
-systemctl enable {podman-auto-update,immich-backup,stalwart-backup,paperless-backup}.timer
+systemctl enable {podman-auto-update,immich-backup,stalwart-backup,paperless-backup,sshfp.service}.timer
 
 reboot now

@@ -1,0 +1,12 @@
+[Unit]
+Description=Update SSHFP DNS Records
+After=cloud-final.service sshd.service
+Requires=cloud-final.service sshd.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/sshfp.sh
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

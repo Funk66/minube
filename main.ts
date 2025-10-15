@@ -21,7 +21,7 @@ class Minube extends TerraformStack {
       alias: "us-east-1",
     });
 
-    const dns = new DNS(this, "dns");
+    const dns = new DNS(this, "dns", provider);
     new CDN(this, "cdn", dns.zone.id, provider);
     const s3 = new S3(this, "buckets");
     new IAM(this, "iam", {
