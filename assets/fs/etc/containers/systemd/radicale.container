@@ -15,7 +15,8 @@ AddCapability=SETUID
 AddCapability=SETGID
 AddCapability=KILL
 PidsLimit=50
-Memory=256M
+# TODO: uncomment with podman 5.5
+# Memory=256M
 ReadOnly=true
 RunInit=true
 HealthCmd="curl --fail http://localhost:5232 || exit 1"

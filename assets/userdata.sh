@@ -40,17 +40,7 @@ chown ubuntu:ubuntu /data
 echo 'UUID="96786644-b31e-4923-bccd-c80f2c3e7c0f" /data xfs defaults,nofail' >>/etc/fstab
 systemctl daemon-reload
 mount -a
-cat <<EOF >>/etc/profile
-set -o vi
-alias pods='podman ps --all --format "table {{.Names}}\t{{.Status}}"'
-postgres() {
-	. /data/immich/env
-	local IMAGE
-	IMAGE=$(podman images --format "{{.Repository}}:{{.Tag}}" | grep '^ghcr.io/immich-app/postgres' | head -n 1)
-	podman run --rm -e PGPASSWORD="$DB_PASSWORD" --network minube-public -it "$IMAGE" psql -h postgres -U postgres
-}
-EOF
 
 systemctl enable {podman-auto-update,immich-backup,stalwart-backup,paperless-backup,sshfp.service}.timer
 
-reboot now
+shutdown -r +1

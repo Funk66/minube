@@ -10,11 +10,7 @@
 }
 
 (proxy) {
-	reverse_proxy {args[0]}:{args[1]} {
-		transport http {
-			proxy_protocol v2
-		}
-	}
+	reverse_proxy {args[0]}:{args[1]}
 
 	log {
 		output file /var/log/caddy/{args[0]}.log
@@ -43,7 +39,15 @@ calendar.guirao.net {
 }
 
 mail.guirao.net {
-	import proxy stalwart 8080
+	reverse_proxy stalwart:8080 {
+		transport http {
+			proxy_protocol v2
+		}
+	}
+
+	log {
+		output file /var/log/caddy/stalwart.log
+	}
 }
 
 http://, https:// {
