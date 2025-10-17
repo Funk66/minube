@@ -56,6 +56,14 @@ stalwart.main "stalwart" {
 	prometheus = prometheus.remote_write.grafana.receiver
 }
 
+import.file "wireguard" {
+	filename = "/etc/alloy/services/wireguard.alloy"
+}
+
+wireguard.main "wireguard" {
+	prometheus = prometheus.remote_write.grafana.receiver
+}
+
 prometheus.remote_write "grafana" {
 	endpoint {
 		url = "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom/push"

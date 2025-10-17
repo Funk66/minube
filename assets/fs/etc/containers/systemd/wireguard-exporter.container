@@ -1,0 +1,23 @@
+# vim: ft=systemd
+
+[Unit]
+Description=WireGuard exporter
+After=wireguard.service
+
+[Container]
+ContainerName=wireguard-exporter
+Image=docker.io/mindflavor/prometheus-wireguard-exporter:latest
+Network=container:wireguard
+AddCapability=NET_ADMIN
+Environment=PROMETHEUS_WIREGUARD_EXPORTER_CONFIG_FILE_NAMES=/etc/wireguard/wg0.conf
+Environment=PROMETHEUS_WIREGUARD_EXPORTER_EXPORT_REMOTE_IP_AND_PORT_ENABLED=true
+Environment=PROMETHEUS_WIREGUARD_EXPORTER_PREPEND_SUDO_ENABLED=false
+Exec=-a false
+Volume=/opt/wireguard/wg0.conf:/etc/wireguard/wg0.conf:ro,Z
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

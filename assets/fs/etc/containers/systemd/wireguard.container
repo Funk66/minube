@@ -1,7 +1,7 @@
 # vim: ft=systemd
 
 [Unit]
-Description=Wireguard
+Description=WireGuard
 After=network-online.target
 
 [Container]

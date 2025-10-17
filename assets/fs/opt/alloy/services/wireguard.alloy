@@ -1,0 +1,31 @@
+declare "main" {
+	argument "prometheus" { }
+
+	discovery.relabel "wireguard" {
+		targets = [{
+			"__address__"      = "wireguard:9586",
+			"__metrics_path__" = "/metrics",
+			"job"              = "integrations/wireguard",
+		}]
+
+		rule {
+			target_label = "instance"
+			replacement  = constants.hostname
+		}
+	}
+
+	prometheus.scrape "wireguard" {
+		targets    = discovery.relabel.wireguard.output
+		forward_to = [prometheus.relabel.wireguard.receiver]
+	}
+
+	prometheus.relabel "wireguard" {
+		forward_to = [argument.prometheus.value]
+
+		rule {
+			source_labels = ["job"]
+			regex         = "integrations/wireguard"
+			action        = "keep"
+		}
+	}
+}
