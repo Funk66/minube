@@ -102,6 +102,9 @@ route = [
   { else = "'relay'" },
 ]
 
+[queue.route.local]
+type = "local"
+
 [queue.route.relay]
 type = "relay"
 description = "SES"
