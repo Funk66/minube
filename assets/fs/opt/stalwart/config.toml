@@ -9,7 +9,6 @@ local-keys = [
   "config.local-keys.*",
   "directory.*",
   "metrics.*",
-  "queue.*",
   "server.*",
   "storage.blob",
   "storage.data",
@@ -95,26 +94,6 @@ renew-before = "30d"
 enable = true
 auth.username = "alloy"
 auth.secret = "%{env:METRICS_SECRET}%"
-
-[queue.strategy]
-route = [
-  { if = "is_local_domain('', rcpt_domain)", then = "'local'" },
-  { else = "'relay'" },
-]
-
-[queue.route.local]
-type = "local"
-
-[queue.route.relay]
-type = "relay"
-description = "SES"
-address = "email-smtp.eu-central-1.amazonaws.com"
-port = 465
-protocol = "smtp"
-auth.username = "%{env:SMTP_USERNAME}%"
-auth.secret = "%{env:SMTP_PASSWORD}%"
-tls.implicit = true
-tls.allow-invalid-certs = false
 
 [tracer.log]
 type = "log"
