@@ -2,14 +2,13 @@
 
 [Unit]
 Description=Alloy
-After=network-online.target
+After=network-online.target pihole.service
 
 [Container]
 ContainerName=alloy
 Image=docker.io/grafana/alloy:latest
 Network=public.network
 Network=private.network
-IP=10.100.1.3
 EnvironmentFile=/data/alloy/env
 Volume=/:/host:ro
 Volume=/var/log:/var/log:ro

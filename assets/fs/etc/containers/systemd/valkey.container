@@ -14,7 +14,9 @@ HealthInterval=10s
 HealthTimeout=5s
 HealthRetries=5
 Notify=healthy
+Volume=/var/opt/valkey:/data:Z
 Label="io.containers.autoupdate=registry"
 
 [Service]
 Restart=always
+ExecStartPre=mkdir -p /var/opt/valkey
