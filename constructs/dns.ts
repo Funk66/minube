@@ -263,5 +263,15 @@ export class DNS extends Construct {
         "2 1 2 7d779dd26d37ca5a72fd05f1b815a06078c8e09777697c651fbe012c8d2894e048fcfe24160ee1562602240b6bef44e00f2b7340c84546d6110842bbdeb484a7",
       ],
     });
+
+    new Route53Record(this, "google-record", {
+      name: this.zone.name,
+      zoneId: this.zone.zoneId,
+      type: "TXT",
+      ttl: 300,
+      records: [
+        "google-site-verification=jm-wNSxSnrlZD5TeJzZMYOIsa8AdIDRNX9TKuAX0h5c",
+      ],
+    });
   }
 }
