@@ -10,20 +10,20 @@
 }
 
 (proxy) {
+	@blockedPaths {
+		path *.php
+		path */.git*
+		path */.env*
+		path */db.sqlite3*
+		path */.htaccess*
+	}
+	abort @blockedPaths
+
 	reverse_proxy {args[0]}:{args[1]}
 
 	log {
 		output file /var/log/caddy/{args[0]}.log
 	}
-
-	@blockedPaths {
-		path */.git*
-		path */.env*
-		path */*.php
-		path */db.sqlite3*
-		path */.htaccess*
-	}
-	abort @blockedPaths
 }
 
 photos.guirao.net {
