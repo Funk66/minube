@@ -13,7 +13,7 @@ Environment=PROMETHEUS_WIREGUARD_EXPORTER_CONFIG_FILE_NAMES=/etc/wireguard/wg0.c
 Environment=PROMETHEUS_WIREGUARD_EXPORTER_EXPORT_REMOTE_IP_AND_PORT_ENABLED=true
 Environment=PROMETHEUS_WIREGUARD_EXPORTER_PREPEND_SUDO_ENABLED=false
 Exec=-a false
-Volume=/opt/wireguard/wg0.conf:/etc/wireguard/wg0.conf:ro,Z
+Volume=/data/wireguard/wg_confs/wg0.conf:/etc/wireguard/wg0.conf:ro,Z
 Label="io.containers.autoupdate=registry"
 
 [Service]
