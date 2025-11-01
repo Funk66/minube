@@ -264,7 +264,7 @@ export class EC2 extends Construct {
 
     const instance = new Instance(this, "instance", {
       ami: ami,
-      instanceType: "t4g.small",
+      instanceType: "t4g.medium",
       keyName: key.keyName,
       userData: readFileSync("assets/userdata.sh", "utf-8"),
       subnetId: config.subnet,
