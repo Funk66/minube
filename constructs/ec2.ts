@@ -275,7 +275,7 @@ export class EC2 extends Construct {
         Name: id,
       },
       rootBlockDevice: {
-        volumeSize: 24,
+        volumeSize: 25,
         volumeType: "gp3",
         encrypted: true,
       },
