@@ -38,6 +38,10 @@ calendar.guirao.net {
 	import proxy radicale 5232
 }
 
+maps.guirao.net {
+  reverse_proxy dawarich:3000
+}
+
 mail.guirao.net {
 	reverse_proxy stalwart:8080 {
 		transport http {

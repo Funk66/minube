@@ -1,0 +1,46 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Sidekiq for Dawarich
+Wants=valkey.service postgis.service dawarich.service
+After=valkey.service postgis.service dawarich.service
+
+[Container]
+ContainerName=sidekiq
+Image=docker.io/freikin/dawarich:latest
+Network=public.network
+IP=10.100.1.16
+Entrypoint=sidekiq-entrypoint.sh
+Exec=bundle exec sidekiq
+EnvironmentFile=/data/dawarich/env
+Environment=RAILS_ENV=production
+Environment=REDIS_URL=redis://valkey:6379
+Environment=DATABASE_HOST=postgis
+Environment=DATABASE_PORT=5432
+Environment=DATABASE_USERNAME=dawarich
+Environment=DATABASE_NAME=dawarich
+Environment=APPLICATION_HOSTS=maps.guirao.net
+Environment=BACKGROUND_PROCESSING_CONCURRENCY=10
+Environment=APPLICATION_PROTOCOL=http
+Environment=PROMETHEUS_EXPORTER_ENABLED=false
+Environment=PROMETHEUS_EXPORTER_HOST=dawarich
+Environment=PROMETHEUS_EXPORTER_PORT=9394
+Environment=RAILS_LOG_TO_STDOUT=true
+Environment=SELF_HOSTED=true
+Environment=STORE_GEODATA=true
+Volume=/data/dawarich/public:/var/app/public:Z
+Volume=/data/dawarich/watched:/var/app/tmp/imports/watched:Z
+Volume=/data/dawarich/storage:/var/app/storage:Z
+HealthCmd=pggrep -f sidekiq
+HealthInterval=10s
+HealthRetries=30
+HealthStartPeriod=30s
+HealthTimeout=10s
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
