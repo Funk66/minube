@@ -28,7 +28,8 @@ Label="io.containers.autoupdate=registry"
 
 [Service]
 Restart=always
-ExecStartPre=mkdir -p /var/log/paperless && chown 1000:1000 /var/log/paperless
+ExecStartPre=mkdir -p /var/log/paperless
+ExecStartPre=chown 1000:1000 /var/log/paperless
 
 [Install]
 WantedBy=multi-user.target
