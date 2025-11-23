@@ -86,7 +86,7 @@ export class CDN extends Construct {
     new CloudfrontDistribution(this, "cloudfront", {
       enabled: true,
       isIpv6Enabled: true,
-      aliases: ["photos.guirao.net", "calendar.guirao.net"],
+      aliases: ["photos.guirao.net"],
       viewerCertificate: {
         acmCertificateArn: cert.arn,
         sslSupportMethod: "sni-only",

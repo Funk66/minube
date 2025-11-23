@@ -34,10 +34,6 @@ docs.guirao.net {
 	import proxy paperless 8000
 }
 
-calendar.guirao.net {
-	import proxy radicale 5232
-}
-
 maps.guirao.net {
   reverse_proxy dawarich:3000
 }
