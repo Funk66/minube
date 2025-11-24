@@ -43,4 +43,6 @@ mount -a
 
 systemctl enable {podman-auto-update,immich-backup,stalwart-backup,paperless-backup,sshfp.service}.timer
 
+echo "SystemMaxUse=1G" >>/etc/systemd/journald.conf
+
 shutdown -r +1
