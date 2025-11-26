@@ -15,6 +15,9 @@ Exec=bundle exec sidekiq
 EnvironmentFile=/data/dawarich/env
 Environment=RAILS_ENV=production
 Environment=REDIS_URL=redis://valkey:6379
+Environment=RAILS_CACHE_DB=3
+Environment=RAILS_JOB_QUEUE_DB=4
+Environment=RAILS_WS_DB=5
 Environment=DATABASE_HOST=postgis
 Environment=DATABASE_PORT=5432
 Environment=DATABASE_USERNAME=dawarich

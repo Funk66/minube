@@ -13,7 +13,6 @@ IP=10.100.1.14
 Volume=/data/dawarich/db:/var/lib/postgresql/data:Z
 EnvironmentFile=/data/dawarich/env
 Environment=POSTGRES_USER=dawarich
-Environment=POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 Environment=POSTGRES_DB=dawarich
 ShmSize=1g
 HealthCmd=pg_isready -U dawarich
