@@ -3,6 +3,7 @@
 [Unit]
 Description=Pi-hole DNS server
 After=network-online.target wireguard.service
+BindsTo=wireguard.service
 
 [Container]
 ContainerName=pihole

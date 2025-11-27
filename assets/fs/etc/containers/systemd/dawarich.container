@@ -4,6 +4,7 @@
 Description=Dawarich
 Wants=valkey.service postgis.service
 After=valkey.service postgis.service
+BindsTo=postgis.service
 
 [Container]
 ContainerName=dawarich

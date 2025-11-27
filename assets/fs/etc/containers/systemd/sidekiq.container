@@ -4,6 +4,7 @@
 Description=Sidekiq for Dawarich
 Wants=valkey.service postgis.service dawarich.service
 After=valkey.service postgis.service dawarich.service
+BindsTo=postgis.service
 
 [Container]
 ContainerName=sidekiq
