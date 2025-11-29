@@ -37,12 +37,11 @@ Volume=/data/dawarich/public:/var/app/public:Z
 Volume=/data/dawarich/watched:/var/app/tmp/imports/watched:Z
 Volume=/data/dawarich/storage:/var/app/storage:Z
 Volume=/data/dawarich/db:/dawarich_db_data
-HealthCmd=/bin/sh -c "wget -qO - http://127.0.0.1:3000/api/v1/health | grep -q '\"status\"\\s*:\\s*\"ok\"'"
+HealthCmd=curl -f http://127.0.0.1:3000/api/v1/health
 HealthStartPeriod=30s
 HealthInterval=10s
 HealthTimeout=10s
 HealthRetries=30
-Notify=healthy
 Label="io.containers.autoupdate=registry"
 
 [Service]

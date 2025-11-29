@@ -35,7 +35,7 @@ Environment=STORE_GEODATA=true
 Volume=/data/dawarich/public:/var/app/public:Z
 Volume=/data/dawarich/watched:/var/app/tmp/imports/watched:Z
 Volume=/data/dawarich/storage:/var/app/storage:Z
-HealthCmd=pggrep -f sidekiq
+HealthCmd=pgrep -f sidekiq
 HealthInterval=10s
 HealthRetries=30
 HealthStartPeriod=30s

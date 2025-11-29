@@ -15,11 +15,12 @@ EnvironmentFile=/data/dawarich/env
 Environment=POSTGRES_USER=dawarich
 Environment=POSTGRES_DB=dawarich
 ShmSize=1g
-HealthCmd=pg_isready -U dawarich
+HealthCmd=pg_isready
 HealthStartPeriod=5s
 HealthInterval=10s
 HealthTimeout=10s
 HealthRetries=5
+Notify=healthy
 Label="io.containers.autoupdate=registry"
 
 [Service]
