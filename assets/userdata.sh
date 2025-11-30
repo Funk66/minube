@@ -41,7 +41,7 @@ echo 'UUID="96786644-b31e-4923-bccd-c80f2c3e7c0f" /data xfs defaults,nofail' >>/
 systemctl daemon-reload
 mount -a
 
-systemctl enable {podman-auto-update,immich-backup,stalwart-backup,paperless-backup,sshfp.service}.timer
+systemctl enable {podman-auto-update,immich-backup,stalwart-backup,dawarich-backup,paperless-backup,sshfp.service}.timer
 
 echo "SystemMaxUse=1G" >>/etc/systemd/journald.conf
 
