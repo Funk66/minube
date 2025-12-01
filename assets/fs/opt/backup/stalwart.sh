@@ -2,6 +2,7 @@
 
 set -eo pipefail
 
+# shellcheck source=/dev/null
 . /data/stalwart/env
 export PGPASSWORD="$POSTGRES_PASSWORD"
 PIPE=$(mktemp -u)

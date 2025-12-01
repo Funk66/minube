@@ -5,7 +5,6 @@ import { VPC } from "./constructs/vpc";
 import { S3 } from "./constructs/s3";
 import { EC2 } from "./constructs/ec2";
 import { DNS } from "./constructs/dns";
-import { CDN } from "./constructs/cdn";
 import { IAM } from "./constructs/iam";
 import { SES } from "./constructs/ses";
 
@@ -22,7 +21,6 @@ class Minube extends TerraformStack {
     });
 
     const dns = new DNS(this, "dns", provider);
-    new CDN(this, "cdn", dns.zone.id, provider);
     const s3 = new S3(this, "buckets");
     new IAM(this, "iam", {
       photos: s3.buckets.photos,
