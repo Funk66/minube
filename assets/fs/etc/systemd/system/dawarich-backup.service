@@ -1,8 +1,0 @@
-[Unit]
-Description=Dawarich backup job
-Wants=network-online.target
-After=network-online.target
-
-[Service]
-Type=oneshot
-ExecStart=/opt/backup/dawarich.sh

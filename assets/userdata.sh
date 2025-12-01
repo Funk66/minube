@@ -34,8 +34,9 @@ systemctl restart systemd-resolved
 
 useradd --uid 2000 --create-home --shell /sbin/nologin podman
 loginctl enable-linger podman
-aws s3 cp --recursive s3://minube-fs/ /host/
-chown -R podman:podman /etc/containers/systemd/users/2000/
+aws s3 cp --recursive s3://minube-files/podman/ /host/home/podman/.config/containers/systemd/
+aws s3 cp --recursive s3://minube-files/systemd/ /host/home/podman/.config/systemd/user/
+chown -R podman:podman /home/podman/.config
 usermod -g podman ubuntu
 
 mkdir /data
@@ -45,6 +46,7 @@ systemctl daemon-reload
 mount -a
 
 systemctl enable {podman-auto-update,immich-backup,stalwart-backup,dawarich-backup,paperless-backup,sshfp.service}.timer
+sudo -u podman XDG_RUNTIME_DIR=/run/user/2000 systemctl --user enable --now dawarich-backup.timer
 
 echo "SystemMaxUse=1G" >>/etc/systemd/journald.conf
 
