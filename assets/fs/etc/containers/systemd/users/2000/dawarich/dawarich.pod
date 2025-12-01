@@ -1,0 +1,5 @@
+# vim: ft=systemd
+
+[Pod]
+PodName=dawarich
+Network=dawarich.network

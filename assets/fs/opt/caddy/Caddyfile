@@ -35,7 +35,7 @@ docs.guirao.net {
 }
 
 maps.guirao.net {
-  reverse_proxy dawarich:3000
+  reverse_proxy host.containers.internal:3000
 }
 
 mail.guirao.net {

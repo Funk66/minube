@@ -16,7 +16,7 @@ snap remove amazon-ssm-agent
 
 apt update
 apt upgrade -y
-apt install -y podman
+apt install -y podman systemd-container
 
 timedatectl set-timezone Europe/Berlin
 
@@ -31,9 +31,12 @@ sed -r -i 's/#?DNSStubListener=yes/DNSStubListener=no/g' /etc/systemd/resolved.c
 rm /etc/resolv.conf
 ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
 systemctl restart systemd-resolved
-loginctl enable-linger ubuntu
 
+useradd --uid 2000 --create-home --shell /sbin/nologin podman
+loginctl enable-linger podman
 aws s3 cp --recursive s3://minube-fs/ /host/
+chown -R podman:podman /etc/containers/systemd/users/2000/
+usermod -g podman ubuntu
 
 mkdir /data
 chown ubuntu:ubuntu /data

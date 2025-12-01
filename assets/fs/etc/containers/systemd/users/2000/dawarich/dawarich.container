@@ -1,18 +1,19 @@
 # vim: ft=systemd
 
 [Unit]
-Description=Sidekiq for Dawarich
-Wants=valkey.service postgis.service dawarich.service
-After=valkey.service postgis.service dawarich.service
-BindsTo=postgis.service
+Description=Backend
+Requires=valkey.service postgis.service
+After=valkey.service postgis.service
 
 [Container]
-ContainerName=sidekiq
+Pod=dawarich.pod
+ContainerName=dawarich
 Image=docker.io/freikin/dawarich:latest
-Network=public.network
-IP=10.100.1.16
-Entrypoint=sidekiq-entrypoint.sh
-Exec=bundle exec sidekiq
+Network=dawarich.network
+Network=valkey.network
+Entrypoint=web-entrypoint.sh
+Exec=bin/rails server -p 3000 -b ::
+UserNS=keep-id:uid=0,gid=0
 EnvironmentFile=/data/dawarich/env
 Environment=RAILS_ENV=production
 Environment=REDIS_URL=redis://valkey:6379
@@ -23,11 +24,12 @@ Environment=DATABASE_HOST=postgis
 Environment=DATABASE_PORT=5432
 Environment=DATABASE_USERNAME=dawarich
 Environment=DATABASE_NAME=dawarich
+Environment=MIN_MINUTES_SPENT_IN_CITY=60
 Environment=APPLICATION_HOSTS=maps.guirao.net
-Environment=BACKGROUND_PROCESSING_CONCURRENCY=10
+Environment=TIME_ZONE=Europe/Berlin
 Environment=APPLICATION_PROTOCOL=http
 Environment=PROMETHEUS_EXPORTER_ENABLED=false
-Environment=PROMETHEUS_EXPORTER_HOST=dawarich
+Environment=PROMETHEUS_EXPORTER_HOST=0.0.0.0
 Environment=PROMETHEUS_EXPORTER_PORT=9394
 Environment=RAILS_LOG_TO_STDOUT=true
 Environment=SELF_HOSTED=true
@@ -35,16 +37,18 @@ Environment=STORE_GEODATA=true
 Volume=/data/dawarich/public:/var/app/public:Z
 Volume=/data/dawarich/watched:/var/app/tmp/imports/watched:Z
 Volume=/data/dawarich/storage:/var/app/storage:Z
-HealthCmd=pgrep -f sidekiq
-HealthInterval=10s
-HealthRetries=30
+Volume=/data/dawarich/db:/dawarich_db_data
+Tmpfs=/var/app/tmp/cache
+Tmpfs=/var/app/tmp/sockets
+HealthCmd=curl -f http://127.0.0.1:3000/api/v1/health
 HealthStartPeriod=30s
+HealthInterval=10s
 HealthTimeout=10s
-Label="io.containers.autoupdate=registry"
+HealthRetries=30
+PublishPort=127.0.0.1:3000:3000
 
 [Service]
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
-
+WantedBy=default.target

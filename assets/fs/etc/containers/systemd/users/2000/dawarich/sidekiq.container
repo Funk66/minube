@@ -1,18 +1,18 @@
 # vim: ft=systemd
 
 [Unit]
-Description=Dawarich
-Wants=valkey.service postgis.service
+Description=Worker
+Requires=valkey.service postgis.service
 After=valkey.service postgis.service
-BindsTo=postgis.service
 
 [Container]
-ContainerName=dawarich
+Pod=dawarich.pod
+ContainerName=sidekiq
 Image=docker.io/freikin/dawarich:latest
-Network=public.network
-IP=10.100.1.15
-Entrypoint=web-entrypoint.sh
-Exec=bin/rails server -p 3000 -b ::
+Network=dawarich.network
+Entrypoint=sidekiq-entrypoint.sh
+Exec=bundle exec sidekiq
+UserNS=keep-id:uid=1000,gid=1000
 EnvironmentFile=/data/dawarich/env
 Environment=RAILS_ENV=production
 Environment=REDIS_URL=redis://valkey:6379
@@ -23,12 +23,11 @@ Environment=DATABASE_HOST=postgis
 Environment=DATABASE_PORT=5432
 Environment=DATABASE_USERNAME=dawarich
 Environment=DATABASE_NAME=dawarich
-Environment=MIN_MINUTES_SPENT_IN_CITY=60
 Environment=APPLICATION_HOSTS=maps.guirao.net
-Environment=TIME_ZONE=Europe/Berlin
+Environment=BACKGROUND_PROCESSING_CONCURRENCY=10
 Environment=APPLICATION_PROTOCOL=http
 Environment=PROMETHEUS_EXPORTER_ENABLED=false
-Environment=PROMETHEUS_EXPORTER_HOST=0.0.0.0
+Environment=PROMETHEUS_EXPORTER_HOST=dawarich
 Environment=PROMETHEUS_EXPORTER_PORT=9394
 Environment=RAILS_LOG_TO_STDOUT=true
 Environment=SELF_HOSTED=true
@@ -36,16 +35,14 @@ Environment=STORE_GEODATA=true
 Volume=/data/dawarich/public:/var/app/public:Z
 Volume=/data/dawarich/watched:/var/app/tmp/imports/watched:Z
 Volume=/data/dawarich/storage:/var/app/storage:Z
-Volume=/data/dawarich/db:/dawarich_db_data
-HealthCmd=curl -f http://127.0.0.1:3000/api/v1/health
-HealthStartPeriod=30s
+HealthCmd=pgrep -f sidekiq
 HealthInterval=10s
-HealthTimeout=10s
 HealthRetries=30
-Label="io.containers.autoupdate=registry"
+HealthStartPeriod=30s
+HealthTimeout=10s
 
 [Service]
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

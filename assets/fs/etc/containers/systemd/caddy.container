@@ -8,6 +8,7 @@ ContainerName=caddy
 Exec=/usr/bin/caddy run --config /etc/caddy/Caddyfile
 Image=docker.io/caddy:latest
 Network=public.network
+Network=dawarich.network
 IP=10.100.1.2
 Notify=true
 Volume=/opt/caddy:/etc/caddy:Z
