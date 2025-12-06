@@ -19,6 +19,81 @@ export class IAM extends Construct {
   constructor(scope: Construct, id: string, config: RoleConfig) {
     super(scope, id);
 
+    const grafanaPolicy = new IamPolicy(this, "grafana-policy", {
+      name: "grafana",
+      policy: JSON.stringify({
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Sid: "AllowReadingMetricsFromCloudWatch",
+            Effect: "Allow",
+            Action: [
+              "CloudWatch:DescribeAlarmsForMetric",
+              "CloudWatch:DescribeAlarmHistory",
+              "CloudWatch:DescribeAlarms",
+              "CloudWatch:ListMetrics",
+              "CloudWatch:GetMetricData",
+              "CloudWatch:GetInsightRuleReport",
+            ],
+            Resource: "*",
+          },
+          {
+            Sid: "AllowReadingResourceMetricsFromPerformanceInsights",
+            Effect: "Allow",
+            Action: "pi:GetResourceMetrics",
+            Resource: "*",
+          },
+          {
+            Sid: "AllowReadingLogsFromCloudWatch",
+            Effect: "Allow",
+            Action: [
+              "logs:DescribeLogGroups",
+              "logs:GetLogGroupFields",
+              "logs:StartQuery",
+              "logs:StopQuery",
+              "logs:GetQueryResults",
+              "logs:GetLogEvents",
+            ],
+            Resource: "*",
+          },
+          {
+            Sid: "AllowReadingTagsInstancesRegionsFromEC2",
+            Effect: "Allow",
+            Action: [
+              "ec2:DescribeTags",
+              "ec2:DescribeInstances",
+              "ec2:DescribeRegions",
+            ],
+            Resource: "*",
+          },
+          {
+            Sid: "AllowReadingResourcesForTags",
+            Effect: "Allow",
+            Action: "tag:GetResources",
+            Resource: "*",
+          },
+          {
+            Action: ["oam:ListSinks", "oam:ListAttachedLinks"],
+            Effect: "Allow",
+            Resource: "*",
+          },
+        ],
+      }),
+    });
+
+    const grafanaUser = new IamUser(this, "grafana-user", {
+      name: "grafana",
+    });
+
+    new IamUserPolicyAttachment(this, "grafana-user-attachment", {
+      user: grafanaUser.name,
+      policyArn: grafanaPolicy.arn,
+    });
+
+    new IamAccessKey(this, "grafana-access-key", {
+      user: grafanaUser.name,
+    });
+
     const officePolicy = new IamPolicy(this, "office-policy", {
       name: "office",
       policy: JSON.stringify({
