@@ -16,6 +16,8 @@ local-keys = [
   "storage.fts",
   "storage.lookup",
   "store.*",
+  "tracer.stdout.*",
+  "tracer.log.*",
 ]
 
 [authentication.fallback-admin]
@@ -49,20 +51,23 @@ protocol = "http"
 bind = ["[::]:8080"]
 proxy.trusted-networks = ["10.100.1.0/28"]
 
+[queue.strategy]
+route = [
+  { if = "is_local_domain('', rcpt_domain)", then = "'local'" },
+  { else = "'relay'" },
+]
+
 [storage]
-data = "postgres"
-fts = "postgres"
+data = "rocksdb"
+fts = "rocksdb"
 blob = "s3"
-lookup = "valkey"
+lookup = "rocksdb"
 directory = "internal"
 
-[store.postgres]
-type = "postgresql"
-host = "postgres"
-port = 5432
-database = "stalwart"
-user = "stalwart"
-password = "%{env:POSTGRES_PASSWORD}%"
+[store.rocksdb]
+type = "rocksdb"
+path = "/opt/stalwart/data"
+compression = "lz4"
 
 [store.s3]
 type = "s3"
@@ -72,14 +77,9 @@ region = "eu-central-1"
 access-key = "%{env:AWS_ACCESS_KEY_ID}%"
 secret-key = "%{env:AWS_ACCESS_KEY_SECRET}%"
 
-[store.valkey]
-type = "redis"
-redis-type = "single"
-urls = "valkey://valkey/1"
-
 [directory.internal]
 type = "internal"
-store = "postgres"
+store = "rocksdb"
 
 [acme.letsencrypt]
 directory = "https://acme-v02.api.letsencrypt.org/directory"
@@ -93,3 +93,12 @@ renew-before = "30d"
 enable = true
 auth.username = "alloy"
 auth.secret = "%{env:METRICS_SECRET}%"
+
+[tracer.log]
+enable = false
+
+[tracer.console]
+type = "console"
+level = "debug"
+ansi = true
+enable = true

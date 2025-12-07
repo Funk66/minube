@@ -121,7 +121,7 @@ export class DNS extends Construct {
       type: "TXT",
       ttl: 300,
       records: [
-        'v=DKIM1; k=rsa; h=sha256; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxpEUbVuE1DlmMXaAQMV8QdHU5ZsTfRaF5dObdJ7+f+2TGvZ4AorQIzmb2kM664Xkl2aJGhkz0YfPv7tRsuachbaRJbjGRCkAftkaP0YYF8LgVuT9zakCIKBzfxyE+uPMaW2dwB+""IrmriZCBSaGJ5cA/krxcfWAkvA6t9yaCG5wibfIL9X+iO9/p0KUcE20CT+8+hU7wjUEWxDF6ia4hLzOSGA8fd3pk6dSSDD2whrZpIIdQjVsBsQsSZ28tvd2zVpkOzWJx5i73YSw1MWV5+tW2uVPxqN65N/DRNimLhNRNSkSq/+F+LyG1M84ttR8ncU1i5hPBHIH9f3/m98ismsQIDAQAB',
+        'v=DKIM1; k=rsa; h=sha256; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxpEUbVuE1DlmMXaAQMV8QdHU5ZsTfRaF5dObdJ7+f+2TGvZ4AorQIzmb2kM664Xkl2aJGhkz0YfPv7tRsuachbaRJbjGRCkAftkaP0YYF8LgVuT9zakCIKBzfxyE+uPMaW2dwB+IrmriZCBSaGJ5cA/krxcfWAkvA6t9yaCG5wibfIL9X+iO9/p""0KUcE20CT+8+hU7wjUEWxDF6ia4hLzOSGA8fd3pk6dSSDD2whrZpIIdQjVsBsQsSZ28tvd2zVpkOzWJx5i73YSw1MWV5+tW2uVPxqN65N/DRNimLhNRNSkSq/+F+LyG1M84ttR8ncU1i5hPBHIH9f3/m98ismsQIDAQAB',
       ],
     });
 
@@ -157,44 +157,12 @@ export class DNS extends Construct {
       records: ["0 1 993 mail." + this.zone.name],
     });
 
-    new Route53Record(this, "srv-imap-record", {
-      name: "_imap._tcp." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "SRV",
-      ttl: 300,
-      records: ["0 1 143 mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "srv-pop3s-record", {
-      name: "_pop3s._tcp." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "SRV",
-      ttl: 300,
-      records: ["0 1 995 mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "srv-pop3-record", {
-      name: "_pop3._tcp." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "SRV",
-      ttl: 300,
-      records: ["0 1 110 mail." + this.zone.name],
-    });
-
     new Route53Record(this, "srv-submissions-record", {
       name: "_submissions._tcp." + this.zone.name,
       zoneId: this.zone.zoneId,
       type: "SRV",
       ttl: 300,
       records: ["0 1 465 mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "srv-submission-record", {
-      name: "_submission._tcp." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "SRV",
-      ttl: 300,
-      records: ["0 1 587 mail." + this.zone.name],
     });
 
     new Route53Record(this, "cname-autoconfig-record", {
@@ -253,14 +221,14 @@ export class DNS extends Construct {
       type: "TLSA",
       ttl: 300,
       records: [
-        "3 0 1 c430400ecd6a2cd960c42358915a8cbf590d448f390407a2c6518706427f5ee6",
-        "3 0 2 5529d6de26a00bc98dd4dccb5b5724632a6278025dd2b948286910f01d33bfe90161b90e944466521b7e4b2869aa077c76cbdf002cd011f01ce702cff958d63a",
-        "3 1 1 685a21cd2003f9860e3fec47dac66ff847ef1f578095b5ff51fc6da24ce342fd",
-        "3 1 2 9ed125bd51c8f7cde85329214c8fa5e5689de2a09288adfb2429bdc9dd9d47bbcaf550393542de22f3812a57e368aa5b13e4150a1ef14e99d7a0cf02406d0ac0",
-        "2 0 1 aeb1fd7410e83bc96f5da3c6a7c2c1bb836d1fa5cb86e708515890e428a8770b",
-        "2 0 2 e18f3d6ccbc578f025c3c7c29ed7bffe1b8eef5b1f839c17298dcf218303d2a63e305f6c1f489691774a18bad836035e5af2de1fc42a3a26cfe9e530f92e3855",
-        "2 1 1 cbbc559b44d524d6a132bdac672744da3407f12aae5d5f722c5f6c7913871c75",
-        "2 1 2 7d779dd26d37ca5a72fd05f1b815a06078c8e09777697c651fbe012c8d2894e048fcfe24160ee1562602240b6bef44e00f2b7340c84546d6110842bbdeb484a7",
+        "3 0 1 5c58c5dfa04d72878f7e2df7834573e531cac422a0baee61c9d95fce7949d586",
+        "3 0 2 b01b8ed87f2d6c2b9e63eb8295077d4a69552477fc8b12eb05c11ebb8b6e977eca9d53c3ff31ba2bc705b8df99f4c7042dca26bccefc93635e642c6736b36da1",
+        "3 1 1 a76e9bd54df6589ac49591790a619fbdeaea807d256eb30aecd55aafe61ed175",
+        "3 1 2 4cef54e6c1792eb6d51e25b9c99c430b65bb77df88603a2088ec277d9f174a5994156f3dbcec213b9bdb0842448ecc663fb7b33fb921d908db8e5e29a662a041",
+        "2 0 1 83624fd338c8d9b023c18a67cb7a9c0519da43d11775b4c6cbdad45c3d997c52",
+        "2 0 2 3565cd99fb0bccf03019e4d2276ca5d7c913a3af1ad58a95a8cad181699364f22fb6dc6cc01e071847db3336ae9a122b968d31c5be9a4443e145daba2a1782c6",
+        "2 1 1 885bf0572252c6741dc9a52f5044487fef2a93b811cdedfad7624cc283b7cdd5",
+        "2 1 2 89d8f1d26d16e94600405c8585e40ad1ecde0023cd447e8b39fd90bc8b482c7bd68d963156e5037023b144ec4caa03af8213296f3a498f69dee691a95a92d722",
       ],
     });
 
