@@ -9,6 +9,7 @@ local-keys = [
   "config.local-keys.*",
   "directory.*",
   "metrics.*",
+  "queue.*",
   "server.*",
   "storage.blob",
   "storage.data",
@@ -16,21 +17,20 @@ local-keys = [
   "storage.fts",
   "storage.lookup",
   "store.*",
-  "tracer.console.*",
-  "tracer.log.*",
+  "tracer.*",
 ]
 
 [authentication.fallback-admin]
-user = "admin"
+# user = "admin"
 
 [server]
 hostname = "mail.guirao.net"
 
 [server.auto-ban]
 abuse.rate = "5/1h"
-auth.rate = "5/1h"
-loiter.rate = "15/1d"
-scan.rate = "5/1d"
+auth.rate = "1/1h"
+loin.rate = "5/1h"
+scan.rate = "1/1d"
 
 [server.listener.smtp]
 bind = ["[::]:25"]
@@ -51,6 +51,51 @@ protocol = "http"
 bind = ["[::]:8080"]
 proxy.trusted-networks = ["10.100.1.0/28"]
 
+[storage]
+data = "postgres"
+fts = "postgres"
+blob = "s3"
+lookup = "valkey"
+directory = "internal"
+
+[store.postgres]
+type = "postgresql"
+host = "postgres"
+port = 5432
+database = "stalwart"
+user = "stalwart"
+password = "%{env:POSTGRES_PASSWORD}%"
+
+[store.s3]
+type = "s3"
+bucket = "minube-mail"
+endpoint = "s3.dualstack.eu-central-1.amazonaws.com"
+region = "eu-central-1"
+access-key = "%{env:AWS_ACCESS_KEY_ID}%"
+secret-key = "%{env:AWS_ACCESS_KEY_SECRET}%"
+
+[store.valkey]
+type = "redis"
+redis-type = "single"
+urls = "valkey://valkey/1"
+
+[directory.internal]
+type = "internal"
+store = "postgres"
+
+[acme.letsencrypt]
+directory = "https://acme-v02.api.letsencrypt.org/directory"
+challenge = "http-01"
+contact = ["admin@guirao.net"]
+domains = ["mail.guirao.net"]
+cache = "%{BASE_PATH}%/data/acme"
+renew-before = "30d"
+
+[metrics.prometheus]
+enable = true
+auth.username = "alloy"
+auth.secret = "%{env:METRICS_SECRET}%"
+
 [queue.strategy]
 route = [
   { if = "is_local_domain('', rcpt_domain)", then = "'local'" },
@@ -68,48 +113,11 @@ auth.secret = "%{env:SMTP_PASSWORD}%"
 tls.implicit = true
 tls.allow-invalid-certs = false
 
-[storage]
-data = "rocksdb"
-fts = "rocksdb"
-blob = "s3"
-lookup = "rocksdb"
-directory = "internal"
-
-[store.rocksdb]
-type = "rocksdb"
-path = "/opt/stalwart/data"
-compression = "lz4"
-
-[store.s3]
-type = "s3"
-bucket = "minube-mail"
-endpoint = "s3.dualstack.eu-central-1.amazonaws.com"
-region = "eu-central-1"
-access-key = "%{env:AWS_ACCESS_KEY_ID}%"
-secret-key = "%{env:AWS_ACCESS_KEY_SECRET}%"
-
-[directory.internal]
-type = "internal"
-store = "rocksdb"
-
-[acme.letsencrypt]
-directory = "https://acme-v02.api.letsencrypt.org/directory"
-challenge = "http-01"
-contact = ["admin@guirao.net"]
-domains = ["mail.guirao.net"]
-cache = "%{BASE_PATH}%/data/acme"
-renew-before = "30d"
-
-[metrics.prometheus]
-enable = true
-auth.username = "alloy"
-auth.secret = "%{env:METRICS_SECRET}%"
-
 [tracer.log]
-enable = false
-
-[tracer.console]
-type = "console"
-level = "debug"
-ansi = true
+type = "log"
+level = "info"
+path = "/opt/stalwart/logs"
+prefix = "stalwart.log"
+rotate = "daily"
+ansi = false
 enable = true
