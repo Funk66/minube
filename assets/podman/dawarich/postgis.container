@@ -2,21 +2,18 @@
 
 [Unit]
 Description=Database
-After=network-online.target
-Wants=network-online.target
 
 [Container]
 Pod=dawarich.pod
 ContainerName=postgis
 Image=docker.io/postgis/postgis:17-3.5-alpine
-Network=dawarich.network
 Volume=/data/dawarich/db:/var/lib/postgresql/data:Z
 UserNS=keep-id:uid=1000,gid=1000
 EnvironmentFile=/data/dawarich/env
 Environment=POSTGRES_USER=dawarich
 Environment=POSTGRES_DB=dawarich
 ShmSize=1g
-HealthCmd=pg_isready
+HealthCmd=pg_isready -U dawarich
 HealthStartPeriod=5s
 HealthInterval=10s
 HealthTimeout=10s

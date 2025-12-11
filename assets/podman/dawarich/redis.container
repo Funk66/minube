@@ -1,0 +1,20 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Redis
+
+[Container]
+ContainerName=redis
+Image=docker.io/redis:7.4-alpine
+Network=dawarich.network
+HealthCmd="/usr/local/bin/redis-cli --raw incr ping"
+HealthStartPeriod=30s
+HealthInterval=10s
+HealthTimeout=5s
+HealthRetries=5
+Notify=healthy
+Volume=redis:/data
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
