@@ -1,0 +1,5 @@
+# vim: set ft=systemd:
+
+[Network]
+NetworkName=caddy
+IPv6=true

@@ -35,10 +35,12 @@ docs.guirao.net {
 }
 
 maps.guirao.net {
-  reverse_proxy host.containers.internal:3000
+	reverse_proxy dawarich:3000
 }
 
-mail.guirao.net {
+mail.guirao.net,
+autoconfig.guirao.net,
+autodiscover.guirao.net {
 	reverse_proxy stalwart:8080 {
 		transport http {
 			proxy_protocol v2
