@@ -2,14 +2,12 @@
 
 [Unit]
 Description=Immich
-Wants=valkey.service postgres.service
 After=valkey.service postgres.service
 
 [Container]
+Pod=immich.pod
 ContainerName=immich
 Image=ghcr.io/immich-app/immich-server:release
-Network=public.network
-IP=10.100.1.7
 EnvironmentFile=/data/immich/env
 Environment=REDIS_HOSTNAME=valkey
 Environment=DB_HOSTNAME=postgres

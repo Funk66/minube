@@ -5,12 +5,11 @@ Description=Immich ML
 After=immich.service
 
 [Container]
+Pod=immich.pod
 ContainerName=immich-ml
 Image=ghcr.io/immich-app/immich-machine-learning:release
-Network=public.network
-IP=10.100.1.8
 EnvironmentFile=/data/immich/env
-Volume=model-cache:/cache
+Volume=immich:/cache
 Volume=/etc/localtime:/etc/localtime:ro
 Label="io.containers.autoupdate=registry"
 

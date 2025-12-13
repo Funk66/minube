@@ -1,0 +1,23 @@
+# vim: ft=systemd
+
+[Unit]
+Description=PostgreSQL
+
+[Container]
+Pod=immich.pod
+ContainerName=postgres
+Image=ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+Environment=POSTGRES_INITDB_ARGS=--data-checksums
+Volume=%h/.config/containers/systemd/immich/postgres-healthcheck.sh:/health.sh:z
+Volume=/data/postgres:/var/lib/postgresql/data
+UserNS=keep-id:uid=0,gid=0
+HealthCmd=pg_isready -U postgres
+HealthStartPeriod=5m
+HealthInterval=30s
+HealthTimeout=5s
+HealthRetries=5
+Notify=healthy
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always

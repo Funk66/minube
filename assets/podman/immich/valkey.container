@@ -1,0 +1,20 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Valkey
+
+[Container]
+Pod=immich.pod
+ContainerName=valkey
+Image=docker.io/valkey/valkey:8-bookworm
+HealthCmd="/usr/local/bin/redis-cli ping || exit 1"
+HealthStartPeriod=30s
+HealthInterval=10s
+HealthTimeout=5s
+HealthRetries=5
+Notify=healthy
+Volume=valkey:/data
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
