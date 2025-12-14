@@ -2,7 +2,8 @@
 
 [Unit]
 Description=Worker
-Requires=redis.service postgis.service
+Wants=dawarich.service
+After=dawarich.service
 
 [Container]
 Pod=dawarich.pod

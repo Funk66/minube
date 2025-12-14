@@ -2,4 +2,6 @@
 
 [Network]
 NetworkName=caddy
+Gateway=10.10.10.1
+Subnet=10.10.10.0/26
 IPv6=true

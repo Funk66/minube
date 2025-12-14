@@ -2,6 +2,7 @@
 
 [Unit]
 Description=Immich ML
+Wants=immich.service
 After=immich.service
 
 [Container]
@@ -17,5 +18,4 @@ Label="io.containers.autoupdate=registry"
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
-
+WantedBy=default.target

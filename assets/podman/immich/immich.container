@@ -2,7 +2,8 @@
 
 [Unit]
 Description=Immich
-After=valkey.service postgres.service
+Requires=valkey.service pgvector.service
+After=valkey.service pgvector.service
 
 [Container]
 Pod=immich.pod
@@ -10,7 +11,7 @@ ContainerName=immich
 Image=ghcr.io/immich-app/immich-server:release
 EnvironmentFile=/data/immich/env
 Environment=REDIS_HOSTNAME=valkey
-Environment=DB_HOSTNAME=postgres
+Environment=DB_HOSTNAME=pgvector
 Environment=UPLOAD_LOCATION=/data/immich/library
 Environment=TZ=Europe/Berlin
 Volume=/data/immich:/usr/src/app/upload
@@ -27,4 +28,4 @@ Label="io.containers.autoupdate=registry"
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

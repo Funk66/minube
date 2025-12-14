@@ -3,6 +3,7 @@
 [Unit]
 Description=Backend
 Requires=redis.service postgis.service
+After=redis.service postgis.service
 
 [Container]
 Pod=dawarich.pod

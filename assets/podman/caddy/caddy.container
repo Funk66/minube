@@ -8,6 +8,7 @@ ContainerName=caddy
 Exec=/usr/bin/caddy run --config /etc/caddy/Caddyfile
 Image=docker.io/caddy:latest
 Network=caddy.network
+IP=10.10.10.2
 Notify=true
 Volume=%h/.config/containers/systemd/caddy/Caddyfile:/etc/caddy/Caddyfile:Z
 Volume=/data/caddy:/data/caddy
