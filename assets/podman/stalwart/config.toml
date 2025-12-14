@@ -3,6 +3,7 @@ local-keys = [
   "!server.allowed-ip.*",
   "!server.blocked-ip.*",
   "acme.*",
+  "auth.dkim.sign",
   "authentication.fallback-admin.user",
   "certificate.*",
   "cluster.*",
@@ -67,6 +68,12 @@ auth.username = "%{env:SMTP_USERNAME}%"
 auth.secret = "%{env:SMTP_PASSWORD}%"
 tls.implicit = true
 tls.allow-invalid-certs = false
+
+[auth.dkim]
+sign = [
+  { if = "is_local_domain('*', sender_domain)", then = "'ed25519' + sender_domain" },
+  { else = false },
+]
 
 [storage]
 data = "rocksdb"
