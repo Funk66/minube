@@ -14,7 +14,7 @@ Environment=REDIS_HOSTNAME=valkey
 Environment=DB_HOSTNAME=pgvector
 Environment=UPLOAD_LOCATION=/data/immich/library
 Environment=TZ=Europe/Berlin
-Volume=/data/immich:/usr/src/app/upload
+Volume=/data/immich/data:/usr/src/app/upload
 Volume=/etc/localtime:/etc/localtime:ro
 HealthCmd=["/bin/bash", "immich-healthcheck"]
 HealthStartPeriod=3m

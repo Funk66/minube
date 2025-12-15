@@ -8,7 +8,7 @@ Pod=immich.pod
 ContainerName=pgvector
 Image=ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
 Environment=POSTGRES_INITDB_ARGS=--data-checksums
-Volume=/data/postgres:/var/lib/postgresql/data
+Volume=/data/immich/pgvector:/var/lib/postgresql/data
 UserNS=keep-id:uid=0,gid=0
 HealthCmd=pg_isready -U postgres
 HealthStartPeriod=5m
