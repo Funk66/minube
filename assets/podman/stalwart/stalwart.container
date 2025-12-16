@@ -6,13 +6,13 @@ Description=Stalwart
 [Container]
 ContainerName=stalwart
 Image=docker.io/stalwartlabs/stalwart:latest
-Network=caddy.network
-Volume=%h/.config/containers/systemd/stalwart/config.toml:/etc/caddy/Caddyfile:Z
+Network=host
+Volume=%h/.config/containers/systemd/stalwart/config.toml:/opt/stalwart/etc/config.toml:Z
 Volume=/data/stalwart/data:/opt/stalwart/data:Z
 PublishPort=25:25
-PublishPort=110:110
 PublishPort=465:465
 PublishPort=993:993
+PublishPort=8080:8080
 EnvironmentFile=/data/stalwart/env
 Label="io.containers.autoupdate=registry"
 

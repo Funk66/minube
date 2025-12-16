@@ -7,14 +7,10 @@ Description=Caddy
 ContainerName=caddy
 Exec=/usr/bin/caddy run --config /etc/caddy/Caddyfile
 Image=docker.io/caddy:latest
-Network=caddy.network
-IP=10.10.10.2
+Network=host
 Notify=true
 Volume=%h/.config/containers/systemd/caddy/Caddyfile:/etc/caddy/Caddyfile:Z
 Volume=/data/caddy:/data/caddy
-PublishPort=80:80
-PublishPort=443:443
-PublishPort=443:443/udp
 Environment=TZ=Europe/Berlin
 Label="io.containers.autoupdate=registry"
 

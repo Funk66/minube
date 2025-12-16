@@ -2,4 +2,4 @@
 
 [Pod]
 PodName=dawarich
-Network=caddy.network
+PublishPort=3000:3000

@@ -2,4 +2,4 @@
 
 [Pod]
 PodName=paperless
-Network=caddy.network
+PublishPort=8000:8000

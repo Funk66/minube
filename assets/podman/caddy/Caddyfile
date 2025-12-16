@@ -19,7 +19,7 @@
 	}
 	abort @blockedPaths
 
-	reverse_proxy {args[0]}:{args[1]}
+  reverse_proxy host.containers.internal:{args[1]}
 
 	log {
 		output file /var/log/caddy/{args[0]}.log
@@ -41,7 +41,7 @@ maps.guirao.net {
 mail.guirao.net,
 autoconfig.guirao.net,
 autodiscover.guirao.net {
-	reverse_proxy stalwart:8080 {
+	reverse_proxy host.containers.internal:8080 {
 		transport http {
 			proxy_protocol v2
 		}

@@ -2,4 +2,4 @@
 
 [Pod]
 PodName=immich
-Network=caddy.network
+PublishPort=2283:2283
