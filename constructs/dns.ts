@@ -106,7 +106,7 @@ export class DNS extends Construct {
     });
 
     new Route53Record(this, "dkim-ecc-record", {
-      name: "202509e._domainkey." + this.zone.name,
+      name: "202512e._domainkey." + this.zone.name,
       zoneId: this.zone.zoneId,
       type: "TXT",
       ttl: 300,
@@ -116,7 +116,7 @@ export class DNS extends Construct {
     });
 
     new Route53Record(this, "dkim-rsa-record", {
-      name: "202509r._domainkey." + this.zone.name,
+      name: "202512e._domainkey." + this.zone.name,
       zoneId: this.zone.zoneId,
       type: "TXT",
       ttl: 300,
