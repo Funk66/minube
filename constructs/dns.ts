@@ -194,7 +194,7 @@ export class DNS extends Construct {
       zoneId: this.zone.zoneId,
       type: "TXT",
       ttl: 300,
-      records: ["v=STSv1; id=8777202045385525987"],
+      records: ["v=STSv1; id=20251219"],
     });
 
     new Route53Record(this, "txt-dmarc-record", {
