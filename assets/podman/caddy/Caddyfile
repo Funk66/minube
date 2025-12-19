@@ -39,6 +39,7 @@ maps.guirao.net {
 }
 
 mail.guirao.net,
+mta-sts.guirao.net,
 autoconfig.guirao.net,
 autodiscover.guirao.net {
 	reverse_proxy host.containers.internal:8080 {
