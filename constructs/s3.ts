@@ -30,23 +30,31 @@ export class S3 extends Construct {
         },
       });
 
-      let lifecycleRules: S3BucketLifecycleConfigurationRule[] = [
-        {
-          id: "Trashcan",
-          status: "Enabled",
-          abortIncompleteMultipartUpload: [{ daysAfterInitiation: 7 }],
-          noncurrentVersionExpiration: [{ noncurrentDays: 90 }],
-          filter: [{ prefix: "" }],
-        },
-      ];
-
+      let lifecycleRules: S3BucketLifecycleConfigurationRule[] = [];
       if (name == "backups") {
         lifecycleRules = lifecycleRules.concat([
           {
             id: "Backups",
             status: "Enabled",
-            expiration: [{ days: 14 }],
+            expiration: [{ days: 30 }],
             filter: [{ prefix: "stalwart/" }],
+          },
+          {
+            id: "Trashcan",
+            status: "Enabled",
+            abortIncompleteMultipartUpload: [{ daysAfterInitiation: 1 }],
+            noncurrentVersionExpiration: [{ noncurrentDays: 10 }],
+            filter: [{ prefix: "stalwart/" }],
+          },
+        ]);
+      } else {
+        lifecycleRules = lifecycleRules.concat([
+          {
+            id: "Trashcan",
+            status: "Enabled",
+            abortIncompleteMultipartUpload: [{ daysAfterInitiation: 7 }],
+            noncurrentVersionExpiration: [{ noncurrentDays: 90 }],
+            filter: [{ prefix: "" }],
           },
         ]);
       }
