@@ -5,4 +5,4 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/opt/backup/immich.sh
+ExecStart=/usr/bin/bash %h/.config/containers/systemd/immich/backup.sh

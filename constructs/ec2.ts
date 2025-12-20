@@ -23,6 +23,7 @@ interface EC2Config {
     photos: S3Bucket;
     docs: S3Bucket;
     fs: S3Bucket;
+    files: S3Bucket;
   };
   hostedZone: Route53Zone;
 }
@@ -56,13 +57,18 @@ export class EC2 extends Construct {
             Resource: [
               `${config.buckets.backups.arn}/*`,
               `${config.buckets.fs.arn}/*`,
+              `${config.buckets.files.arn}/*`,
             ],
             Action: ["s3:GetObject*", "s3:PutObject*"],
           },
           {
             Sid: "ListBackups",
             Effect: "Allow",
-            Resource: [config.buckets.backups.arn, config.buckets.fs.arn],
+            Resource: [
+              config.buckets.backups.arn,
+              config.buckets.fs.arn,
+              config.buckets.files.arn,
+            ],
             Action: ["s3:ListBucket"],
           },
           {

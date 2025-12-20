@@ -1,10 +1,24 @@
-#!/bin/bash
+#!/usr/bin/bash
 
-set -eo pipefail
+set -euo pipefail
 
-sync() {
-	podman run --rm -v /data/immich:/immich docker.io/amazon/aws-cli s3 sync --no-progress --delete --exclude ".immich" "$@"
+exec 200>"/tmp/immich-s3-backup.lock"
+flock -n 200 || {
+	log "Another backup is already running"
+	exit 0
 }
 
-sync --storage-class DEEP_ARCHIVE /immich/library s3://minube-photos/library
-sync /immich/backups s3://minube-photos/backups
+aws_sync() {
+	podman run --rm -i \
+		-v "/data/immich/data:/immich:ro" \
+		"docker.io/amazon/aws-cli" \
+		s3 sync \
+		--no-progress \
+		--only-show-errors \
+		--delete \
+		--exclude ".immich" \
+		"$@"
+}
+
+aws_sync --storage-class DEEP_ARCHIVE "/immich/library" "s3://minube-photos/library/"
+aws_sync --storage-class STANDARD_IA "/immich/backups" "s3://minube-backups/immich/"

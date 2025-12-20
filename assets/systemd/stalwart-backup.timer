@@ -1,8 +1,8 @@
 [Unit]
-Description=Immich backup timer
+Description=Stalwart backup timer
 
 [Timer]
-OnCalendar=weekly
+OnCalendar=daily
 RandomizedDelaySec=10m
 Persistent=true
 
