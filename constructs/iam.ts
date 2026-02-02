@@ -100,47 +100,25 @@ export class IAM extends Construct {
         Version: "2012-10-17",
         Statement: [
           {
-            Sid: "ReadWriteAssetBackups",
-            Effect: "Allow",
-            Resource: [`${config.docs.arn}/*`],
-            Action: [
-              "s3:DeleteObject",
-              "s3:GetObject",
-              "s3:GetObjectTagging",
-              "s3:PutObject",
-              "s3:PutObjectTagging",
-              "s3:AbortMultipartUpload",
-            ],
-          },
-          {
-            Sid: "ListAssets",
-            Effect: "Allow",
-            Resource: [config.docs.arn],
-            Action: ["s3:ListBucket"],
-          },
-          {
             Sid: "ListHostedZones",
             Effect: "Allow",
             Resource: ["*"],
             Action: ["route53:ListHostedZones"],
           },
           {
-            Sid: "ListRecordSets",
+            Sid: "ChangeRecordSets",
             Effect: "Allow",
             Resource: [config.hostedZone.arn],
-            Action: ["route53:ListResourceRecordSets"],
+            Action: [
+              "route53:ListResourceRecordSets",
+              "route53:ChangeResourceRecordSets",
+            ],
           },
           {
             Sid: "GetChange",
             Effect: "Allow",
             Resource: ["arn:aws:route53:::change/*"],
             Action: ["route53:GetChange"],
-          },
-          {
-            Sid: "WriteRecordSets",
-            Effect: "Allow",
-            Resource: [config.hostedZone.arn],
-            Action: ["route53:ChangeResourceRecordSets"],
           },
         ],
       }),

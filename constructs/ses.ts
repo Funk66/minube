@@ -42,7 +42,7 @@ export class SES extends Construct {
       name: mailFrom.mailFromDomain,
       type: "TXT",
       ttl: 300,
-      records: [`v=spf1 include:amazonses.com -all`],
+      records: ["v=spf1 include:amazonses.com -all"],
     });
   }
 }
