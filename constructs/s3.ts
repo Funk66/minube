@@ -42,17 +42,29 @@ export class S3 extends Construct {
       if (name == "backups") {
         lifecycleRules = lifecycleRules.concat([
           {
-            id: "Backups",
+            id: "Stalwart",
             status: "Enabled",
             expiration: [{ days: 30 }],
             filter: [{ prefix: "stalwart/" }],
+          },
+          {
+            id: "Dawarich",
+            status: "Enabled",
+            expiration: [{ days: 30 }],
+            filter: [{ prefix: "dawarich/" }],
+          },
+          {
+            id: "Immich",
+            status: "Enabled",
+            expiration: [{ days: 30 }],
+            filter: [{ prefix: "immich/" }],
           },
           {
             id: "Trashcan",
             status: "Enabled",
             abortIncompleteMultipartUpload: [{ daysAfterInitiation: 1 }],
             noncurrentVersionExpiration: [{ noncurrentDays: 10 }],
-            filter: [{ prefix: "stalwart/" }],
+            filter: [{ prefix: "/" }],
           },
         ]);
       } else {

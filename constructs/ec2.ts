@@ -59,7 +59,11 @@ export class EC2 extends Construct {
               `${config.buckets.fs.arn}/*`,
               `${config.buckets.files.arn}/*`,
             ],
-            Action: ["s3:GetObject*", "s3:PutObject*"],
+            Action: [
+              "s3:GetObject*",
+              "s3:PutObject*",
+              "s3:AbortMultipartUpload",
+            ],
           },
           {
             Sid: "ListBackups",
