@@ -326,6 +326,22 @@ export class EC2 extends Construct {
       records: [eip.publicIp],
     });
 
+    new Route53Record(this, `main-a-record`, {
+      name: config.hostedZone.name,
+      zoneId: config.hostedZone.id,
+      type: "A",
+      ttl: 300,
+      records: [eip.publicIp],
+    });
+
+    new Route53Record(this, `main-aaaa-record`, {
+      name: config.hostedZone.name,
+      zoneId: config.hostedZone.id,
+      type: "AAAA",
+      ttl: 300,
+      records: instance.ipv6Addresses,
+    });
+
     for (const subdomain of ["photos", "docs", "mail", "maps"]) {
       new Route53Record(this, `${subdomain}-a-record`, {
         name: `${subdomain}.${config.hostedZone.name}`,

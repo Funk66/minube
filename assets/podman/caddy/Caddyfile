@@ -26,6 +26,10 @@
 	}
 }
 
+guirao.net {
+  redir https://guillermo.guirao.net{uri} permanent
+}
+
 photos.guirao.net {
 	import proxy immich 2283
 }

@@ -97,6 +97,14 @@ export class DNS extends Construct {
       hostedZoneId: keySigningKey.hostedZoneId,
     });
 
+    new Route53Record(this, "funk66-cname", {
+      name: "guillermo." + this.zone.name,
+      zoneId: this.zone.zoneId,
+      type: "CNAME",
+      ttl: 300,
+      records: ["funk66.github.io"],
+    });
+
     new Route53Record(this, "mx-record", {
       name: this.zone.name,
       zoneId: this.zone.zoneId,
