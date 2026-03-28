@@ -113,26 +113,6 @@ export class DNS extends Construct {
       records: ["10 mail." + this.zone.name],
     });
 
-    new Route53Record(this, "dkim-ecc-record", {
-      name: "202512e._domainkey." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "TXT",
-      ttl: 300,
-      records: [
-        "v=DKIM1; k=ed25519; h=sha256; p=ZYCK6R7Xca3xMOAq2lvIGchlqIAOKQwfgI3pRCW/Amk=",
-      ],
-    });
-
-    new Route53Record(this, "dkim-rsa-record", {
-      name: "202512r._domainkey." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "TXT",
-      ttl: 300,
-      records: [
-        'v=DKIM1; k=rsa; h=sha256; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4Yyq+OW6MdIQuVPP3+DQRTBBSNC4bu4FUj8i024+l1MCoLSNoftGbG6+N+zK41d16SY8zqmhkQn9J5IY6QY6TAPnp5os83dgXzpKNq2S1SyX5d5e1D554dAKaFN73QS/4JiFJNSTFLCt2M42sGoHcm2bA0EbWWHBxzhVuYU3ysJduSY3pwSwM0q" "1Hh3QVkVgvihMHwjvc0cwhuanEEHB4Kh2/i/595QpyQCQzrZ4xcVS781kfq2dvCm8+Z3QvxNR03sxuExn6ZbUvAOHCpkHLslx3yzN+5k4aDsVsPd3T+ADxfuq+VkYSaZ82dYJ8xBeEKAKfCY/BgIhjSwQWJAo9QIDAQAB',
-      ],
-    });
-
     new Route53Record(this, "srv-jmap-record", {
       name: "_jmap._tcp." + this.zone.name,
       zoneId: this.zone.zoneId,

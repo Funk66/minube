@@ -3,6 +3,8 @@ import { SesDomainIdentity } from "@cdktf/provider-aws/lib/ses-domain-identity";
 import { Route53Zone } from "@cdktf/provider-aws/lib/route53-zone";
 import { Route53Record } from "@cdktf/provider-aws/lib/route53-record";
 import { SesDomainMailFrom } from "@cdktf/provider-aws/lib/ses-domain-mail-from";
+import { SesDomainDkim } from "@cdktf/provider-aws/lib/ses-domain-dkim";
+import { Fn } from "cdktf";
 
 interface SesConfig {
   hostedZone: Route53Zone;
@@ -19,6 +21,10 @@ export class SES extends Construct {
     const mailFrom = new SesDomainMailFrom(this, "domain-mail-from", {
       domain: config.hostedZone.name,
       mailFromDomain: `bounces.${config.hostedZone.name}`,
+    });
+
+    const dkim = new SesDomainDkim(this, "domain-dkim", {
+      domain: config.hostedZone.name,
     });
 
     new Route53Record(this, "verification-record", {
@@ -44,5 +50,16 @@ export class SES extends Construct {
       ttl: 300,
       records: ["v=spf1 include:amazonses.com -all"],
     });
+
+    for (let i = 0; i < 3; i++) {
+      const token = Fn.element(dkim.dkimTokens, i);
+      new Route53Record(this, `dkim-record-${i}`, {
+        zoneId: config.hostedZone.id,
+        name: `${token}._domainkey.${config.hostedZone.name}`,
+        type: "CNAME",
+        ttl: 300,
+        records: [`${token}.dkim.amazonses.com`],
+      });
+    }
   }
 }
