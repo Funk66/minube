@@ -11,6 +11,7 @@ Network=host
 Notify=true
 Volume=%h/.config/containers/systemd/caddy/Caddyfile:/etc/caddy/Caddyfile:Z
 Volume=/data/caddy:/data/caddy
+Volume=/var/log/caddy:/var/log/caddy
 Environment=TZ=Europe/Berlin
 Label="io.containers.autoupdate=registry"
 

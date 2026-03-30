@@ -42,6 +42,10 @@ maps.guirao.net {
 	reverse_proxy dawarich:3000
 }
 
+bulwark.guirao.net {
+  import proxy bulwark 3333
+}
+
 mail.guirao.net,
 mta-sts.guirao.net,
 autoconfig.guirao.net,

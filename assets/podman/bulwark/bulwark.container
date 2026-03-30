@@ -1,0 +1,16 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Email frontend
+
+[Container]
+ContainerName=bulwark
+Image=ghcr.io/bulwarkmail/webmail:latest
+Environment=JMAP_SERVER_URL=https://mail.guirao.net
+Environment=PORT=3333
+EnvironmentFile=/data/bulwark/env
+PublishPort=3333:3333
+Label="io.containers.autoupdate=registry"
+
+[Install]
+WantedBy=default.target
