@@ -6,7 +6,7 @@ Description=Valkey
 [Container]
 Pod=immich.pod
 ContainerName=valkey
-Image=docker.io/valkey/valkey:8-bookworm
+Image=docker.io/valkey/valkey:9
 HealthCmd="/usr/local/bin/redis-cli ping || exit 1"
 HealthStartPeriod=30s
 HealthInterval=10s
