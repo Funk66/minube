@@ -8,17 +8,21 @@ flock -n 200 || {
 	exit 0
 }
 
-aws_sync() {
+aws() {
 	podman run --rm -i \
 		-v "/data/immich/data:/immich:ro" \
 		"docker.io/amazon/aws-cli" \
-		s3 sync \
 		--no-progress \
 		--only-show-errors \
-		--delete \
-		--exclude ".immich" \
 		"$@"
 }
 
-aws_sync --storage-class DEEP_ARCHIVE "/immich/library" "s3://minube-photos/library/"
-aws_sync --storage-class STANDARD_IA "/immich/backups" "s3://minube-backups/immich/"
+aws s3 sync \
+	--delete \
+	--exclude ".immich" \
+	--storage-class DEEP_ARCHIVE "/immich/library" "s3://minube-photos/library/"
+
+aws s3 cp \
+	--recursive \
+	--exclude ".immich" \
+	--storage-class STANDARD_IA "/immich/backups" "s3://minube-backups/immich/"
