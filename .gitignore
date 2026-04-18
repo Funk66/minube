@@ -11,3 +11,4 @@ tsconfig.tsbuildinfo
 !jest.config.js
 !setup.js
 .DS_Store
+assets/fs.tar.gz

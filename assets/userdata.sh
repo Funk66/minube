@@ -34,11 +34,9 @@ systemctl restart systemd-resolved
 
 useradd --uid 2000 --create-home --shell /sbin/nologin podman
 loginctl enable-linger podman
-aws s3 cp --recursive s3://minube-files/etc/ /etc/
-aws s3 cp --recursive s3://minube-files/opt/ /opt/
-aws s3 cp --recursive s3://minube-files/podman/ /host/home/podman/.config/containers/systemd/
-aws s3 cp --recursive s3://minube-files/systemd/ /host/home/podman/.config/systemd/user/
-chown -R podman:podman /home/podman/.config
+aws s3 cp s3://minube-fs/fs.tar.gz /host/tmp/fs.tar.gz
+tar -xzf /tmp/fs.tar.gz -C /
+rm /tmp/fs.tar.gz
 usermod -g podman ubuntu
 
 mkdir /data

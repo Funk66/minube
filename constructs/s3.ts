@@ -1,5 +1,4 @@
 import * as path from "path";
-import * as fs from "fs";
 import { Fn } from "cdktf";
 import { Construct } from "constructs";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
@@ -85,36 +84,12 @@ export class S3 extends Construct {
       });
     }
 
-    this.uploadDirectory("fs", path.join(assets, "fs"));
-  }
-
-  private uploadDirectory(bucketName: string, sourcePath: string) {
-    const files = this.getAllFiles(sourcePath);
-    for (const file of files) {
-      const relativePath = path.relative(sourcePath, file);
-      const key = relativePath.replace(/\\/g, "/"); // Ensure forward slashes for S3 key
-      new S3Object(this, `s3-fs-object-${key.replace(/[\/.]/g, "-")}`, {
-        bucket: this.buckets[bucketName].bucket,
-        key: key,
-        source: file,
-        storageClass: "GLACIER_IR",
-        etag: Fn.filemd5(file),
-      });
-    }
-  }
-
-  private getAllFiles(dirPath: string, arrayOfFiles: string[] = []): string[] {
-    const files = fs.readdirSync(dirPath);
-
-    files.forEach((file) => {
-      const fullPath = path.join(dirPath, file);
-      if (fs.statSync(fullPath).isDirectory()) {
-        this.getAllFiles(fullPath, arrayOfFiles);
-      } else {
-        arrayOfFiles.push(fullPath);
-      }
+    const tarball = path.join(assets, "fs.tar.gz");
+    new S3Object(this, "s3-fs-tarball", {
+      bucket: this.buckets["fs"].bucket,
+      key: "fs.tar.gz",
+      source: tarball,
+      etag: Fn.filemd5(tarball),
     });
-
-    return arrayOfFiles;
   }
 }
