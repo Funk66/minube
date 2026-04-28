@@ -10,7 +10,7 @@ findtime           = 24h
 filter             = %(__name__)s
 maxretry           = 1
 port               = http,https
-ignoreip           = 10.10.10.0/26
+ignoreip           = 10.10.10.0/26 62.96.185.101
 banaction          = nftables
 banaction_allports = nftables[type=allports]
 
