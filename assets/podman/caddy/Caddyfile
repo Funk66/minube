@@ -1,3 +1,5 @@
+# vim: set ft=caddy:
+
 {
 	email admin@guirao.net
 	admin :2019
@@ -26,6 +28,11 @@
 	}
 }
 
+(private) {
+	bind 10.100.0.1
+	tls /data/letsencrypt/live/private/fullchain.pem /data/letsencrypt/live/private/privkey.pem
+}
+
 guirao.net {
   redir https://guillermo.guirao.net{uri} permanent
 }
@@ -35,10 +42,12 @@ photos.guirao.net {
 }
 
 docs.guirao.net {
+	import private
 	import proxy paperless 8000
 }
 
 maps.guirao.net {
+	import private
 	reverse_proxy dawarich:3000
 }
 

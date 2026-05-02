@@ -1,0 +1,30 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Certbot DNS-01 (Route53) for private services
+
+[Container]
+ContainerName=certbot
+Image=docker.io/certbot/dns-route53:latest
+Network=host
+Volume=/data/letsencrypt:/etc/letsencrypt:Z
+Environment=AWS_REGION=eu-central-1
+Exec=certonly \
+  --non-interactive \
+  --agree-tos \
+  --email letsencrypt@guirao.net \
+  --dns-route53 \
+  --keep-until-expiring \
+  --expand \
+  --cert-name private \
+  -d docs.guirao.net \
+  -d maps.guirao.net
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStartPost=-/usr/bin/podman exec caddy /usr/bin/caddy reload --config /etc/caddy/Caddyfile --address unix//run/admin.sock --force
+
+[Install]
+WantedBy=default.target

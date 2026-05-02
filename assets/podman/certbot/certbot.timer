@@ -1,0 +1,10 @@
+[Unit]
+Description=Renew certificates for private services
+
+[Timer]
+OnCalendar=weekly
+RandomizedDelaySec=1h
+Persistent=true
+
+[Install]
+WantedBy=default.target

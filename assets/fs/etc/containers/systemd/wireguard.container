@@ -35,6 +35,8 @@ Label="io.containers.autoupdate=registry"
 [Service]
 Restart=always
 TimeoutStartSec=900
+ExecStartPost=/usr/sbin/ip route replace 10.10.10.0/26 via 10.100.0.2
+ExecStopPost=-/usr/sbin/ip route del 10.10.10.0/26 via 10.100.0.2
 
 [Install]
 WantedBy=multi-user.target
