@@ -1,5 +1,4 @@
 # vim: set ft=caddy:
-
 {
 	email admin@guirao.net
 	admin :2019
@@ -11,7 +10,7 @@
 	}
 }
 
-(proxy) {
+(public) {
 	@blockedPaths {
 		path *.php
 		path */.git*
@@ -19,13 +18,16 @@
 		path */db.sqlite3*
 		path */.htaccess*
 	}
+	log_skip @blockedPaths
 	abort @blockedPaths
 
-  reverse_proxy host.containers.internal:{args[1]}
-
-	log {
-		output file /var/log/caddy/{args[0]}.log
+	@disallowed {
+		header_regexp User-Agent "(?i)(bot|crawler|spider|scrap(er|y)|scan(ner)?|fetch|monitor|http[-_ ]?client|libwww|wget|python|java|go-http|ruby|perl|nikto|nmap|zgrab|censys|shodan|leakix|netcraft|semrush|ahrefs|mj12|palo alto|expanse|cypex|visionheight|rootevidence|assetnote|iaudit|headlesschrome|dart|aiohttp|req/v)"
+		not header_regexp User-Agent (?i)(immich|applecoremedia|cfnetwork|networkingextension)
+		not header_regexp User-Agent ^Mozilla/5\.0 .*(Gecko|AppleWebKit).*(Firefox|Chrome|Safari|Edg|OPR)/[0-9]
 	}
+	log_skip @disallowed
+	abort @disallowed
 }
 
 (private) {
@@ -34,25 +36,44 @@
 }
 
 guirao.net {
-  redir https://guillermo.guirao.net{uri} permanent
+	redir https://guillermo.guirao.net{uri} permanent
 }
 
 photos.guirao.net {
-	import proxy immich 2283
-}
-
-docs.guirao.net {
-	import private
-	import proxy paperless 8000
-}
-
-maps.guirao.net {
-	import private
-	reverse_proxy dawarich:3000
+	log {
+		output file /var/log/caddy/immich.log
+	}
+	handle /api/server/ping {
+		reverse_proxy host.containers.internal:2283
+	}
+	handle {
+		import public
+		reverse_proxy host.containers.internal:2283
+	}
 }
 
 bulwark.guirao.net {
-  import proxy bulwark 3333
+	log {
+		output file /var/log/caddy/bulwark.log
+	}
+	import public
+	reverse_proxy host.containers.internal:3333
+}
+
+docs.guirao.net {
+	log {
+		output file /var/log/caddy/paperless.log
+	}
+	import private
+	reverse_proxy host.containers.internal:8000
+}
+
+maps.guirao.net {
+	log {
+		output file /var/log/caddy/dawarich.log
+	}
+	import private
+	reverse_proxy host.containers.internal:3000
 }
 
 mail.guirao.net,
@@ -64,7 +85,6 @@ autodiscover.guirao.net {
 			proxy_protocol v2
 		}
 	}
-
 	log {
 		output file /var/log/caddy/stalwart.log
 	}

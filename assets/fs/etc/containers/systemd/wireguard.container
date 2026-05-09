@@ -6,7 +6,7 @@ After=network-online.target
 
 [Container]
 ContainerName=wireguard
-Image=lscr.io/linuxserver/wireguard:latest
+Image=docker.io/linuxserver/wireguard:latest
 Network=private.network
 IP=10.100.0.2
 PublishPort=0.0.0.0:51820:51820/udp
