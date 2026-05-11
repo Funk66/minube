@@ -342,7 +342,7 @@ export class EC2 extends Construct {
       records: instance.ipv6Addresses,
     });
 
-    for (const subdomain of ["photos", "mail", "bulwark"]) {
+    for (const subdomain of ["photos", "mail", "bulwark", "files"]) {
       new Route53Record(this, `${subdomain}-a-record`, {
         name: `${subdomain}.${config.hostedZone.name}`,
         zoneId: config.hostedZone.id,

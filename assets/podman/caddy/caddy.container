@@ -14,6 +14,7 @@ Volume=/data/caddy:/data/caddy
 Volume=/data/letsencrypt:/data/letsencrypt:ro
 Volume=/var/log/caddy:/var/log/caddy
 Environment=TZ=Europe/Berlin
+EnvironmentFile=/data/caddy/env
 Label="io.containers.autoupdate=registry"
 
 [Service]

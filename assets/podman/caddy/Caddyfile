@@ -76,6 +76,20 @@ maps.guirao.net {
 	reverse_proxy host.containers.internal:3000
 }
 
+files.guirao.net {
+	log {
+		output file /var/log/caddy/files.log
+	}
+	import public
+	basic_auth {
+		user {$FILES_PASSWORD_HASH}
+	}
+	file_server {
+		root /data/caddy/files
+		browse
+	}
+}
+
 mail.guirao.net,
 mta-sts.guirao.net,
 autoconfig.guirao.net,
