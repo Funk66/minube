@@ -23,12 +23,13 @@ export class DNS extends Construct {
       name: this.zone.name,
       zoneId: this.zone.zoneId,
       type: "CAA",
-      ttl: 300,
+      ttl: 60,
       records: [
         '0 issue "amazon.com"',
         '0 issuewild "amazon.com"',
-        '0 issue "letsencrypt.org"',
-        '0 issuewild "letsencrypt.org"',
+        '0 issue "letsencrypt.org;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/3335389816"',
+        '0 issuewild "letsencrypt.org;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/3335389816"',
+        '0 iodef "mailto:acme@guirao.net"',
       ],
     });
 
@@ -103,121 +104,6 @@ export class DNS extends Construct {
       type: "CNAME",
       ttl: 300,
       records: ["funk66.github.io"],
-    });
-
-    new Route53Record(this, "mx-record", {
-      name: this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "MX",
-      ttl: 300,
-      records: ["10 mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "srv-jmap-record", {
-      name: "_jmap._tcp." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "SRV",
-      ttl: 300,
-      records: ["0 1 443 mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "srv-caldavs-record", {
-      name: "_caldavs._tcp." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "SRV",
-      ttl: 300,
-      records: ["0 1 443 mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "srv-carddavs-record", {
-      name: "_carddavs._tcp." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "SRV",
-      ttl: 300,
-      records: ["0 1 443 mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "srv-imaps-record", {
-      name: "_imaps._tcp." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "SRV",
-      ttl: 300,
-      records: ["0 1 993 mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "srv-submissions-record", {
-      name: "_submissions._tcp." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "SRV",
-      ttl: 300,
-      records: ["0 1 465 mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "cname-autoconfig-record", {
-      name: "autoconfig." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "CNAME",
-      ttl: 300,
-      records: ["mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "cname-autodiscover-record", {
-      name: "autodiscover." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "CNAME",
-      ttl: 300,
-      records: ["mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "cname-mta-sts-record", {
-      name: "mta-sts." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "CNAME",
-      ttl: 300,
-      records: ["mail." + this.zone.name],
-    });
-
-    new Route53Record(this, "txt-mta-sts-record", {
-      name: "_mta-sts." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "TXT",
-      ttl: 300,
-      records: ["v=STSv1; id=20251219"],
-    });
-
-    new Route53Record(this, "txt-dmarc-record", {
-      name: "_dmarc." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "TXT",
-      ttl: 300,
-      records: [
-        "v=DMARC1; p=reject; rua=mailto:postmaster@guirao.net; ruf=mailto:postmaster@guirao.net",
-      ],
-    });
-
-    new Route53Record(this, "txt-smtp-record", {
-      name: "_smtp._tls." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "TXT",
-      ttl: 300,
-      records: ["v=TLSRPTv1; rua=mailto:postmaster@guirao.net"],
-    });
-
-    new Route53Record(this, "tlsa-25-record", {
-      name: "_25._tcp.mail." + this.zone.name,
-      zoneId: this.zone.zoneId,
-      type: "TLSA",
-      ttl: 300,
-      records: [
-        "3 0 1 5c58c5dfa04d72878f7e2df7834573e531cac422a0baee61c9d95fce7949d586",
-        "3 0 2 b01b8ed87f2d6c2b9e63eb8295077d4a69552477fc8b12eb05c11ebb8b6e977eca9d53c3ff31ba2bc705b8df99f4c7042dca26bccefc93635e642c6736b36da1",
-        "3 1 1 a76e9bd54df6589ac49591790a619fbdeaea807d256eb30aecd55aafe61ed175",
-        "3 1 2 4cef54e6c1792eb6d51e25b9c99c430b65bb77df88603a2088ec277d9f174a5994156f3dbcec213b9bdb0842448ecc663fb7b33fb921d908db8e5e29a662a041",
-        "2 0 1 83624fd338c8d9b023c18a67cb7a9c0519da43d11775b4c6cbdad45c3d997c52",
-        "2 0 2 3565cd99fb0bccf03019e4d2276ca5d7c913a3af1ad58a95a8cad181699364f22fb6dc6cc01e071847db3336ae9a122b968d31c5be9a4443e145daba2a1782c6",
-        "2 1 1 885bf0572252c6741dc9a52f5044487fef2a93b811cdedfad7624cc283b7cdd5",
-        "2 1 2 89d8f1d26d16e94600405c8585e40ad1ecde0023cd447e8b39fd90bc8b482c7bd68d963156e5037023b144ec4caa03af8213296f3a498f69dee691a95a92d722",
-      ],
     });
 
     new Route53Record(this, "google-record", {

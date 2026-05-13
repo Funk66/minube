@@ -7,12 +7,10 @@ Description=Stalwart
 ContainerName=stalwart
 Image=docker.io/stalwartlabs/stalwart:latest
 Network=host
-Volume=%h/.config/containers/systemd/stalwart/config.toml:/opt/stalwart/etc/config.toml:Z
-Volume=/data/stalwart/data:/opt/stalwart/data:Z
-PublishPort=25:25
-PublishPort=465:465
-PublishPort=993:993
-PublishPort=8080:8080
+Volume=%h/.config/containers/systemd/stalwart/config.json:/etc/stalwart/config.json:Z
+Volume=/data/stalwart/data:/var/lib/stalwart:Z
+Volume=/data/stalwart/logs:/var/log/stalwart:Z
+UserNS=keep-id:uid=2000,gid=2000
 EnvironmentFile=/data/stalwart/env
 Label="io.containers.autoupdate=registry"
 

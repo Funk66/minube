@@ -154,6 +154,21 @@ export class IAM extends Construct {
             Resource: ["*"],
             Action: ["ses:SendRawEmail"],
           },
+          {
+            Sid: "Route53UpdateRecords",
+            Effect: "Allow",
+            Resource: [config.hostedZone.arn],
+            Action: [
+              "route53:ChangeResourceRecordSets",
+              "route53:ListResourceRecordSets",
+            ],
+          },
+          {
+            Sid: "Route53GetChange",
+            Effect: "Allow",
+            Resource: "arn:aws:route53:::change/*",
+            Action: ["route53:GetChange"],
+          },
         ],
       }),
     });
