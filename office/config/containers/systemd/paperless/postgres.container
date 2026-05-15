@@ -7,10 +7,9 @@ Description=PostgreSQL
 Pod=paperless.pod
 ContainerName=postgres
 Image=docker.io/library/postgres:18
-UserNS=keep-id:uid=1000,gid=1000
 Environment=POSTGRES_INITDB_ARGS=--data-checksums
-Volume=/data/paperless/postgres:/var/lib/postgresql:Z
-HealthCmd=pg_isready -U postgres
+Volume=%S/paperless/postgres:/var/lib/postgresql:Z
+HealthCmd=pg_isready -U paperless -d paperless
 HealthStartPeriod=5m
 HealthInterval=30s
 HealthTimeout=5s

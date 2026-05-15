@@ -1,0 +1,6 @@
+[Unit]
+Description=Notify on %i failure
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -c 'journalctl --user -u %i --no-pager -n 50 | %h/.local/bin/alert.sh "[%H] %i failed"'

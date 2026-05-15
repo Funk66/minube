@@ -1,0 +1,7 @@
+FROM docker.io/library/debian:stable-slim
+RUN apt-get update && apt-get install -y curl unzip && \
+  curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o /tmp/awscli.zip && \
+  unzip /tmp/awscli.zip -d /tmp && /tmp/aws/install && \
+  rm -rf /tmp/aws /tmp/awscli.zip && \
+  apt-get purge -y curl unzip && apt-get autoremove -y
+ENTRYPOINT ["aws"]

@@ -120,6 +120,12 @@ export class IAM extends Construct {
             Resource: ["arn:aws:route53:::change/*"],
             Action: ["route53:GetChange"],
           },
+          {
+            Sid: "AccessS3",
+            Effect: "Allow",
+            Resource: [config.docs.arn],
+            Action: ["s3:*"],
+          },
         ],
       }),
     });

@@ -2,4 +2,4 @@
 
 [Pod]
 PodName=paperless
-PublishPort=8000:8000
+PublishPort=10.10.10.11:8000:8000/tcp

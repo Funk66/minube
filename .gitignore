@@ -1,6 +1,6 @@
 *.d.ts
 *.js
-bin
+./bin
 node_modules
 cdktf.out
 cdktf.log
@@ -12,3 +12,4 @@ tsconfig.tsbuildinfo
 !setup.js
 .DS_Store
 assets/fs.tar.gz
+.claude/

@@ -1,19 +1,19 @@
 # vim: ft=systemd
 
 [Unit]
-Description=Redis broker
+Description=Valkey broker
 
 [Container]
 Pod=paperless.pod
-ContainerName=broker
-Image=docker.io/library/redis:8
-HealthCmd="/usr/local/bin/redis-cli ping || exit 1"
+ContainerName=valkey
+Image=docker.io/valkey/valkey:8
+HealthCmd="/usr/local/bin/valkey-cli ping || exit 1"
 HealthStartPeriod=30s
 HealthInterval=10s
 HealthTimeout=5s
 HealthRetries=5
 Notify=healthy
-Volume=broker:/data
+Volume=valkey:/data
 Label="io.containers.autoupdate=registry"
 
 [Service]

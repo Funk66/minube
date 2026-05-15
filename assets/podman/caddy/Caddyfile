@@ -65,7 +65,7 @@ docs.guirao.net {
 		output file /var/log/caddy/paperless.log
 	}
 	import private
-	reverse_proxy host.containers.internal:8000
+	reverse_proxy 10.10.10.11:8000
 }
 
 maps.guirao.net {
