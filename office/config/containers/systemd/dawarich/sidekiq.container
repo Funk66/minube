@@ -2,7 +2,7 @@
 
 [Unit]
 Description=Worker
-Wants=dawarich.service
+Requires=dawarich.service
 After=dawarich.service
 
 [Container]
@@ -12,7 +12,7 @@ Image=docker.io/freikin/dawarich:latest
 Entrypoint=sidekiq-entrypoint.sh
 Exec=bundle exec sidekiq
 UserNS=keep-id:uid=1000,gid=1000
-EnvironmentFile=/data/dawarich/env
+EnvironmentFile=%E/dawarich/env
 Environment=RAILS_ENV=production
 Environment=DATABASE_HOST=postgis
 Environment=DATABASE_PORT=5432
@@ -27,9 +27,9 @@ Environment=PROMETHEUS_EXPORTER_PORT=9394
 Environment=RAILS_LOG_TO_STDOUT=true
 Environment=SELF_HOSTED=true
 Environment=STORE_GEODATA=true
-Volume=/data/dawarich/public:/var/app/public:Z
-Volume=/data/dawarich/watched:/var/app/tmp/imports/watched:Z
-Volume=/data/dawarich/storage:/var/app/storage:Z
+Volume=%S/dawarich/public:/var/app/public:Z
+Volume=%S/dawarich/watched:/var/app/tmp/imports/watched:Z
+Volume=%S/dawarich/storage:/var/app/storage:Z
 HealthCmd=pgrep -f sidekiq
 HealthInterval=10s
 HealthRetries=30

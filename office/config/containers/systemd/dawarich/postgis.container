@@ -7,9 +7,8 @@ Description=Database
 Pod=dawarich.pod
 ContainerName=postgis
 Image=docker.io/postgis/postgis:17-3.5-alpine
-Volume=/data/dawarich/db:/var/lib/postgresql/data:Z
-UserNS=keep-id:uid=1000,gid=1000
-EnvironmentFile=/data/dawarich/env
+Volume=%S/dawarich/db:/var/lib/postgresql/data:Z
+EnvironmentFile=%E/dawarich/env
 Environment=POSTGRES_USER=dawarich
 Environment=POSTGRES_DB=dawarich
 ShmSize=1g

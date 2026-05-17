@@ -2,7 +2,8 @@
 Description=Dawarich backup job
 Wants=network-online.target
 After=network-online.target
+OnFailure=backup-failure-notify@%n.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/bash %h/.config/containers/systemd/dawarich/backup.sh
+ExecStart=/usr/bin/bash %h/.local/bin/dawarich-backup.sh

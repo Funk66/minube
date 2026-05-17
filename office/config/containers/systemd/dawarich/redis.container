@@ -4,9 +4,10 @@
 Description=Redis
 
 [Container]
+Pod=dawarich.pod
 ContainerName=redis
 Image=docker.io/redis:7.4-alpine
-Network=dawarich.network
+Exec=redis-server --save 900 1 --save 300 10 --appendonly no
 HealthCmd="/usr/local/bin/redis-cli --raw incr ping"
 HealthStartPeriod=30s
 HealthInterval=10s

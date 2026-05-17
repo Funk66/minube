@@ -10,7 +10,7 @@ interface RoleConfig {
   photos: S3Bucket;
   docs: S3Bucket;
   mail: S3Bucket;
-  fs: S3Bucket;
+  backups: S3Bucket;
   domain: string;
   hostedZone: Route53Zone;
 }
@@ -125,6 +125,23 @@ export class IAM extends Construct {
             Effect: "Allow",
             Resource: [config.docs.arn],
             Action: ["s3:*"],
+          },
+          {
+            Sid: "BackupDawarich",
+            Effect: "Allow",
+            Resource: [`${config.backups.arn}/dawarich/*`],
+            Action: ["s3:PutObject", "s3:GetObject", "s3:GetObjectVersion"],
+          },
+          {
+            Sid: "ListBackupsDawarich",
+            Effect: "Allow",
+            Resource: [config.backups.arn],
+            Action: ["s3:ListBucket", "s3:ListBucketVersions"],
+            Condition: {
+              StringLike: {
+                "s3:prefix": ["dawarich/*"],
+              },
+            },
           },
         ],
       }),

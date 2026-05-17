@@ -73,7 +73,7 @@ maps.guirao.net {
 		output file /var/log/caddy/dawarich.log
 	}
 	import private
-	reverse_proxy host.containers.internal:3000
+	reverse_proxy 10.10.10.11:3000
 }
 
 files.guirao.net {

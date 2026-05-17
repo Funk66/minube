@@ -2,4 +2,4 @@
 
 [Pod]
 PodName=dawarich
-PublishPort=3000:3000
+PublishPort=10.10.10.11:3000:3000/tcp
