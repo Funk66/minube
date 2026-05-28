@@ -3,3 +3,9 @@
 [Pod]
 PodName=dawarich
 PublishPort=10.10.10.11:3000:3000/tcp
+
+[Unit]
+StartLimitIntervalSec=0
+
+[Service]
+ExecStartPre=/usr/bin/timeout 120 /usr/bin/bash -c 'until ip -4 addr show wg0 2>/dev/null | grep -q "inet 10.10.10.11"; do sleep 1; done'
