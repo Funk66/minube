@@ -57,7 +57,7 @@ bulwark.guirao.net {
 		output file /var/log/caddy/bulwark.log
 	}
 	import public
-	reverse_proxy host.containers.internal:3333
+	reverse_proxy 10.10.10.11:3333
 }
 
 docs.guirao.net {
