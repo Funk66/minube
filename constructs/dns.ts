@@ -27,8 +27,8 @@ export class DNS extends Construct {
       records: [
         '0 issue "amazon.com"',
         '0 issuewild "amazon.com"',
-        '0 issue "letsencrypt.org;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/3335389816"',
-        '0 issuewild "letsencrypt.org;accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/3335389816"',
+        '0 issue "letsencrypt.org"',
+        '0 issuewild "letsencrypt.org"',
         '0 iodef "mailto:acme@guirao.net"',
       ],
     });

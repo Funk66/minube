@@ -76,6 +76,14 @@ maps.guirao.net {
 	reverse_proxy 10.10.10.11:3000
 }
 
+podcasts.guirao.net {
+	log {
+		output file /var/log/caddy/podcasts.log
+	}
+	import private
+	reverse_proxy 10.10.10.11:4444
+}
+
 files.guirao.net {
 	log {
 		output file /var/log/caddy/files.log
