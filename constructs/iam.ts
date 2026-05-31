@@ -127,6 +127,25 @@ export class IAM extends Construct {
             Action: ["s3:*"],
           },
           {
+            Sid: "ListAssets",
+            Effect: "Allow",
+            Resource: [config.photos.arn, config.docs.arn],
+            Action: ["s3:ListBucket"],
+          },
+          {
+            Sid: "ReadWriteAssetBackups",
+            Effect: "Allow",
+            Resource: [`${config.photos.arn}/*`, `${config.docs.arn}/*`],
+            Action: [
+              "s3:DeleteObject",
+              "s3:GetObject",
+              "s3:GetObjectTagging",
+              "s3:PutObject",
+              "s3:PutObjectTagging",
+              "s3:AbortMultipartUpload",
+            ],
+          },
+          {
             Sid: "BackupDawarich",
             Effect: "Allow",
             Resource: [`${config.backups.arn}/dawarich/*`],

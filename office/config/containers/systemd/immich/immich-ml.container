@@ -9,7 +9,7 @@ After=immich.service
 Pod=immich.pod
 ContainerName=immich-ml
 Image=ghcr.io/immich-app/immich-machine-learning:release
-EnvironmentFile=/data/immich/env
+EnvironmentFile=%E/immich/env
 Volume=immich:/cache
 Volume=/etc/localtime:/etc/localtime:ro
 Label="io.containers.autoupdate=registry"

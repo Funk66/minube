@@ -2,7 +2,8 @@
 Description=Immich backup job
 Wants=network-online.target
 After=network-online.target
+OnFailure=backup-failure-notify@%n.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/bash %h/.config/containers/systemd/immich/backup.sh
+ExecStart=/usr/bin/bash %h/.local/bin/immich-backup.sh

@@ -5,15 +5,15 @@ Description=Valkey
 
 [Container]
 Pod=immich.pod
-ContainerName=valkey
+ContainerName=valkey9
 Image=docker.io/valkey/valkey:9
-HealthCmd="/usr/local/bin/redis-cli ping || exit 1"
+HealthCmd="/usr/local/bin/valkey-cli ping || exit 1"
 HealthStartPeriod=30s
 HealthInterval=10s
 HealthTimeout=5s
 HealthRetries=5
 Notify=healthy
-Volume=valkey:/data
+Volume=valkey9:/data
 Label="io.containers.autoupdate=registry"
 
 [Service]
