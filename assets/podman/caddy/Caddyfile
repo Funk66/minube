@@ -103,6 +103,7 @@ mta-sts.guirao.net,
 autoconfig.guirao.net,
 autodiscover.guirao.net {
 	reverse_proxy 127.0.0.1:8080 {
+
 		transport http {
 			proxy_protocol v2
 		}

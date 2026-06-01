@@ -26,7 +26,7 @@ class Minube extends TerraformStack {
       photos: s3.buckets.photos,
       docs: s3.buckets.docs,
       mail: s3.buckets.mail,
-      fs: s3.buckets.fs,
+      backups: s3.buckets.backups,
       domain: dns.zone.name,
       hostedZone: dns.zone,
     });

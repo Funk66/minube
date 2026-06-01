@@ -8,7 +8,6 @@ import { Instance } from "@cdktf/provider-aws/lib/instance";
 import { KeyPair } from "@cdktf/provider-aws/lib/key-pair";
 import { SecurityGroup } from "@cdktf/provider-aws/lib/security-group";
 import { DataAwsAmi } from "@cdktf/provider-aws/lib/data-aws-ami";
-import { Eip } from "@cdktf/provider-aws/lib/eip";
 import { EbsVolume } from "@cdktf/provider-aws/lib/ebs-volume";
 import { VolumeAttachment } from "@cdktf/provider-aws/lib/volume-attachment";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
@@ -76,28 +75,6 @@ export class EC2 extends Construct {
             Action: ["s3:ListBucket"],
           },
           {
-            Sid: "ReadWriteAssetBackups",
-            Effect: "Allow",
-            Resource: [
-              `${config.buckets.photos.arn}/*`,
-              `${config.buckets.docs.arn}/*`,
-            ],
-            Action: [
-              "s3:DeleteObject",
-              "s3:GetObject",
-              "s3:GetObjectTagging",
-              "s3:PutObject",
-              "s3:PutObjectTagging",
-              "s3:AbortMultipartUpload",
-            ],
-          },
-          {
-            Sid: "ListAssets",
-            Effect: "Allow",
-            Resource: [config.buckets.photos.arn, config.buckets.docs.arn],
-            Action: ["s3:ListBucket"],
-          },
-          {
             Sid: "ListHostedZones",
             Effect: "Allow",
             Resource: ["*"],
@@ -139,7 +116,7 @@ export class EC2 extends Construct {
     const ami = new DataAwsAmi(this, "ubuntu", {
       mostRecent: true,
       owners: ["amazon"],
-      nameRegex: "ubuntu/images/hvm-ssd-gp3/ubuntu-questing-25.10-arm64-server",
+      nameRegex: "ubuntu/images/hvm-ssd-gp3/ubuntu-resolute-26.04-arm64-server",
     }).id;
 
     const sg = new SecurityGroup(this, "sg", {
@@ -274,7 +251,7 @@ export class EC2 extends Construct {
 
     const instance = new Instance(this, "instance", {
       ami: ami,
-      instanceType: "t4g.medium",
+      instanceType: "t4g.micro",
       keyName: key.keyName,
       userData: readFileSync("assets/userdata.sh", "utf-8"),
       subnetId: config.subnet,
@@ -285,7 +262,7 @@ export class EC2 extends Construct {
         Name: id,
       },
       rootBlockDevice: {
-        volumeSize: 30,
+        volumeSize: 16,
         volumeType: "gp3",
         encrypted: true,
       },
@@ -294,17 +271,10 @@ export class EC2 extends Construct {
       },
     });
 
-    const eip = new Eip(this, "eip", {
-      instance: instance.id,
-      tags: {
-        Name: id,
-      },
-    });
-
     const volume = new EbsVolume(this, "volume", {
       availabilityZone: "eu-central-1b",
       type: "gp3",
-      size: 70,
+      size: 1,
       encrypted: true,
       tags: {
         Name: "data",
@@ -315,23 +285,6 @@ export class EC2 extends Construct {
       deviceName: "/dev/sdf",
       volumeId: volume.id,
       instanceId: instance.id,
-    });
-
-    // TODO: configure IPv6 subnet for Wireguard
-    new Route53Record(this, `minube-a-record`, {
-      name: `minube.${config.hostedZone.name}`,
-      zoneId: config.hostedZone.id,
-      type: "A",
-      ttl: 300,
-      records: [eip.publicIp],
-    });
-
-    new Route53Record(this, `main-a-record`, {
-      name: config.hostedZone.name,
-      zoneId: config.hostedZone.id,
-      type: "A",
-      ttl: 300,
-      records: [eip.publicIp],
     });
 
     new Route53Record(this, `main-aaaa-record`, {

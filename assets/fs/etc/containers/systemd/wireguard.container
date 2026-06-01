@@ -19,7 +19,7 @@ Environment=PGID=1000
 Environment=TZ=Europe/Berlin
 Environment=SERVERURL=minube.guirao.net
 Environment=SERVERPORT=51820
-Environment=PEERS=MBP,iPhone,iPad,rpi,office,router,oneplus,tablet,mac
+Environment=PEERS=MBP,iPhone,iPad,rpi,office,router,oneplus,tablet,mac,dell
 Environment=PEERDNS=10.100.0.3
 Environment=INTERNAL_SUBNET=10.10.10.0/26
 Environment=ALLOWEDIPS=10.10.10.0/26,10.100.0.0/26

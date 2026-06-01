@@ -112,6 +112,7 @@ export class DNS extends Construct {
       type: "TXT",
       ttl: 300,
       records: [
+        "v=spf1 mx -all",
         "google-site-verification=jm-wNSxSnrlZD5TeJzZMYOIsa8AdIDRNX9TKuAX0h5c",
       ],
     });
