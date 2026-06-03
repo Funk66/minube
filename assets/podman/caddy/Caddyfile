@@ -88,14 +88,8 @@ files.guirao.net {
 	log {
 		output file /var/log/caddy/files.log
 	}
-	import public
-	basic_auth {
-		user {$FILES_PASSWORD_HASH}
-	}
-	file_server {
-		root /data/caddy/files
-		browse
-	}
+	import private
+	reverse_proxy 10.10.10.11:5555
 }
 
 mail.guirao.net,

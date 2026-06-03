@@ -17,7 +17,7 @@ Environment=FTLCONF_webserver_api_password=
 Environment=FTLCONF_database_maxDBdays=1425
 Environment=FTLCONF_dns_domainNeeded=true
 Environment=FTLCONF_dns_listeningMode=ALL
-Environment="FTLCONF_dns_hosts=10.10.10.2 MBP;10.10.10.3 iPhone;10.10.10.4 iPad;10.10.10.5 rpi;10.10.10.6 office;10.10.10.7 router;10.10.10.8 oneplus;10.10.10.9 tablet;10.10.10.10 mac;10.10.10.11 dell;10.100.0.1 docs.guirao.net;10.100.0.1 maps.guirao.net;10.100.0.1 podcasts.guirao.net"
+Environment="FTLCONF_dns_hosts=10.10.10.2 MBP;10.10.10.3 iPhone;10.10.10.4 iPad;10.10.10.5 rpi;10.10.10.6 office;10.10.10.7 router;10.10.10.8 oneplus;10.10.10.9 tablet;10.10.10.10 mac;10.10.10.11 dell;10.100.0.1 docs.guirao.net;10.100.0.1 maps.guirao.net;10.100.0.1 files.guirao.net;10.100.0.1 podcasts.guirao.net"
 AddCapability=NET_ADMIN
 AddCapability=NET_RAW
 Label="io.containers.autoupdate=registry"

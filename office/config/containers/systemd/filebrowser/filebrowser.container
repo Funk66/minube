@@ -1,0 +1,24 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Filebrowser service
+
+[Container]
+ContainerName=filebrowser
+Image=docker.io/gtstef/filebrowser:stable
+Volume=%h/files:/files
+Volume=%S/filebrowser:/home/filebrowser/data
+UserNS=keep-id
+PublishPort=5555:8080
+Label="io.containers.autoupdate=registry"
+HealthCmd=curl -f http://localhost:8080/health
+HealthInterval=30s
+HealthTimeout=3s
+HealthStartPeriod=10s
+HealthRetries=3
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

@@ -9,6 +9,7 @@ Image=docker.io/certbot/dns-route53:latest
 Network=host
 Volume=/data/letsencrypt:/etc/letsencrypt:Z
 Environment=AWS_REGION=eu-central-1
+Environment=AWS_USE_DUALSTACK_ENDPOINT=true
 Exec=certonly \
   --non-interactive \
   --agree-tos \
@@ -19,6 +20,7 @@ Exec=certonly \
   --cert-name private \
   -d docs.guirao.net \
   -d maps.guirao.net \
+  -d files.guirao.net \
   -d podcasts.guirao.net
 Label="io.containers.autoupdate=registry"
 
