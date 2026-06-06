@@ -8,6 +8,7 @@ import { Instance } from "@cdktf/provider-aws/lib/instance";
 import { KeyPair } from "@cdktf/provider-aws/lib/key-pair";
 import { SecurityGroup } from "@cdktf/provider-aws/lib/security-group";
 import { DataAwsAmi } from "@cdktf/provider-aws/lib/data-aws-ami";
+import { Eip } from "@cdktf/provider-aws/lib/eip";
 import { EbsVolume } from "@cdktf/provider-aws/lib/ebs-volume";
 import { VolumeAttachment } from "@cdktf/provider-aws/lib/volume-attachment";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
@@ -269,6 +270,16 @@ export class EC2 extends Construct {
       metadataOptions: {
         httpTokens: "required",
       },
+      lifecycle: {
+        ignoreChanges: ["ami"],
+      },
+    });
+
+    const eip = new Eip(this, "eip", {
+      instance: instance.id,
+      tags: {
+        Name: id,
+      },
     });
 
     const volume = new EbsVolume(this, "volume", {
@@ -287,6 +298,14 @@ export class EC2 extends Construct {
       instanceId: instance.id,
     });
 
+    new Route53Record(this, `main-a-record`, {
+      name: config.hostedZone.name,
+      zoneId: config.hostedZone.id,
+      type: "A",
+      ttl: 300,
+      records: [eip.publicIp],
+    });
+
     new Route53Record(this, `main-aaaa-record`, {
       name: config.hostedZone.name,
       zoneId: config.hostedZone.id,
@@ -296,6 +315,14 @@ export class EC2 extends Construct {
     });
 
     for (const subdomain of ["minube", "photos", "mail", "bulwark"]) {
+      new Route53Record(this, `${subdomain}-a-record`, {
+        name: `${subdomain}.${config.hostedZone.name}`,
+        zoneId: config.hostedZone.id,
+        type: "A",
+        ttl: 300,
+        records: [eip.publicIp],
+      });
+
       new Route53Record(this, `${subdomain}-aaaa-record`, {
         name: `${subdomain}.${config.hostedZone.name}`,
         zoneId: config.hostedZone.id,
