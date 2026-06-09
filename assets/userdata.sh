@@ -42,7 +42,10 @@ sudo -u podman XDG_RUNTIME_DIR=/run/user/2000 systemctl --user enable --now {imm
 
 echo "SystemMaxUse=1G" >>/etc/systemd/journald.conf
 
-echo "find /data/stalwart/data -maxdepth 1 -name 'LOG.old.*' -mtime +7 -delete" >/etc/cron.daily/cleanup-stalwart-logs
-echo "find /data/stalwart/logs -mtime +30 -delete" >/etc/cron.daily/cleanup-stalwart-logs
+cat <<EOF >/etc/cron.daily/cleanup-stalwart-logs
+find /data/stalwart/data -maxdepth 1 -name 'LOG.old.*' -mtime +7 -delete
+find /data/stalwart/logs -mtime +30 -delete
+EOF
+chmod +x /etc/cron.daily/cleanup-stalwart-logs
 
 shutdown -r +1
