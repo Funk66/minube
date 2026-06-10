@@ -4,6 +4,8 @@
 Description=Paperless
 Requires=valkey.service postgres.service
 After=valkey.service postgres.service
+BindsTo=valkey.service postgres.service
+PartOf=valkey.service postgres.service
 
 [Container]
 Pod=paperless.pod

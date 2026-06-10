@@ -3,6 +3,8 @@
 [Unit]
 Description=Alloy
 After=network-online.target pihole.service
+BindsTo=pihole.service
+PartOf=pihole.service
 
 [Container]
 ContainerName=alloy

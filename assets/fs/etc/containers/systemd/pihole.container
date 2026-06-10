@@ -4,6 +4,7 @@
 Description=Pi-hole DNS server
 After=network-online.target wireguard.service
 BindsTo=wireguard.service
+PartOf=wireguard.service
 
 [Container]
 ContainerName=pihole

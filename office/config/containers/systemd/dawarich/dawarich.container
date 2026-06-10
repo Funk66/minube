@@ -4,6 +4,8 @@
 Description=Backend
 Requires=redis.service postgis.service
 After=redis.service postgis.service
+BindsTo=redis.service postgis.service
+PartOf=redis.service postgis.service
 
 [Container]
 Pod=dawarich.pod

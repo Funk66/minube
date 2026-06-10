@@ -4,6 +4,8 @@
 Description=Worker
 Requires=dawarich.service
 After=dawarich.service
+BindsTo=dawarich.service
+PartOf=dawarich.service
 
 [Container]
 Pod=dawarich.pod

@@ -4,6 +4,8 @@
 Description=Immich ML
 Wants=immich.service
 After=immich.service
+BindsTo=immich.service
+PartOf=immich.service
 
 [Container]
 Pod=immich.pod

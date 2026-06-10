@@ -4,6 +4,8 @@
 Description=Immich
 Requires=valkey9.service pgvector.service
 After=valkey9.service pgvector.service
+BindsTo=valkey9.service pgvector.service
+PartOf=valkey9.service pgvector.service
 
 [Container]
 Pod=immich.pod

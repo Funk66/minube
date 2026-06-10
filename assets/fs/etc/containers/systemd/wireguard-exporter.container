@@ -3,6 +3,8 @@
 [Unit]
 Description=WireGuard exporter
 After=wireguard.service
+BindsTo=wireguard.service
+PartOf=wireguard.service
 
 [Container]
 ContainerName=wireguard-exporter
