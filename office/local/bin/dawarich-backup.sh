@@ -7,7 +7,9 @@ set -euo pipefail
 export PGPASSWORD="$POSTGRES_PASSWORD"
 podman --log-level=error exec postgis pg_dump -U dawarich |
   gzip -c |
-  podman --log-level=error run --rm -i docker.io/amazon/aws-cli \
+  podman --log-level=error run --rm \
+    --env-file ~/.config/aws/credentials \
+    -i docker.io/amazon/aws-cli \
     s3 cp - "s3://minube-backups/dawarich/$(date +%F).sql.gz" \
     --content-type application/sql \
     --content-encoding gzip \
