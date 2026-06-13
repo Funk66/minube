@@ -18,6 +18,7 @@ HealthInterval=10s
 HealthTimeout=10s
 HealthRetries=5
 Notify=healthy
+Label="io.containers.autoupdate=registry"
 
 [Service]
 Restart=always
