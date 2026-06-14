@@ -76,6 +76,12 @@ export class EC2 extends Construct {
             Action: ["s3:ListBucket"],
           },
           {
+            Sid: "SendNotificationEmails",
+            Effect: "Allow",
+            Resource: ["*"],
+            Action: ["ses:SendEmail", "ses:SendRawEmail"],
+          },
+          {
             Sid: "ListHostedZones",
             Effect: "Allow",
             Resource: ["*"],
