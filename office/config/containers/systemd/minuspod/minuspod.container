@@ -1,0 +1,34 @@
+# vim: ft=systemd
+
+[Unit]
+Description=MinusPod podcast ad removal
+
+[Container]
+ContainerName=minuspod
+Image=docker.io/ttlequals0/minuspod:latest
+AddDevice=nvidia.com/gpu=all
+Network=minuspod.network
+Environment=BASE_URL=http://minuspod:8000
+Environment=SESSION_COOKIE_SECURE=false
+Environment=WHISPER_MODEL=large-v3-turbo
+Environment=WHISPER_COMPUTE_TYPE=int8_float16
+Environment=WHISPER_DEVICE=cuda
+Environment=LLM_PROVIDER=openai-compatible
+Environment=OPENAI_MODEL=gemini-2.5-flash
+Environment=OPENAI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
+EnvironmentFile=%E/minuspod/env
+Volume=%S/minuspod/data:/app/data:Z
+UserNS=keep-id:uid=1000,gid=1000
+PublishPort=10.10.10.11:4445:8000
+HealthCmd=curl -f http://localhost:8000/api/v1/health
+HealthInterval=30s
+HealthTimeout=3s
+HealthStartPeriod=20s
+HealthRetries=3
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

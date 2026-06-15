@@ -6,8 +6,11 @@ Description=Podcast service
 [Container]
 ContainerName=audiobookshelf
 Image=ghcr.io/advplyr/audiobookshelf:latest
+Network=minuspod.network
+Environment=SSRF_REQUEST_FILTER_WHITELIST=minuspod
 Volume=%S/audiobookshelf/metadata:/metadata:Z
 Volume=%S/audiobookshelf/config:/config:Z
+Volume=%S/audiobookshelf/data:/podcasts:Z
 PublishPort=4444:80
 Label="io.containers.autoupdate=registry"
 
