@@ -275,6 +275,7 @@ export class EC2 extends Construct {
       },
       metadataOptions: {
         httpTokens: "required",
+        httpPutResponseHopLimit: 1,
       },
       lifecycle: {
         ignoreChanges: ["ami"],

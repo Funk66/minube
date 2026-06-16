@@ -4,25 +4,26 @@ set -euo pipefail
 
 exec 200>"/tmp/immich-s3-backup.lock"
 flock -n 200 || {
-	log "Another backup is already running"
-	exit 0
+  log "Another backup is already running"
+  exit 0
 }
 
 aws() {
-	podman run --rm -i \
-		-v "/data/immich/data:/immich:ro" \
-		"docker.io/amazon/aws-cli" \
-		--no-progress \
-		--only-show-errors \
-		"$@"
+  podman run --rm -i \
+    -v "$HOME/.local/state/immich/data:/immich:ro" \
+    --env-file ~/.config/aws/credentials \
+    "docker.io/amazon/aws-cli" \
+    --no-progress \
+    --only-show-errors \
+    "$@"
 }
 
 aws s3 sync \
-	--delete \
-	--exclude ".immich" \
-	--storage-class DEEP_ARCHIVE "/immich/library" "s3://minube-photos/library/"
+  --delete \
+  --exclude ".immich" \
+  --storage-class DEEP_ARCHIVE "/immich/library" "s3://minube-photos/library/"
 
 aws s3 cp \
-	--recursive \
-	--exclude ".immich" \
-	--storage-class STANDARD_IA "/immich/backups" "s3://minube-backups/immich/"
+  --recursive \
+  --exclude ".immich" \
+  --storage-class STANDARD_IA "/immich/backups" "s3://minube-backups/immich/"

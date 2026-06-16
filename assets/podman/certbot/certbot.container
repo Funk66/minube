@@ -27,7 +27,7 @@ Label="io.containers.autoupdate=registry"
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStartPost=-/usr/bin/podman exec caddy /usr/bin/caddy reload --config /etc/caddy/Caddyfile --address unix//run/admin.sock --force
+ExecStartPost=-/usr/bin/podman exec caddy /usr/bin/caddy reload --config /etc/caddy/Caddyfile --address http://localhost:2019 --force
 
 [Install]
 WantedBy=default.target

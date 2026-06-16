@@ -11,6 +11,7 @@ Environment=SSRF_REQUEST_FILTER_WHITELIST=minuspod
 Volume=%S/audiobookshelf/metadata:/metadata:Z
 Volume=%S/audiobookshelf/config:/config:Z
 Volume=%S/audiobookshelf/data:/podcasts:Z
+Volume=/etc/localtime:/etc/localtime:ro
 PublishPort=4444:80
 Label="io.containers.autoupdate=registry"
 

@@ -18,6 +18,7 @@ Environment=OPENAI_MODEL=gemini-2.5-flash
 Environment=OPENAI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
 EnvironmentFile=%E/minuspod/env
 Volume=%S/minuspod/data:/app/data:Z
+Volume=/etc/localtime:/etc/localtime:ro
 UserNS=keep-id:uid=1000,gid=1000
 PublishPort=10.10.10.11:4445:8000
 HealthCmd=curl -f http://localhost:8000/api/v1/health

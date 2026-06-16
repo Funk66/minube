@@ -13,7 +13,6 @@ ContainerName=sidekiq
 Image=docker.io/freikin/dawarich:latest
 Entrypoint=sidekiq-entrypoint.sh
 Exec=bundle exec sidekiq
-UserNS=keep-id:uid=1000,gid=1000
 EnvironmentFile=%E/dawarich/env
 Environment=RAILS_ENV=production
 Environment=DATABASE_HOST=postgis
