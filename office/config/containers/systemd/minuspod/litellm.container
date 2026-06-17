@@ -1,0 +1,19 @@
+# vim: ft=systemd
+
+[Unit]
+Description=LiteLLM gateway (LM Studio primary, Gemini fallback) for MinusPod
+
+[Container]
+ContainerName=litellm
+Image=ghcr.io/berriai/litellm:main-stable
+Network=minuspod.network
+Exec=--config /etc/litellm/config.yaml --port 4000 --num_workers 1
+Volume=%E/litellm/config.yaml:/etc/litellm/config.yaml:ro,Z
+EnvironmentFile=%E/litellm/env
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
