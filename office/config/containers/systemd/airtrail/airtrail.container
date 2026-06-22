@@ -1,0 +1,22 @@
+# vim: ft=systemd
+
+[Unit]
+Description=AirTrail
+Requires=airtrail-db.service
+After=airtrail-db.service
+BindsTo=airtrail-db.service
+PartOf=airtrail-db.service
+
+[Container]
+Pod=airtrail.pod
+ContainerName=airtrail
+Image=docker.io/johly/airtrail:latest
+EnvironmentFile=%E/airtrail/env
+Volume=%S/airtrail/uploads:/app/uploads:Z
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

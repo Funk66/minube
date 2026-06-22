@@ -21,6 +21,7 @@ Exec=certonly \
   -d docs.guirao.net \
   -d maps.guirao.net \
   -d files.guirao.net \
+  -d airtrail.guirao.net \
   -d podcasts.guirao.net
 Label="io.containers.autoupdate=registry"
 

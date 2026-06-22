@@ -1,0 +1,23 @@
+# vim: ft=systemd
+
+[Unit]
+Description=AirTrail Database
+
+[Container]
+Pod=airtrail.pod
+ContainerName=airtrail-db
+Image=docker.io/library/postgres:16-alpine
+EnvironmentFile=%E/airtrail/env
+Environment=POSTGRES_DB=airtrail
+Environment=POSTGRES_USER=airtrail
+Volume=%S/airtrail/db:/var/lib/postgresql/data:Z
+HealthCmd=pg_isready -U airtrail -d airtrail
+HealthStartPeriod=5s
+HealthInterval=5s
+HealthTimeout=5s
+HealthRetries=5
+Notify=healthy
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always

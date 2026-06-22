@@ -1,0 +1,12 @@
+# vim: ft=systemd
+
+[Pod]
+PodName=airtrail
+PublishPort=10.10.10.11:3030:3000/tcp
+PublishPort=127.0.0.1:3030:3000/tcp
+
+[Unit]
+StartLimitIntervalSec=0
+
+[Service]
+ExecStartPre=/usr/bin/timeout 120 /usr/bin/bash -c 'until ip -4 addr show wg0 2>/dev/null | grep -q "inet 10.10.10.11"; do sleep 1; done'
