@@ -100,6 +100,13 @@ files.guirao.net {
 	reverse_proxy 10.10.10.11:5555
 }
 
+academy.guirao.net {
+	import private
+	@compressible path *.js *.css *.html *.json *.svg *.txt
+	encode @compressible zstd gzip
+	reverse_proxy 10.10.10.11:8181
+}
+
 mail.guirao.net,
 mta-sts.guirao.net,
 autoconfig.guirao.net,

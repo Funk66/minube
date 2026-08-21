@@ -1,0 +1,35 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Academy course viewer
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=localhost/academy:latest
+ContainerName=academy
+PublishPort=8181:8181
+Volume=%S/academy:/content:ro
+Volume=academy-cache:/cache
+Environment=HOST=0.0.0.0
+Environment=PORT=8181
+Environment=CONTENT_ROOT=/content
+Environment=CACHE_DIR=/cache
+# Bind mounts frequently do not deliver recursive inotify events. Rescan on
+# demand instead of trusting a watcher that may never fire.
+Environment=WATCH=0
+
+HealthCmd=wget -qO- http://127.0.0.1:8181/api/health || exit 1
+HealthInterval=30s
+HealthTimeout=5s
+HealthRetries=3
+HealthStartPeriod=10s
+
+NoNewPrivileges=true
+
+[Service]
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
