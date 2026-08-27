@@ -1,0 +1,38 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Dynamic DNS updater for thinkcentre.guirao.net
+Wants=network-online.target
+After=network-online.target
+
+[Container]
+ContainerName=dyndns
+Image=docker.io/amazon/aws-cli:latest
+# The image already ships bash, curl and jq; the script is the only payload.
+PodmanArgs=--entrypoint=/usr/bin/bash
+Exec=/usr/local/bin/dyndns.sh
+Volume=%h/.local/bin/dyndns.sh:/usr/local/bin/dyndns.sh:ro
+# The addresses have to be the host's, not a rootless network's.
+Network=host
+# Without passthrough, podman stamps every line as PRIORITY=6 and the script's
+# "<4>"/"<3>" prefixes are lost, breaking `journalctl -p warning`.
+LogDriver=passthrough
+EnvironmentFile=%E/aws/credentials
+Environment=AWS_DEFAULT_REGION=eu-central-1
+Environment=AWS_PAGER=
+Environment=HOME=/tmp
+Environment=DYNDNS_DOMAIN=thinkcentre.guirao.net
+Environment=DYNDNS_ZONE=guirao.net
+Environment=DYNDNS_INTERVAL=600
+Environment=DYNDNS_TTL=300
+Tmpfs=/tmp
+ReadOnly=true
+NoNewPrivileges=true
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=default.target

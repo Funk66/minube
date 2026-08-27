@@ -44,11 +44,11 @@ photos.guirao.net {
 		output file /var/log/caddy/immich.log
 	}
 	handle /api/server/ping {
-		reverse_proxy 10.10.10.11:2283
+		reverse_proxy 10.10.10.12:2283
 	}
 	handle {
 		import public
-		reverse_proxy 10.10.10.11:2283
+		reverse_proxy 10.10.10.12:2283
 	}
 }
 
@@ -57,7 +57,7 @@ bulwark.guirao.net {
 		output file /var/log/caddy/bulwark.log
 	}
 	import public
-	reverse_proxy 10.10.10.11:3333
+	reverse_proxy 10.10.10.12:3333
 }
 
 docs.guirao.net {
@@ -65,7 +65,7 @@ docs.guirao.net {
 		output file /var/log/caddy/paperless.log
 	}
 	import private
-	reverse_proxy 10.10.10.11:8000
+	reverse_proxy 10.10.10.12:8000
 }
 
 maps.guirao.net {
@@ -73,7 +73,7 @@ maps.guirao.net {
 		output file /var/log/caddy/dawarich.log
 	}
 	import private
-	reverse_proxy 10.10.10.11:3000
+	reverse_proxy 10.10.10.12:3000
 }
 
 airtrail.guirao.net {
@@ -81,7 +81,7 @@ airtrail.guirao.net {
 		output file /var/log/caddy/airtrail.log
 	}
 	import private
-	reverse_proxy 10.10.10.11:3030
+	reverse_proxy 10.10.10.12:3030
 }
 
 podcasts.guirao.net {
@@ -89,7 +89,7 @@ podcasts.guirao.net {
 		output file /var/log/caddy/podcasts.log
 	}
 	import private
-	reverse_proxy 10.10.10.11:4444
+	reverse_proxy 10.10.10.12:4444
 }
 
 files.guirao.net {
@@ -97,14 +97,14 @@ files.guirao.net {
 		output file /var/log/caddy/files.log
 	}
 	import private
-	reverse_proxy 10.10.10.11:5555
+	reverse_proxy 10.10.10.12:5555
 }
 
 academy.guirao.net {
 	import private
 	@compressible path *.js *.css *.html *.json *.svg *.txt
 	encode @compressible zstd gzip
-	reverse_proxy 10.10.10.11:8181
+	reverse_proxy 10.10.10.12:8181
 }
 
 mail.guirao.net,
