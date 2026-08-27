@@ -292,7 +292,7 @@ export class EC2 extends Construct {
     const volume = new EbsVolume(this, "volume", {
       availabilityZone: "eu-central-1b",
       type: "gp3",
-      size: 1,
+      size: 2,
       encrypted: true,
       tags: {
         Name: "data",
