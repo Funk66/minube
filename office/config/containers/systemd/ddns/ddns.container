@@ -1,0 +1,19 @@
+[Unit]
+Description=Route53 Dynamic DNS updater
+
+[Container]
+Image=ghcr.io/crazy-max/ddns-route53:latest
+ContainerName=ddns
+Volume=%E/ddns/config.yaml:/ddns-route53.yml:ro
+Environment=SCHEDULE="*/5 * * * *"
+Environment=TZ=Europe/Berlin
+Environment=LOG_LEVEL=debug
+Environment=LOG_JSON=false
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
