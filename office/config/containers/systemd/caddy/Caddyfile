@@ -1,0 +1,16 @@
+# vim: set ft=caddy:
+{
+	email admin@guirao.net
+	admin :2019
+	metrics {
+		per_host
+	}
+	log {
+		output stdout
+	}
+}
+
+coder.guirao.net {
+  reverse_proxy 127.0.0.1:7080
+  tls /data/letsencrypt/live/home/fullchain.pem /data/letsencrypt/live/home/privkey.pem
+}

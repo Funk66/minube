@@ -1,0 +1,32 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Coder PostgreSQL database
+Wants=podman-user-wait-network-online.service
+After=podman-user-wait-network-online.service
+
+[Container]
+Image=docker.io/library/postgres:17
+ContainerName=coder-db
+# Root inside the user namespace lets the image initialize/chown its volume.
+# The image entrypoint then drops to the postgres user.
+User=0
+Pod=coder.pod
+StartWithPod=true
+AutoUpdate=registry
+Environment=POSTGRES_USER=coder
+Environment=POSTGRES_DB=coder
+EnvironmentFile=%E/coder/env
+Volume=coder_data:/var/lib/postgresql/data:Z
+HealthCmd=pg_isready -U username -d coder
+HealthInterval=5s
+HealthTimeout=5s
+HealthRetries=5
+HealthStartPeriod=30s
+HealthOnFailure=kill
+Notify=healthy
+
+[Service]
+Restart=always
+RestartSec=5s
+TimeoutStartSec=900

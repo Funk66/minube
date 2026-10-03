@@ -1,0 +1,22 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Caddy
+
+[Container]
+ContainerName=caddy
+Exec=/usr/bin/caddy run --config /etc/caddy/Caddyfile
+Image=docker.io/caddy:latest
+Network=host
+Notify=true
+Volume=%h/.config/containers/systemd/caddy/Caddyfile:/etc/caddy/Caddyfile:Z
+Volume=%S/caddy:/data/caddy
+Volume=%S/letsencrypt:/data/letsencrypt:ro
+Environment=TZ=Europe/Berlin
+Label="io.containers.autoupdate=registry"
+
+[Service]
+ExecReload=podman exec caddy /usr/bin/caddy reload --config /etc/caddy/Caddyfile --address localhost:2019 --force
+
+[Install]
+WantedBy=default.target

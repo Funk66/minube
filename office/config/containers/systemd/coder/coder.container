@@ -1,0 +1,27 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Coder server
+Wants=podman-user-wait-network-online.service
+Requires=coder-db.service podman.socket
+After=podman-user-wait-network-online.service coder-db.service podman.socket
+PartOf=coder-db.service
+
+[Container]
+Image=ghcr.io/coder/coder:latest
+ContainerName=coder-server
+User=1000:1000
+Pod=coder.pod
+StartWithPod=true
+AutoUpdate=registry
+Environment=CODER_HTTP_ADDRESS=0.0.0.0:7080
+EnvironmentFile=%E/coder/env
+Volume=coder_home:/home/coder:Z
+Volume=%t/podman/podman.sock:/var/run/docker.sock
+# Required for access to the mounted API socket on SELinux hosts.
+SecurityLabelDisable=true
+
+[Service]
+Restart=always
+RestartSec=5s
+TimeoutStartSec=900
