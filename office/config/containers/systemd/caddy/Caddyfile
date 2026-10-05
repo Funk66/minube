@@ -10,13 +10,33 @@
 	}
 }
 
+(public) {
+	@blockedPaths {
+		path *.php
+		path */.git*
+		path */.env*
+		path */db.sqlite3*
+		path */.htaccess*
+	}
+	log_skip @blockedPaths
+	abort @blockedPaths
+
+	@disallowed {
+		header_regexp User-Agent "(?i)(bot|crawler|spider|scrap(er|y)|scan(ner)?|fetch|monitor|http[-_ ]?client|libwww|wget|python|java|go-http|ruby|perl|nikto|nmap|zgrab|censys|shodan|leakix|netcraft|semrush|ahrefs|mj12|palo alto|expanse|cypex|visionheight|rootevidence|assetnote|iaudit|headlesschrome|dart|aiohttp|req/v)"
+		not header_regexp User-Agent (?i)(immich|applecoremedia|cfnetwork|networkingextension)
+		not header_regexp User-Agent ^Mozilla/5\.0 .*(Gecko|AppleWebKit).*(Firefox|Chrome|Safari|Edg|OPR)/[0-9]
+	}
+	log_skip @disallowed
+	abort @disallowed
+}
+
 (private) {
   tls /data/letsencrypt/live/guirao.net/fullchain.pem /data/letsencrypt/live/guirao.net/privkey.pem
 
   @allowed remote_ip 192.168.178.0/24 fd47:410:a83::/64 100.64.0.0/10
 
   handle @allowed {
-      reverse_proxy {args[0]}
+      reverse_proxy 127.0.0.1:{args[0]}
   }
 
   handle {
@@ -24,10 +44,57 @@
   }
 }
 
+guirao.net {
+	redir https://guillermo.guirao.net{uri} permanent
+}
+
 pihole.guirao.net {
-  import private 127.0.0.1:8080
+  import private 8080
+}
+
+photos.guirao.net {
+	log {
+		output file /var/log/caddy/immich.log
+	}
+	handle /api/server/ping {
+		reverse_proxy 127.0.0.1:2283
+	}
+	handle {
+		import public
+		reverse_proxy 127.0.0.1:2283
+	}
+}
+
+bulwark.guirao.net {
+	log {
+		output file /var/log/caddy/bulwark.log
+	}
+	import public
+	reverse_proxy 127.0.0.1:3333
 }
 
 coder.guirao.net {
-  import private 127.0.0.1:7080
+  import private 7080
+}
+
+docs.guirao.net {
+	import private 8000
+}
+
+maps.guirao.net {
+	import private 3000
+}
+
+airtrail.guirao.net {
+	import private 3030
+}
+
+files.guirao.net {
+	import private 5555
+}
+
+academy.guirao.net {
+	import private 8181
+	@compressible path *.js *.css *.html *.json *.svg *.txt
+	encode @compressible zstd gzip
 }

@@ -17,10 +17,9 @@ Exec=certonly \
   --email letsencrypt@guirao.net \
   --dns-route53 \
   --keep-until-expiring \
-  --expand \
   --cert-name guirao.net \
-  -d coder.guirao.net \
-  -d pihole.guirao.net
+  -d guirao.net \
+  -d '*.guirao.net'
 Label="io.containers.autoupdate=registry"
 
 [Service]

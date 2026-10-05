@@ -15,7 +15,6 @@ Environment=PAPERLESS_TIME_ZONE=Europe/Berlin
 Environment=PAPERLESS_REDIS=redis://valkey:6379
 Environment=PAPERLESS_DBHOST=postgres
 Environment=PAPERLESS_URL=https://docs.guirao.net
-Environment=PAPERLESS_TRUSTED_PROXIES=10.10.10.2
 Environment=PAPERLESS_OCR_LANGUAGE=deu+eng
 Environment=PAPERLESS_DATE_PARSER_LANGUAGES=de+en
 Environment=PAPERLESS_CONSUMER_DISABLE=1
