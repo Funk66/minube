@@ -10,7 +10,24 @@
 	}
 }
 
+(private) {
+  tls /data/letsencrypt/live/guirao.net/fullchain.pem /data/letsencrypt/live/guirao.net/privkey.pem
+
+  @allowed remote_ip 192.168.178.0/24 fd47:410:a83::/64 100.64.0.0/10
+
+  handle @allowed {
+      reverse_proxy {args[0]}
+  }
+
+  handle {
+      respond "Forbidden" 403
+  }
+}
+
+pihole.guirao.net {
+  import private 127.0.0.1:8080
+}
+
 coder.guirao.net {
-  reverse_proxy 127.0.0.1:7080
-  tls /data/letsencrypt/live/home/fullchain.pem /data/letsencrypt/live/home/privkey.pem
+  import private 127.0.0.1:7080
 }

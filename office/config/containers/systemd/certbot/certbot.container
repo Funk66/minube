@@ -18,8 +18,9 @@ Exec=certonly \
   --dns-route53 \
   --keep-until-expiring \
   --expand \
-  --cert-name home \
-  -d coder.guirao.net
+  --cert-name guirao.net \
+  -d coder.guirao.net \
+  -d pihole.guirao.net
 Label="io.containers.autoupdate=registry"
 
 [Service]
