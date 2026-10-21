@@ -38,7 +38,6 @@ systemctl daemon-reload
 mount -a
 
 systemctl enable --now podman-auto-update.timer
-sudo -u podman XDG_RUNTIME_DIR=/run/user/2000 systemctl --user enable --now {immich-backup,dawarich-backup}.timer
 
 echo "SystemMaxUse=1G" >>/etc/systemd/journald.conf
 

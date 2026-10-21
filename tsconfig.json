@@ -23,7 +23,8 @@
     "stripInternal": true,
     "target": "ES2018",
     "incremental": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["node"]
   },
   "include": [
     "**/*.ts"
