@@ -14,7 +14,7 @@
     "source=opencode-state-${devcontainerId},target=/home/ubuntu/.local/state/opencode,type=volume"
   ],
   "remoteEnv": {
-    "TERRAFORM_TOKEN": "${localEnv:TERRAFORM_TOKEN}",
+    "TF_TOKEN_app_terraform_io": "${localEnv:TERRAFORM_TOKEN}",
     "AWS_ACCESS_KEY_ID": "${localEnv:AWS_ACCESS_KEY_ID}",
     "AWS_SECRET_ACCESS_KEY": "${localEnv:AWS_SECRET_ACCESS_KEY}",
     "AWS_DEFAULT_REGION": "${localEnv:AWS_DEFAULT_REGION}",
