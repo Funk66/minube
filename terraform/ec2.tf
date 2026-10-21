@@ -1,33 +1,33 @@
-data "aws_ami" "minube_ubuntu_DBD887C0" {
+data "aws_ami" "ubuntu" {
   most_recent = true
   name_regex  = "ubuntu/images/hvm-ssd-gp3/ubuntu-resolute-26.04-arm64-server"
   owners      = ["amazon"]
 }
 
-resource "aws_iam_policy" "minube_ec2-policy_1589FCF6" {
+resource "aws_iam_policy" "ec2_policy" {
   name   = "minube"
-  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"ReadWriteBackups\",\"Effect\":\"Allow\",\"Resource\":[\"${aws_s3_bucket.buckets_minube-backups_0F1ACE02.arn}/*\",\"${aws_s3_bucket.buckets_minube-fs_5D278F8B.arn}/*\",\"${aws_s3_bucket.buckets_minube-files_0207517F.arn}/*\"],\"Action\":[\"s3:GetObject*\",\"s3:PutObject*\",\"s3:AbortMultipartUpload\"]},{\"Sid\":\"ListBackups\",\"Effect\":\"Allow\",\"Resource\":[\"${aws_s3_bucket.buckets_minube-backups_0F1ACE02.arn}\",\"${aws_s3_bucket.buckets_minube-fs_5D278F8B.arn}\",\"${aws_s3_bucket.buckets_minube-files_0207517F.arn}\"],\"Action\":[\"s3:ListBucket\"]},{\"Sid\":\"SendNotificationEmails\",\"Effect\":\"Allow\",\"Resource\":[\"*\"],\"Action\":[\"ses:SendEmail\",\"ses:SendRawEmail\"]},{\"Sid\":\"ListHostedZones\",\"Effect\":\"Allow\",\"Resource\":[\"*\"],\"Action\":[\"route53:ListHostedZones\",\"route53:ListHostedZonesByName\"]},{\"Sid\":\"WriteRecordSets\",\"Effect\":\"Allow\",\"Resource\":[\"${aws_route53_zone.dns_zone_2E2729FB.arn}\"],\"Action\":[\"route53:ListResourceRecordSets\",\"route53:ChangeResourceRecordSets\"]},{\"Sid\":\"GetChange\",\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:route53:::change/*\"],\"Action\":[\"route53:GetChange\"]}]}"
+  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"ReadWriteBackups\",\"Effect\":\"Allow\",\"Resource\":[\"${aws_s3_bucket.backups.arn}/*\",\"${aws_s3_bucket.fs.arn}/*\",\"${aws_s3_bucket.files.arn}/*\"],\"Action\":[\"s3:GetObject*\",\"s3:PutObject*\",\"s3:AbortMultipartUpload\"]},{\"Sid\":\"ListBackups\",\"Effect\":\"Allow\",\"Resource\":[\"${aws_s3_bucket.backups.arn}\",\"${aws_s3_bucket.fs.arn}\",\"${aws_s3_bucket.files.arn}\"],\"Action\":[\"s3:ListBucket\"]},{\"Sid\":\"SendNotificationEmails\",\"Effect\":\"Allow\",\"Resource\":[\"*\"],\"Action\":[\"ses:SendEmail\",\"ses:SendRawEmail\"]},{\"Sid\":\"ListHostedZones\",\"Effect\":\"Allow\",\"Resource\":[\"*\"],\"Action\":[\"route53:ListHostedZones\",\"route53:ListHostedZonesByName\"]},{\"Sid\":\"WriteRecordSets\",\"Effect\":\"Allow\",\"Resource\":[\"${aws_route53_zone.zone.arn}\"],\"Action\":[\"route53:ListResourceRecordSets\",\"route53:ChangeResourceRecordSets\"]},{\"Sid\":\"GetChange\",\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:route53:::change/*\"],\"Action\":[\"route53:GetChange\"]}]}"
 }
 
-resource "aws_iam_role" "minube_ec2-role_7EBD8617" {
+resource "aws_iam_role" "ec2_role" {
   name               = "minube"
   assume_role_policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"EC2\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
 }
 
-resource "aws_iam_policy_attachment" "minube_ec2-role-attachment_79AAE2A7" {
-  name       = aws_iam_policy.minube_ec2-policy_1589FCF6.name
-  policy_arn = aws_iam_policy.minube_ec2-policy_1589FCF6.arn
-  roles      = [aws_iam_role.minube_ec2-role_7EBD8617.id]
+resource "aws_iam_policy_attachment" "ec2_role_attachment" {
+  name       = aws_iam_policy.ec2_policy.name
+  policy_arn = aws_iam_policy.ec2_policy.arn
+  roles      = [aws_iam_role.ec2_role.id]
 }
 
-resource "aws_iam_instance_profile" "minube_profile_DA0BE098" {
-  name = aws_iam_role.minube_ec2-role_7EBD8617.id
-  role = aws_iam_role.minube_ec2-role_7EBD8617.id
+resource "aws_iam_instance_profile" "instance_profile" {
+  name = aws_iam_role.ec2_role.id
+  role = aws_iam_role.ec2_role.id
 }
 
-resource "aws_security_group" "minube_sg_FD4FC769" {
+resource "aws_security_group" "security_group" {
   name   = "minube"
-  vpc_id = aws_vpc.vpc_6776A399.id
+  vpc_id = aws_vpc.vpc.id
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 22
@@ -141,18 +141,18 @@ resource "aws_security_group" "minube_sg_FD4FC769" {
   }
 }
 
-resource "aws_key_pair" "minube_key_C5C91068" {
+resource "aws_key_pair" "ssh_key" {
   key_name   = "ggaguilar"
   public_key = file("${path.root}/../assets/key.pub")
 }
 
-resource "aws_instance" "minube_instance_DC8B55B2" {
-  ami                    = data.aws_ami.minube_ubuntu_DBD887C0.id
+resource "aws_instance" "instance" {
+  ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t4g.micro"
-  key_name               = aws_key_pair.minube_key_C5C91068.key_name
-  subnet_id              = aws_subnet.vpc_subnet_376FC355.id
-  vpc_security_group_ids = [aws_security_group.minube_sg_FD4FC769.id]
-  iam_instance_profile   = aws_iam_instance_profile.minube_profile_DA0BE098.id
+  key_name               = aws_key_pair.ssh_key.key_name
+  subnet_id              = aws_subnet.subnet.id
+  vpc_security_group_ids = [aws_security_group.security_group.id]
+  iam_instance_profile   = aws_iam_instance_profile.instance_profile.id
   availability_zone      = "eu-central-1b"
   user_data              = file("${path.root}/../assets/userdata.sh")
   root_block_device {
@@ -172,14 +172,14 @@ resource "aws_instance" "minube_instance_DC8B55B2" {
   }
 }
 
-resource "aws_eip" "minube_eip_ABBEFAB8" {
-  instance = aws_instance.minube_instance_DC8B55B2.id
+resource "aws_eip" "eip" {
+  instance = aws_instance.instance.id
   tags = {
     Name = "minube"
   }
 }
 
-resource "aws_ebs_volume" "minube_volume_7905D60F" {
+resource "aws_ebs_volume" "data_volume" {
   availability_zone = "eu-central-1b"
   type              = "gp3"
   size              = 2
@@ -189,56 +189,56 @@ resource "aws_ebs_volume" "minube_volume_7905D60F" {
   }
 }
 
-resource "aws_volume_attachment" "minube_attachment_5CBBB29D" {
+resource "aws_volume_attachment" "data_attachment" {
   device_name = "/dev/sdf"
-  volume_id   = aws_ebs_volume.minube_volume_7905D60F.id
-  instance_id = aws_instance.minube_instance_DC8B55B2.id
+  volume_id   = aws_ebs_volume.data_volume.id
+  instance_id = aws_instance.instance.id
 }
 
-resource "aws_route53_record" "minube_main-a-record_C6633991" {
-  name    = aws_route53_zone.dns_zone_2E2729FB.name
-  zone_id = aws_route53_zone.dns_zone_2E2729FB.id
+resource "aws_route53_record" "main_a" {
+  name    = aws_route53_zone.zone.name
+  zone_id = aws_route53_zone.zone.id
   type    = "A"
   ttl     = 300
-  records = [aws_eip.minube_eip_ABBEFAB8.public_ip]
+  records = [aws_eip.eip.public_ip]
 }
 
-resource "aws_route53_record" "minube_main-aaaa-record_6A1C442D" {
-  name    = aws_route53_zone.dns_zone_2E2729FB.name
-  zone_id = aws_route53_zone.dns_zone_2E2729FB.id
+resource "aws_route53_record" "main_aaaa" {
+  name    = aws_route53_zone.zone.name
+  zone_id = aws_route53_zone.zone.id
   type    = "AAAA"
   ttl     = 300
-  records = aws_instance.minube_instance_DC8B55B2.ipv6_addresses
+  records = aws_instance.instance.ipv6_addresses
 }
 
-resource "aws_route53_record" "minube_minube-a-record_BF1F97B8" {
-  name    = "minube.${aws_route53_zone.dns_zone_2E2729FB.name}"
-  zone_id = aws_route53_zone.dns_zone_2E2729FB.id
+resource "aws_route53_record" "minube_a" {
+  name    = "minube.${aws_route53_zone.zone.name}"
+  zone_id = aws_route53_zone.zone.id
   type    = "A"
   ttl     = 300
-  records = [aws_eip.minube_eip_ABBEFAB8.public_ip]
+  records = [aws_eip.eip.public_ip]
 }
 
-resource "aws_route53_record" "minube_minube-aaaa-record_DD7D00D9" {
-  name    = "minube.${aws_route53_zone.dns_zone_2E2729FB.name}"
-  zone_id = aws_route53_zone.dns_zone_2E2729FB.id
+resource "aws_route53_record" "minube_aaaa" {
+  name    = "minube.${aws_route53_zone.zone.name}"
+  zone_id = aws_route53_zone.zone.id
   type    = "AAAA"
   ttl     = 300
-  records = aws_instance.minube_instance_DC8B55B2.ipv6_addresses
+  records = aws_instance.instance.ipv6_addresses
 }
 
-resource "aws_route53_record" "minube_mail-a-record_3EE44DA1" {
-  name    = "mail.${aws_route53_zone.dns_zone_2E2729FB.name}"
-  zone_id = aws_route53_zone.dns_zone_2E2729FB.id
+resource "aws_route53_record" "mail_a" {
+  name    = "mail.${aws_route53_zone.zone.name}"
+  zone_id = aws_route53_zone.zone.id
   type    = "A"
   ttl     = 300
-  records = [aws_eip.minube_eip_ABBEFAB8.public_ip]
+  records = [aws_eip.eip.public_ip]
 }
 
-resource "aws_route53_record" "minube_mail-aaaa-record_D2746EED" {
-  name    = "mail.${aws_route53_zone.dns_zone_2E2729FB.name}"
-  zone_id = aws_route53_zone.dns_zone_2E2729FB.id
+resource "aws_route53_record" "mail_aaaa" {
+  name    = "mail.${aws_route53_zone.zone.name}"
+  zone_id = aws_route53_zone.zone.id
   type    = "AAAA"
   ttl     = 300
-  records = aws_instance.minube_instance_DC8B55B2.ipv6_addresses
+  records = aws_instance.instance.ipv6_addresses
 }

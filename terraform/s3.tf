@@ -1,16 +1,16 @@
-resource "aws_s3_bucket" "buckets_minube-backups_0F1ACE02" {
+resource "aws_s3_bucket" "backups" {
   bucket = "minube-backups"
 }
 
-resource "aws_s3_bucket_versioning" "buckets_backups-versioning_50248965" {
-  bucket = aws_s3_bucket.buckets_minube-backups_0F1ACE02.bucket
+resource "aws_s3_bucket_versioning" "backups_versioning" {
+  bucket = aws_s3_bucket.backups.bucket
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "buckets_backups-lifecycle_FA66DD08" {
-  bucket = aws_s3_bucket.buckets_minube-backups_0F1ACE02.bucket
+resource "aws_s3_bucket_lifecycle_configuration" "backups_lifecycle" {
+  bucket = aws_s3_bucket.backups.bucket
   rule {
     id     = "Stalwart"
     status = "Enabled"
@@ -56,19 +56,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_backups-lifecycle_FA66
   }
 }
 
-resource "aws_s3_bucket" "buckets_minube-fs_5D278F8B" {
+resource "aws_s3_bucket" "fs" {
   bucket = "minube-fs"
 }
 
-resource "aws_s3_bucket_versioning" "buckets_fs-versioning_069DB685" {
-  bucket = aws_s3_bucket.buckets_minube-fs_5D278F8B.bucket
+resource "aws_s3_bucket_versioning" "fs_versioning" {
+  bucket = aws_s3_bucket.fs.bucket
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "buckets_fs-lifecycle_20D547F5" {
-  bucket = aws_s3_bucket.buckets_minube-fs_5D278F8B.bucket
+resource "aws_s3_bucket_lifecycle_configuration" "fs_lifecycle" {
+  bucket = aws_s3_bucket.fs.bucket
   rule {
     id     = "Trashcan"
     status = "Enabled"
@@ -84,19 +84,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_fs-lifecycle_20D547F5"
   }
 }
 
-resource "aws_s3_bucket" "buckets_minube-files_0207517F" {
+resource "aws_s3_bucket" "files" {
   bucket = "minube-files"
 }
 
-resource "aws_s3_bucket_versioning" "buckets_files-versioning_DC55B346" {
-  bucket = aws_s3_bucket.buckets_minube-files_0207517F.bucket
+resource "aws_s3_bucket_versioning" "files_versioning" {
+  bucket = aws_s3_bucket.files.bucket
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "buckets_files-lifecycle_7E91F0D4" {
-  bucket = aws_s3_bucket.buckets_minube-files_0207517F.bucket
+resource "aws_s3_bucket_lifecycle_configuration" "files_lifecycle" {
+  bucket = aws_s3_bucket.files.bucket
   rule {
     id     = "Trashcan"
     status = "Enabled"
@@ -112,19 +112,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_files-lifecycle_7E91F0
   }
 }
 
-resource "aws_s3_bucket" "buckets_minube-storage_A1ADE638" {
+resource "aws_s3_bucket" "storage" {
   bucket = "minube-storage"
 }
 
-resource "aws_s3_bucket_versioning" "buckets_storage-versioning_FA7AAE6C" {
-  bucket = aws_s3_bucket.buckets_minube-storage_A1ADE638.bucket
+resource "aws_s3_bucket_versioning" "storage_versioning" {
+  bucket = aws_s3_bucket.storage.bucket
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "buckets_storage-lifecycle_12A6B5B2" {
-  bucket = aws_s3_bucket.buckets_minube-storage_A1ADE638.bucket
+resource "aws_s3_bucket_lifecycle_configuration" "storage_lifecycle" {
+  bucket = aws_s3_bucket.storage.bucket
   rule {
     id     = "Trashcan"
     status = "Enabled"
@@ -140,19 +140,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_storage-lifecycle_12A6
   }
 }
 
-resource "aws_s3_bucket" "buckets_minube-photos_3472E0E4" {
+resource "aws_s3_bucket" "photos" {
   bucket = "minube-photos"
 }
 
-resource "aws_s3_bucket_versioning" "buckets_photos-versioning_42CA05AD" {
-  bucket = aws_s3_bucket.buckets_minube-photos_3472E0E4.bucket
+resource "aws_s3_bucket_versioning" "photos_versioning" {
+  bucket = aws_s3_bucket.photos.bucket
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "buckets_photos-lifecycle_D1433BBC" {
-  bucket = aws_s3_bucket.buckets_minube-photos_3472E0E4.bucket
+resource "aws_s3_bucket_lifecycle_configuration" "photos_lifecycle" {
+  bucket = aws_s3_bucket.photos.bucket
   rule {
     id     = "Trashcan"
     status = "Enabled"
@@ -168,19 +168,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_photos-lifecycle_D1433
   }
 }
 
-resource "aws_s3_bucket" "buckets_minube-mail_2017F00D" {
+resource "aws_s3_bucket" "mail" {
   bucket = "minube-mail"
 }
 
-resource "aws_s3_bucket_versioning" "buckets_mail-versioning_FB59FB1A" {
-  bucket = aws_s3_bucket.buckets_minube-mail_2017F00D.bucket
+resource "aws_s3_bucket_versioning" "mail_versioning" {
+  bucket = aws_s3_bucket.mail.bucket
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "buckets_mail-lifecycle_EC4CE7EE" {
-  bucket = aws_s3_bucket.buckets_minube-mail_2017F00D.bucket
+resource "aws_s3_bucket_lifecycle_configuration" "mail_lifecycle" {
+  bucket = aws_s3_bucket.mail.bucket
   rule {
     id     = "Trashcan"
     status = "Enabled"
@@ -196,19 +196,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "buckets_mail-lifecycle_EC4CE7E
   }
 }
 
-resource "aws_s3_bucket" "buckets_minube-docs_08FE3C73" {
+resource "aws_s3_bucket" "docs" {
   bucket = "minube-docs"
 }
 
-resource "aws_s3_bucket_versioning" "buckets_docs-versioning_4EC986D3" {
-  bucket = aws_s3_bucket.buckets_minube-docs_08FE3C73.bucket
+resource "aws_s3_bucket_versioning" "docs_versioning" {
+  bucket = aws_s3_bucket.docs.bucket
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "buckets_docs-lifecycle_BCB6FB67" {
-  bucket = aws_s3_bucket.buckets_minube-docs_08FE3C73.bucket
+resource "aws_s3_bucket_lifecycle_configuration" "docs_lifecycle" {
+  bucket = aws_s3_bucket.docs.bucket
   rule {
     id     = "Trashcan"
     status = "Enabled"

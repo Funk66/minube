@@ -1,10 +1,10 @@
-resource "aws_route53_zone" "dns_zone_2E2729FB" {
+resource "aws_route53_zone" "zone" {
   name = "guirao.net"
 }
 
-resource "aws_route53_record" "dns_caa-record_487843A3" {
-  name    = aws_route53_zone.dns_zone_2E2729FB.name
-  zone_id = aws_route53_zone.dns_zone_2E2729FB.zone_id
+resource "aws_route53_record" "caa_record" {
+  name    = aws_route53_zone.zone.name
+  zone_id = aws_route53_zone.zone.zone_id
   type    = "CAA"
   ttl     = 60
   records = [
@@ -16,11 +16,11 @@ resource "aws_route53_record" "dns_caa-record_487843A3" {
   ]
 }
 
-data "aws_caller_identity" "dns_current_750979D0" {
+data "aws_caller_identity" "current" {
 
 }
 
-data "aws_iam_policy_document" "dns_dnssec-policy_FD420429" {
+data "aws_iam_policy_document" "dnssec_policy" {
   statement {
     sid    = "Allow administration of the key"
     effect = "Allow"
@@ -44,48 +44,48 @@ data "aws_iam_policy_document" "dns_dnssec-policy_FD420429" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.dns_current_750979D0.account_id}:root"
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
       ]
     }
   }
 }
 
-resource "aws_kms_key" "dns_kms-key_3A639EF6" {
-  description              = "KMS key for DNSSEC in ${aws_route53_zone.dns_zone_2E2729FB.name}"
+resource "aws_kms_key" "kms_key" {
+  description              = "KMS key for DNSSEC in ${aws_route53_zone.zone.name}"
   key_usage                = "SIGN_VERIFY"
   customer_master_key_spec = "ECC_NIST_P256"
   deletion_window_in_days  = 7
-  policy                   = data.aws_iam_policy_document.dns_dnssec-policy_FD420429.json
+  policy                   = data.aws_iam_policy_document.dnssec_policy.json
   provider                 = aws.us-east-1
 }
 
-resource "aws_kms_alias" "dns_kms-key-alias_C6B16ECE" {
+resource "aws_kms_alias" "kms_key_alias" {
   name          = "alias/dnssec"
-  target_key_id = aws_kms_key.dns_kms-key_3A639EF6.key_id
+  target_key_id = aws_kms_key.kms_key.key_id
   provider      = aws.us-east-1
 }
 
-resource "aws_route53_key_signing_key" "dns_key-signing-key_71FE8640" {
+resource "aws_route53_key_signing_key" "key_signing_key" {
   name                       = "guirao-net-dnssec"
-  hosted_zone_id             = aws_route53_zone.dns_zone_2E2729FB.zone_id
-  key_management_service_arn = aws_kms_key.dns_kms-key_3A639EF6.arn
+  hosted_zone_id             = aws_route53_zone.zone.zone_id
+  key_management_service_arn = aws_kms_key.kms_key.arn
 }
 
-resource "aws_route53_hosted_zone_dnssec" "dns_dnssec_B5444A19" {
-  hosted_zone_id = aws_route53_key_signing_key.dns_key-signing-key_71FE8640.hosted_zone_id
+resource "aws_route53_hosted_zone_dnssec" "dnssec" {
+  hosted_zone_id = aws_route53_key_signing_key.key_signing_key.hosted_zone_id
 }
 
-resource "aws_route53_record" "dns_funk66-cname_1E1DFA2C" {
-  name    = "guillermo.${aws_route53_zone.dns_zone_2E2729FB.name}"
-  zone_id = aws_route53_zone.dns_zone_2E2729FB.zone_id
+resource "aws_route53_record" "funk66_cname" {
+  name    = "guillermo.${aws_route53_zone.zone.name}"
+  zone_id = aws_route53_zone.zone.zone_id
   type    = "CNAME"
   ttl     = 300
   records = ["funk66.github.io"]
 }
 
-resource "aws_route53_record" "dns_google-record_BC4BA9C2" {
-  name    = aws_route53_zone.dns_zone_2E2729FB.name
-  zone_id = aws_route53_zone.dns_zone_2E2729FB.zone_id
+resource "aws_route53_record" "google_record" {
+  name    = aws_route53_zone.zone.name
+  zone_id = aws_route53_zone.zone.zone_id
   type    = "TXT"
   ttl     = 300
   records = [
