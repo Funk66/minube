@@ -431,11 +431,13 @@ difference in `user_data`, a missing `provider =` line, a provider version chang
 ## 7. Definition of done
 
 - [x] Stage 0: baseline plan = no changes (verified 2026-10-21)
-- [ ] Stage 1: `terraform/` with old names; fmt/validate/plan gates green; committed
-- [ ] Stage 2: rename + moved.tf; plan gate green; **approved** cutover apply =
-      `0 added, 0 changed, 0 destroyed`; post-apply sanity checks pass; committed
-- [ ] Stage 3: `moved.tf` removed; plan green; committed
-- [ ] Stage 4: cdktf scaffolding gone; plan green; committed; branch merged to master
+- [x] Stage 1: `terraform/` with old names; fmt/validate/plan gates green; committed
+- [x] Stage 2: rename + moved.tf; plan gate green; **approved** cutover apply =
+      `0 added, 0 changed, 0 destroyed`; post-apply sanity checks pass (DNS
+      resolves, EIP unchanged, state list shows friendly names); committed
+- [x] Stage 3: `moved.tf` removed; plan green; committed
+- [x] Stage 4: cdktf scaffolding gone; plan green; committed
+- [ ] Branch `hcl-migration` merged to master (user decision)
 - [ ] (optional) Stage 5 polish commits
 - Result: `git ls-files` shows a small tidy `terraform/` tree; `terraform plan`
   prints "No changes"; the TF Cloud workspace runs on it; the server, mail, and

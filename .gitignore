@@ -1,15 +1,23 @@
-*.d.ts
-*.js
-./bin
-node_modules
-cdktf.out
-cdktf.log
-*terraform.*.tfstate*
-.gen
+# Local .terraform directories
 .terraform
-tsconfig.tsbuildinfo
-!jest.config.js
-!setup.js
+
+# Terraform state files (state lives in HCP Terraform)
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Terraform variable files (often contain secrets)
+*.tfvars
+*.tfvars.*
+*.*.tf
+*.tf.*
+!*.tfvars
+!*.tfvars.*
+!*.override.tf
+!*.override.tf.json
+!*.tf
+!*.tf.json
+
 .DS_Store
 assets/fs.tar.gz
 .claude/
