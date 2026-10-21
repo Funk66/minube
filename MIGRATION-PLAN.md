@@ -437,7 +437,7 @@ difference in `user_data`, a missing `provider =` line, a provider version chang
       resolves, EIP unchanged, state list shows friendly names); committed
 - [x] Stage 3: `moved.tf` removed; plan green; committed
 - [x] Stage 4: cdktf scaffolding gone; plan green; committed
-- [ ] Branch `hcl-migration` merged to master (user decision)
+- [x] Branch `hcl-migration` merged to master
 - [ ] (optional) Stage 5 polish commits
 - Result: `git ls-files` shows a small tidy `terraform/` tree; `terraform plan`
   prints "No changes"; the TF Cloud workspace runs on it; the server, mail, and
