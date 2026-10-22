@@ -4,14 +4,121 @@ data "aws_ami" "ubuntu" {
   owners      = ["amazon"]
 }
 
+data "aws_iam_policy_document" "ec2" {
+  statement {
+    sid    = "ReadWriteBackups"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject*",
+      "s3:PutObject*",
+      "s3:AbortMultipartUpload",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.backups.arn}/*",
+      "${aws_s3_bucket.fs.arn}/*",
+      "${aws_s3_bucket.files.arn}/*",
+    ]
+  }
+
+  statement {
+    sid    = "ListBackups"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      aws_s3_bucket.backups.arn,
+      aws_s3_bucket.fs.arn,
+      aws_s3_bucket.files.arn,
+    ]
+  }
+
+  statement {
+    sid    = "SendNotificationEmails"
+    effect = "Allow"
+
+    actions = [
+      "ses:SendEmail",
+      "ses:SendRawEmail",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    sid    = "ListHostedZones"
+    effect = "Allow"
+
+    actions = [
+      "route53:ListHostedZones",
+      "route53:ListHostedZonesByName",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    sid    = "WriteRecordSets"
+    effect = "Allow"
+
+    actions = [
+      "route53:ListResourceRecordSets",
+      "route53:ChangeResourceRecordSets",
+    ]
+
+    resources = [
+      aws_route53_zone.zone.arn,
+    ]
+  }
+
+  statement {
+    sid    = "GetChange"
+    effect = "Allow"
+
+    actions = [
+      "route53:GetChange",
+    ]
+
+    resources = [
+      "arn:aws:route53:::change/*",
+    ]
+  }
+}
+
 resource "aws_iam_policy" "ec2_policy" {
   name   = "minube"
-  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"ReadWriteBackups\",\"Effect\":\"Allow\",\"Resource\":[\"${aws_s3_bucket.backups.arn}/*\",\"${aws_s3_bucket.fs.arn}/*\",\"${aws_s3_bucket.files.arn}/*\"],\"Action\":[\"s3:GetObject*\",\"s3:PutObject*\",\"s3:AbortMultipartUpload\"]},{\"Sid\":\"ListBackups\",\"Effect\":\"Allow\",\"Resource\":[\"${aws_s3_bucket.backups.arn}\",\"${aws_s3_bucket.fs.arn}\",\"${aws_s3_bucket.files.arn}\"],\"Action\":[\"s3:ListBucket\"]},{\"Sid\":\"SendNotificationEmails\",\"Effect\":\"Allow\",\"Resource\":[\"*\"],\"Action\":[\"ses:SendEmail\",\"ses:SendRawEmail\"]},{\"Sid\":\"ListHostedZones\",\"Effect\":\"Allow\",\"Resource\":[\"*\"],\"Action\":[\"route53:ListHostedZones\",\"route53:ListHostedZonesByName\"]},{\"Sid\":\"WriteRecordSets\",\"Effect\":\"Allow\",\"Resource\":[\"${aws_route53_zone.zone.arn}\"],\"Action\":[\"route53:ListResourceRecordSets\",\"route53:ChangeResourceRecordSets\"]},{\"Sid\":\"GetChange\",\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:route53:::change/*\"],\"Action\":[\"route53:GetChange\"]}]}"
+  policy = data.aws_iam_policy_document.ec2.json
+}
+
+data "aws_iam_policy_document" "ec2_assume_role" {
+  statement {
+    sid    = "EC2"
+    effect = "Allow"
+
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "ec2.amazonaws.com",
+      ]
+    }
+  }
 }
 
 resource "aws_iam_role" "ec2_role" {
   name               = "minube"
-  assume_role_policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"EC2\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
+  assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
 }
 
 resource "aws_iam_policy_attachment" "ec2_role_attachment" {

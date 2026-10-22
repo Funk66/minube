@@ -19,7 +19,7 @@
     "AWS_SECRET_ACCESS_KEY": "${localEnv:AWS_SECRET_ACCESS_KEY}",
     "AWS_DEFAULT_REGION": "${localEnv:AWS_DEFAULT_REGION}",
     "TAVILY_API_KEY": "${localEnv:TAVILY_API_KEY}",
-    "SOFA_API_TOKEN": "${localEnv:SOFA_API_TOKEN}"
+    "GH_TOKEN": "${localEnv:GH_TOKEN}"
   },
   "runArgs": ["--add-host=coder.guirao.net:169.254.1.2"]
 }
