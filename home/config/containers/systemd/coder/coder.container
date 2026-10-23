@@ -15,6 +15,7 @@ Pod=coder.pod
 StartWithPod=true
 AutoUpdate=registry
 Environment=CODER_HTTP_ADDRESS=0.0.0.0:7080
+Environment=CODER_TELEMETRY_ENABLE=false
 EnvironmentFile=%E/coder/env
 Volume=coder_home:/home/coder:Z
 Volume=%t/podman/podman.sock:/var/run/docker.sock
