@@ -1,0 +1,20 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Fritzr53
+
+[Container]
+ContainerName=fritzr53
+Image=ghcr.io/funk66/fritzr53:latest
+EnvironmentFile=%E/fritzr53/env
+Volume=%E/fritzr53/config.toml:/etc/fritzr53/config.toml:ro
+Volume=%S/fritzr53/data:/data:Z
+PublishPort=5353:8080
+PublishPort=5454:9090
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
