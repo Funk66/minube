@@ -150,7 +150,7 @@ def fetch_repo_root(tmpdir: Path) -> Path:
     branch = None
     try:
         branch = json.loads(_download(GITHUB_API_BASE).decode("utf-8")).get("default_branch")
-    except Exception:
+    except (OSError, ValueError):
         branch = None
 
     candidates: list[str] = []
@@ -163,20 +163,17 @@ def fetch_repo_root(tmpdir: Path) -> Path:
         try:
             data = _download(f"{TARBALL_BASE}/{cand}")
             break
-        except Exception:
+        except (OSError, ValueError):
             data = None
 
     if data is None:
         raise RuntimeError("could not download the repository tarball from GitHub")
 
-    tf = tarfile.open(fileobj=io.BytesIO(data), mode="r:gz")
-    try:
+    with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as tf:
         try:
             tf.extractall(path=str(tmpdir), filter="data")
         except TypeError:
             tf.extractall(path=str(tmpdir))
-    finally:
-        tf.close()
 
     entries = sorted(tmpdir.iterdir(), key=lambda p: p.name)
     top = entries[0] if len(entries) == 1 else tmpdir
@@ -246,8 +243,14 @@ def sync_sources(repo_root: Path, changed: list[Change], apply: bool) -> None:
 
 def run_systemctl(args: list[str], timeout: float = 90.0) -> subprocess.CompletedProcess:
     try:
-        return subprocess.run(["systemctl", "--user", *args], capture_output=True, text=True, timeout=timeout)
-    except Exception as exc:
+        return subprocess.run(
+            ["systemctl", "--user", *args],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
         failed = subprocess.CompletedProcess(["systemctl", "--user", *args], returncode=1)
         failed.stdout = ""
         failed.stderr = f"{type(exc).__name__}: {exc}"
@@ -258,12 +261,13 @@ def journal_tail(unit: str, lines: int = JOURNAL_TAIL_LINES) -> str:
     try:
         res = subprocess.run(
             ["journalctl", "--user", "-u", unit, "--no-pager", "-n", str(lines)],
+            check=False,
             capture_output=True,
             text=True,
             timeout=30.0,
         )
         return (res.stdout or "").strip()
-    except Exception:
+    except (OSError, subprocess.TimeoutExpired):
         return ""
 
 
@@ -273,7 +277,7 @@ def unit_names_for(changed: list[Change]) -> list[str]:
         name = ch.repo_rel.rsplit("/", 1)[-1]
         if name.endswith(".container"):
             units.add(name[: -len(".container")] + ".service")
-        elif name.endswith(".service") or name.endswith(".timer"):
+        elif name.endswith((".service", ".timer")):
             units.add(name)
     return sorted(units)
 
@@ -496,7 +500,7 @@ def main(argv: list[str] | None = None) -> int:
 if __name__ == "__main__":
     try:
         _exit_code = main()
-    except Exception as exc:  # keep failures easy to read for the user
+    except Exception as exc:  # noqa: BLE001 - keep failures easy to read for the user
         print_line(err(f"sync aborted: {type(exc).__name__}: {exc}"))
         _exit_code = 1
     raise SystemExit(_exit_code)
