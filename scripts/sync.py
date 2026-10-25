@@ -536,10 +536,16 @@ def main(argv: list[str] | None = None) -> int:
 
     changed: list[Change] = []
     repo_root = find_repo_root()
+    issues: list[tuple[str, str, str]] = []
     if repo_root is None:
         with tempfile.TemporaryDirectory(prefix="minube-sync-") as td:
             repo_root = fetch_repo_root(Path(td))
-    sync_sources(repo_root, changed, apply=not args.dry_run)
+            # keep the temporary directory alive: the extracted checkout lives inside it
+            sync_sources(repo_root, changed, apply=not args.dry_run)
+            issues = check_container_volumes(repo_root, home, uid, state_dir)
+    else:
+        sync_sources(repo_root, changed, apply=not args.dry_run)
+        issues = check_container_volumes(repo_root, home, uid, state_dir)
 
     added = [c for c in changed if c.status == "added"]
     modified = [c for c in changed if c.status == "modified"]
@@ -560,7 +566,6 @@ def main(argv: list[str] | None = None) -> int:
 
     units = unit_names_for(changed)
 
-    issues = check_container_volumes(repo_root, home, uid, state_dir)
     if issues:
         logger.info("")
         logger.info(bold("Container volume checks (host directories referenced by Volume= mounts):"))
