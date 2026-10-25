@@ -46,6 +46,7 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import logging
 import os
 import re
 import stat
@@ -111,14 +112,87 @@ def info(text: str) -> str:
     return _paint("0;36", text)
 
 
-def print_line(text: str = "") -> None:
-    print(text, flush=True)
+LOG_FORMAT = "%(levelname)s: %(message)s"
+
+
+class _LevelRangeFilter(logging.Filter):
+    """Allow only records whose level is within ``[min_level, max_level]``."""
+
+    def __init__(self, min_level: int, max_level: int) -> None:
+        super().__init__()
+        self.min_level = min_level
+        self.max_level = max_level
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return self.min_level <= record.levelno <= self.max_level
+
+
+class ColorFormatter(logging.Formatter):
+    """Colorize the level name, mirroring the plain-stdlib color helpers.
+
+    Colors are only used when the stream is attached to an interactive
+    terminal, so redirected or piped output stays plain text.
+    """
+
+    LEVEL_COLORS = {
+        "DEBUG": "2",
+        "INFO": "0;36",
+        "WARNING": "0;33",
+        "ERROR": "0;31",
+        "CRITICAL": "1;31",
+    }
+
+    def __init__(self) -> None:
+        super().__init__(fmt=LOG_FORMAT)
+
+    def format(self, record: logging.LogRecord) -> str:
+        levelname = record.levelname
+        color = self.LEVEL_COLORS.get(levelname)
+        if color and _USE_COLOR:
+            levelname = f"\033[{color}m{levelname}\033[0m"
+        original = record.levelname
+        record.levelname = levelname
+        try:
+            return super().format(record)
+        finally:
+            record.levelname = original
+
+
+def _setup_logging(level: int = logging.INFO) -> logging.Logger:
+    """Wire the console handlers of the ``minube.sync`` logger.
+
+    Debug and informational records are written to stdout, while warnings
+    and failures are written to stderr - mirroring the usual unix
+    convention.  The verbosity can be changed through the ``--log-level``
+    command line option.
+    """
+    log = logging.getLogger("minube.sync")
+    log.setLevel(level)
+    log.propagate = False
+
+    formatter = ColorFormatter()
+    out = logging.StreamHandler(sys.stdout)
+    out.setLevel(logging.DEBUG)
+    out.addFilter(_LevelRangeFilter(logging.DEBUG, logging.INFO))
+    out.setFormatter(formatter)
+    log.addHandler(out)
+
+    err_handler = logging.StreamHandler(sys.stderr)
+    err_handler.setLevel(logging.WARNING)
+    err_handler.addFilter(_LevelRangeFilter(logging.WARNING, logging.CRITICAL))
+    err_handler.setFormatter(formatter)
+    log.addHandler(err_handler)
+
+    return log
+
+
+logger = logging.getLogger("minube.sync")
 
 
 def banner() -> None:
-    print_line(bold("=" * 72))
-    print_line(bold(f"  minube sync  ·  {GITHUB_REPO}  ·  github.com/Funk66/minube"))
-    print_line(bold("=" * 72))
+    logger.info(bold("=" * 72))
+    logger.info(bold(f"  minube sync  ·  {GITHUB_REPO}  ·  github.com/Funk66/minube"))
+    logger.info(bold("=" * 72))
 
 
 # --------------------------------------------------------------------------
@@ -139,17 +213,20 @@ class Change:
 # --------------------------------------------------------------------------
 
 
-def _download(url: str) -> bytes:
+def _download(url: str) -> tuple[bytes, str | None]:
+    """Download a URL, returning the payload together with the GitHub cache status."""
     req = urllib.request.Request(url, headers={"User-Agent": "minube-sync"})
     with urllib.request.urlopen(req, timeout=FETCH_TIMEOUT) as resp:
-        return resp.read()
+        cache_status = (resp.headers.get("X-GitHub-Cache") or "").strip() or None
+        data = resp.read()
+    return data, cache_status
 
 
 def fetch_repo_root(tmpdir: Path) -> Path:
     """Download the latest tarball of the GitHub repository and extract it."""
     branch = None
     try:
-        branch = json.loads(_download(GITHUB_API_BASE).decode("utf-8")).get("default_branch")
+        branch = json.loads(_download(GITHUB_API_BASE)[0].decode("utf-8")).get("default_branch")
     except (OSError, ValueError):
         branch = None
 
@@ -159,15 +236,22 @@ def fetch_repo_root(tmpdir: Path) -> Path:
     candidates.extend(["master", "main"])
 
     data: bytes | None = None
+    cache_status: str | None = None
     for cand in dict.fromkeys(candidates):
         try:
-            data = _download(f"{TARBALL_BASE}/{cand}")
+            data, cache_status = _download(f"{TARBALL_BASE}/{cand}")
             break
         except (OSError, ValueError):
             data = None
 
     if data is None:
         raise RuntimeError("could not download the repository tarball from GitHub")
+
+    logger.info("Downloaded repository tarball from GitHub (branch candidate: %s)", cand)
+    if cache_status:
+        logger.debug("GitHub reported the tarball cache status as: %s", cache_status)
+        if cache_status.upper() == "HIT":
+            logger.info("The downloaded repository is being served from the GitHub cache")
 
     with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as tf:
         try:
@@ -208,6 +292,7 @@ def sync_sources(repo_root: Path, changed: list[Change], apply: bool) -> None:
                         identical = False
 
                 if identical:
+                    logger.debug("Host file %s is already in sync with the repository", dst)
                     continue
 
                 status = "modified" if dst.exists() else "added"
@@ -225,7 +310,7 @@ def sync_sources(repo_root: Path, changed: list[Change], apply: bool) -> None:
                     os.chmod(tmp, stat.S_IMODE(src.stat().st_mode))
                     os.replace(tmp, dst)
                 except OSError as exc:
-                    print_line(err(f"  ! failed to write {dst}: {exc}"))
+                    logger.error(f"  ! failed to write {dst}: {exc}")
                 finally:
                     if tmp.exists():
                         try:
@@ -355,12 +440,12 @@ def reload_and_restart(units: list[str]) -> list[tuple[str, bool]]:
 
     res = run_systemctl(["daemon-reload"])
     if res.returncode != 0:
-        print_line(err(f"  ! systemctl --user daemon-reload failed: {(res.stderr or res.stdout or '').strip()}"))
+        logger.error(f"  ! systemctl --user daemon-reload failed: {(res.stderr or res.stdout or '').strip()}")
 
     for unit in units:
         res = run_systemctl(["restart", unit])
         if res.returncode != 0:
-            print_line(err(f"  ! restarting {unit} failed: {(res.stderr or res.stdout or '').strip()}"))
+            logger.error(f"  ! restarting {unit} failed: {(res.stderr or res.stdout or '').strip()}")
             results.append((unit, False))
             continue
 
@@ -372,9 +457,9 @@ def reload_and_restart(units: list[str]) -> list[tuple[str, bool]]:
 
         if not active:
             tail = journal_tail(unit)
-            print_line(err(f"  ! service {unit} is not running after restart"))
+            logger.error(f"  ! service {unit} is not running after restart")
             for line in tail.splitlines()[-15:]:
-                print_line(dim(f"      | {line}"))
+                logger.debug(f"      | {line}")
 
     return results
 
@@ -426,20 +511,28 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="compare host paths with the repository and report, but do not write files or restart services",
     )
+    parser.add_argument(
+        "--log-level",
+        default="info",
+        choices=("debug", "info", "warning", "error", "critical"),
+        help="log verbosity (default: info)",
+    )
     args = parser.parse_args(argv)
+
+    _setup_logging(logging.getLevelName(args.log_level.upper()))
 
     home = Path.home()
     if not home.is_dir():
-        print_line(err(f"HOME directory does not exist: {home}"))
+        logger.error(f"HOME directory does not exist: {home}")
         return 1
 
     state_dir = Path(os.environ.get("XDG_STATE_HOME") or str(home / ".local" / "state"))
     uid = os.getuid() if hasattr(os, "getuid") else -1
 
     banner()
-    print_line(info("Scanning repository source roots:"))
+    logger.info(info("Scanning repository source roots:"))
     for src_name, target_raw in SOURCE_ROOTS:
-        print_line(f"  - {src_name:<22} -> {os.path.expanduser(target_raw)}")
+        logger.info(f"  - {src_name:<22} -> {os.path.expanduser(target_raw)}")
 
     changed: list[Change] = []
     repo_root = find_repo_root()
@@ -452,47 +545,48 @@ def main(argv: list[str] | None = None) -> int:
     modified = [c for c in changed if c.status == "modified"]
 
     if changed:
-        print_line("")
-        print_line(bold(f"Changes detected: {len(modified)} modified, {len(added)} added"))
+        logger.info("")
+        logger.info(bold(f"Changes detected: {len(modified)} modified, {len(added)} added"))
         if modified:
-            print_line(dim("  modified:"))
+            logger.info(dim("  modified:"))
             for c in modified:
-                print_line(f"  ~ {c.host}   (repo: {c.repo_rel})")
+                logger.info(f"  ~ {c.host}   (repo: {c.repo_rel})")
         if added:
-            print_line(dim("  added:"))
+            logger.info(dim("  added:"))
             for c in added:
-                print_line(f"  + {c.host}   (repo: {c.repo_rel})")
+                logger.info(f"  + {c.host}   (repo: {c.repo_rel})")
     else:
-        print_line(ok("No drift detected - everything under the managed host paths is in sync."))
+        logger.info(ok("No drift detected - everything under the managed host paths is in sync."))
 
     units = unit_names_for(changed)
 
     issues = check_container_volumes(repo_root, home, uid, state_dir)
     if issues:
-        print_line("")
-        print_line(bold("Container volume checks (host directories referenced by Volume= mounts):"))
+        logger.info("")
+        logger.info(bold("Container volume checks (host directories referenced by Volume= mounts):"))
         for unit, src, resolved in issues:
-            print_line(err(f"  X {unit}: host directory does not exist: {resolved}   (from Volume={src})"))
+            logger.error(f"  X {unit}: host directory does not exist: {resolved}   (from Volume={src})")
 
     if units and not args.dry_run:
-        print_line("")
+        logger.info("")
         prompt = "systemd/quadlet drift detected - reload the systemd user manager and restart the affected services?"
+        logger.info(bold(prompt))
         if confirm(prompt):
             results = reload_and_restart(units)
             for unit, running in results:
                 if running:
-                    print_line(ok(f"  ✓ service {unit} restarted and is running"))
+                    logger.info(ok(f"  ✓ service {unit} restarted and is running"))
                 else:
-                    print_line(err(f"  X service {unit} failed to start / is not running"))
+                    logger.error(f"  X service {unit} failed to start / is not running")
         elif changed:
-            print_line(dim("  Drift acknowledged but not applied - no services were restarted."))
+            logger.warning("Drift acknowledged but not applied - no services were restarted.")
 
-    print_line("")
-    print_line(bold("=" * 72))
+    logger.info("")
+    logger.info(bold("=" * 72))
     if args.dry_run:
-        print_line(warn("Dry-run mode: no files were written and no services were restarted."))
-    print_line(ok("minube sync finished"))
-    print_line(bold("=" * 72))
+        logger.warning("Dry-run mode: no files were written and no services were restarted.")
+    logger.info(ok("minube sync finished"))
+    logger.info(bold("=" * 72))
 
     return 0
 
@@ -501,6 +595,6 @@ if __name__ == "__main__":
     try:
         _exit_code = main()
     except Exception as exc:  # noqa: BLE001 - keep failures easy to read for the user
-        print_line(err(f"sync aborted: {type(exc).__name__}: {exc}"))
+        logger.critical(f"sync aborted: {type(exc).__name__}: {exc}")
         _exit_code = 1
     raise SystemExit(_exit_code)
