@@ -44,6 +44,7 @@ not leave any files behind.
 from __future__ import annotations
 
 import argparse
+import difflib
 import io
 import json
 import logging
@@ -270,6 +271,48 @@ def fetch_repo_root(tmpdir: Path) -> Path:
 # --------------------------------------------------------------------------
 
 
+def _write_file(dst: Path, src: Path) -> None:
+    """Atomically replace the host file with the repository content."""
+    tmp = dst.parent / f".{dst.name}.sync-{os.getpid()}"
+    try:
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        with open(tmp, "wb") as fh:
+            fh.write(src.read_bytes())
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.chmod(tmp, stat.S_IMODE(src.stat().st_mode))
+        os.replace(tmp, dst)
+    except OSError as exc:
+        logger.error(f"  ! failed to write {dst}: {exc}")
+    finally:
+        if tmp.exists():
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
+
+
+def _print_diff(src: Path, dst: Path) -> None:
+    """Print a unified diff of the host file (``dst``) against the repository one (``src``)."""
+    src_bytes = src.read_bytes()
+    dst_bytes = dst.read_bytes() if dst.is_file() else b""
+    src_lines = src_bytes.decode("utf-8", errors="replace").splitlines()
+    dst_lines = dst_bytes.decode("utf-8", errors="replace").splitlines()
+    diff = list(difflib.unified_diff(dst_lines, src_lines, fromfile=str(dst), tofile=str(src), lineterm=""))
+
+    def paint(line: str) -> str:
+        if line.startswith("@@") or line.startswith("---") or line.startswith("+++"):
+            return bold(line) if _USE_COLOR else line
+        if line.startswith("+"):
+            return ok(line) if _USE_COLOR else line
+        if line.startswith("-"):
+            return err(line) if _USE_COLOR else line
+        return line
+
+    for line in diff:
+        print(paint(line))
+
+
 def sync_sources(repo_root: Path, changed: list[Change], apply: bool) -> None:
     for src_name, target_raw in SOURCE_ROOTS:
         target_root = Path(os.path.expanduser(target_raw))
@@ -296,28 +339,27 @@ def sync_sources(repo_root: Path, changed: list[Change], apply: bool) -> None:
                     continue
 
                 status = "modified" if dst.exists() else "added"
+
+                # Show the drift between the host file and the repository copy.
+                _print_diff(src, dst)
+
                 if not apply:
                     changed.append(Change(dst, rel, status, src))
                     continue
 
-                tmp = dst.parent / f".{dst.name}.sync-{os.getpid()}"
-                try:
-                    dst.parent.mkdir(parents=True, exist_ok=True)
-                    with open(tmp, "wb") as fh:
-                        fh.write(src.read_bytes())
-                        fh.flush()
-                        os.fsync(fh.fileno())
-                    os.chmod(tmp, stat.S_IMODE(src.stat().st_mode))
-                    os.replace(tmp, dst)
-                except OSError as exc:
-                    logger.error(f"  ! failed to write {dst}: {exc}")
-                finally:
-                    if tmp.exists():
-                        try:
-                            tmp.unlink()
-                        except OSError:
-                            pass
+                if status == "added":
+                    # Files that are missing on the host are created anew
+                    # by copying the repository content in full.
+                    _write_file(dst, src)
+                    changed.append(Change(dst, rel, status, src))
+                    continue
 
+                # For modified files the user decides file by file whether to sync.
+                if not confirm(f"Sync {dst} from the repository?"):
+                    logger.info(f"Skipped {dst} - sync declined by user")
+                    continue
+
+                _write_file(dst, src)
                 changed.append(Change(dst, rel, status, src))
 
 
@@ -393,6 +435,10 @@ def resolve_host_path(path: str, home: Path, uid: int, state_dir: Path) -> str:
         tok = m.group(0)
         if tok in ("%h", "%H"):
             return str(home)
+        if tok == "%E":
+            # ``%E`` is the configuration directory root: ``/etc`` for the system
+            # manager, ``$XDG_CONFIG_HOME`` (``~/.config``) for the user manager.
+            return os.path.expanduser(str(os.environ.get("XDG_CONFIG_HOME") or "~/.config"))
         if tok in ("%U", "%u"):
             return str(uid)
         if tok in ("%S", "%s"):
@@ -401,6 +447,25 @@ def resolve_host_path(path: str, home: Path, uid: int, state_dir: Path) -> str:
 
     p = re.sub(r"%[A-Za-z]", repl, p)
     return os.path.normpath(p)
+
+
+def _is_host_mount_source(src: str) -> bool:
+    """Return whether ``src`` refers to a host filesystem path that should be checked.
+
+    Bare source names - e.g. ``academy-cache`` or ``immich`` - are podman *named*
+    volumes, not host directories, so they must not be treated as missing paths.
+    Paths written with systemd specifiers (``%h``, ``%E``, ``%S``, ...) are host paths,
+    while runtime paths (``%t/...``) and unknown specifiers are not host config dirs.
+    """
+    s = src.strip()
+    if not s:
+        return False
+    if s.startswith("/") or s.startswith("~"):
+        return True
+    if s.startswith("%"):
+        tok = re.match(r"%[A-Za-z]", s).group(0)
+        return tok in ("%h", "%E", "%S", "%C", "%D", "%L")
+    return False
 
 
 def check_container_volumes(repo_root: Path, home: Path, uid: int, state_dir: Path) -> list[tuple[str, str, str]]:
@@ -429,6 +494,9 @@ def check_container_volumes(repo_root: Path, home: Path, uid: int, state_dir: Pa
         except OSError:
             continue
         for src in volume_sources(text):
+            if not _is_host_mount_source(src):
+                # Named podman volumes (``name:/container/path``) are not host directories.
+                continue
             resolved = resolve_host_path(src, home, uid, state_dir)
             if not os.path.exists(resolved):
                 issues.append((unit, src, resolved))
