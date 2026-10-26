@@ -31,17 +31,17 @@
 }
 
 (private) {
-  tls /data/letsencrypt/live/guirao.net/fullchain.pem /data/letsencrypt/live/guirao.net/privkey.pem
+	tls /data/letsencrypt/live/guirao.net/fullchain.pem /data/letsencrypt/live/guirao.net/privkey.pem
 
-  @allowed remote_ip 192.168.178.0/24 fd47:410:a83::/64 100.64.0.0/10
+	@allowed remote_ip 192.168.178.0/24 fd47:410:a83::/64 100.64.0.0/10
 
-  handle @allowed {
-      reverse_proxy 127.0.0.1:{args[0]}
-  }
+	handle @allowed {
+		reverse_proxy 127.0.0.1:{args[0]}
+	}
 
-  handle {
-      respond "Forbidden" 403
-  }
+	handle {
+		respond "Forbidden" 403
+	}
 }
 
 guirao.net {
@@ -49,7 +49,7 @@ guirao.net {
 }
 
 pihole.guirao.net {
-  import private 8080
+	import private 8080
 }
 
 photos.guirao.net {
@@ -78,7 +78,7 @@ calibre.guirao.net {
 }
 
 coder.guirao.net {
-  import private 7080
+	import private 7080
 }
 
 docs.guirao.net {
