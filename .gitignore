@@ -21,3 +21,5 @@ crash.log
 .DS_Store
 assets/fs.tar.gz
 .claude/
+
+__pycache__

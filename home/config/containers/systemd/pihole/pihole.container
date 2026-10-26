@@ -25,7 +25,7 @@ Environment=FTLCONF_ntp_ipv6_active=false
 Environment=FTLCONF_ntp_sync_active=false
 Environment=FTLCONF_webserver_domain=pihole.guirao.net
 Environment=FTLCONF_dns_revServers=true,192.168.178.0/24,192.168.178.1,fritz.box
-Environment="FTLCONF_dns_hosts=192.168.178.10 docs.guirao.net;192.168.178.10 maps.guirao.net;192.168.178.10 files.guirao.net;192.168.178.10 airtrail.guirao.net;192.168.178.10 academy.guirao.net;"
+Environment="FTLCONF_dns_hosts=192.168.178.10 docs.guirao.net;192.168.178.10 maps.guirao.net;192.168.178.10 files.guirao.net;192.168.178.10 airtrail.guirao.net;192.168.178.10 coder.guirao.net;192.168.178.10 calibre.guirao.net;192.168.178.10 academy.guirao.net;"
 Label="io.containers.autoupdate=registry"
 HostName=pi-hole
 

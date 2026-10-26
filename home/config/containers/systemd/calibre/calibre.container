@@ -1,0 +1,27 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Calibre Web NextGen
+
+[Container]
+Image=ghcr.io/new-usemame/calibre-web-nextgen:latest
+ContainerName=calibre
+Pod=calibre.pod
+Environment=CWA_PORT_OVERRIDE=8083
+Environment=CWA_CALIBRE_USER_PLUGINS=true
+Environment=NETWORK_SHARE_MODE=false
+Environment=TRUSTED_PROXY_COUNT=1
+Environment=PUID=1000
+Environment=PGID=1000
+Environment=TZ=Europe/Berlin
+Volume=%E/calibre:/config:Z
+Volume=%S/calibre/library:/calibre-library:Z
+Volume=%S/calibre/ingest:/cwa-book-ingest:Z
+HealthCmd=/usr/local/bin/cwa-healthcheck
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

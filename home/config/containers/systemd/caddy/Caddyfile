@@ -73,6 +73,10 @@ bulwark.guirao.net {
 	reverse_proxy 127.0.0.1:3333
 }
 
+calibre.guirao.net {
+	import private 8083
+}
+
 coder.guirao.net {
   import private 7080
 }
