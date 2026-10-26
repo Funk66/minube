@@ -115,8 +115,8 @@ data "aws_iam_policy_document" "office" {
     effect = "Allow"
 
     actions = [
-      "route53:ListResourceRecordSets",
       "route53:ChangeResourceRecordSets",
+      "route53:ListResourceRecordSets",
     ]
 
     resources = [
@@ -169,12 +169,12 @@ data "aws_iam_policy_document" "office" {
     effect = "Allow"
 
     actions = [
+      "s3:AbortMultipartUpload",
       "s3:DeleteObject",
       "s3:GetObject",
       "s3:GetObjectTagging",
       "s3:PutObject",
       "s3:PutObjectTagging",
-      "s3:AbortMultipartUpload",
     ]
 
     resources = [
@@ -188,13 +188,14 @@ data "aws_iam_policy_document" "office" {
     effect = "Allow"
 
     actions = [
-      "s3:PutObject",
       "s3:GetObject",
       "s3:GetObjectVersion",
+      "s3:PutObject",
     ]
 
     resources = [
       "${aws_s3_bucket.backups.arn}/dawarich/*",
+      "${aws_s3_bucket.backups.arn}/immich/*",
     ]
   }
 
@@ -365,38 +366,4 @@ resource "aws_iam_user_policy_attachment" "casa_attachment" {
 
 resource "aws_iam_access_key" "casa_key" {
   user = aws_iam_user.casa.name
-}
-
-data "aws_iam_policy_document" "fritz" {
-  statement {
-    sid    = "UpdateRecordSets"
-    effect = "Allow"
-
-    actions = [
-      "route53:ChangeResourceRecordSets",
-      "route53:ListResourceRecordSets",
-    ]
-
-    resources = [
-      "arn:aws:route53:::hostedzone/Z08454293CYFNUE96599",
-    ]
-  }
-}
-
-resource "aws_iam_policy" "fritz_policy" {
-  name   = "fritz"
-  policy = data.aws_iam_policy_document.fritz.json
-}
-
-resource "aws_iam_user" "fritz" {
-  name = "fritzr53"
-}
-
-resource "aws_iam_user_policy_attachment" "fritz_attachment" {
-  user       = aws_iam_user.fritz.name
-  policy_arn = aws_iam_policy.fritz_policy.arn
-}
-
-resource "aws_iam_access_key" "fritz_key" {
-  user = aws_iam_user.fritz.name
 }
