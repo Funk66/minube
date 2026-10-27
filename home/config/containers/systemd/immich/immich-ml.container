@@ -10,8 +10,7 @@ PartOf=immich.service
 [Container]
 Pod=immich.pod
 ContainerName=immich-ml
-Image=ghcr.io/immich-app/immich-machine-learning:release-cuda
-AddDevice=nvidia.com/gpu=all
+Image=ghcr.io/immich-app/immich-machine-learning:release
 EnvironmentFile=%E/immich/env
 Volume=immich:/cache
 Volume=/etc/localtime:/etc/localtime:ro
