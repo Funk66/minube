@@ -11,8 +11,8 @@ Environment=CWA_PORT_OVERRIDE=8083
 Environment=CWA_CALIBRE_USER_PLUGINS=true
 Environment=NETWORK_SHARE_MODE=false
 Environment=TRUSTED_PROXY_COUNT=1
-Environment=PUID=1000
-Environment=PGID=1000
+Environment=PUID=0
+Environment=PGID=0
 Environment=TZ=Europe/Berlin
 Volume=%E/calibre:/config:Z
 Volume=%S/calibre/library:/calibre-library:Z
