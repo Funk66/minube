@@ -6,4 +6,4 @@ OnFailure=backup-failure-notify@%n.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/bash %h/.config/containers/systemd/stalwart/backup.sh
+ExecStart=/usr/bin/bash %h/.local/bin/stalwart-backup.sh

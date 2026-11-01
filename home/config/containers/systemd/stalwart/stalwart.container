@@ -1,0 +1,21 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Stalwart
+
+[Container]
+ContainerName=stalwart
+Image=docker.io/stalwartlabs/stalwart:latest
+Network=host
+Volume=%E/stalwart/config.json:/etc/stalwart/config.json:Z
+Volume=%S/stalwart/data:/var/lib/stalwart:Z
+Volume=%S/stalwart/logs:/var/log/stalwart:Z
+UserNS=keep-id:uid=1000,gid=1000
+EnvironmentFile=%E/stalwart/env
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

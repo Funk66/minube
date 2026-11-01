@@ -333,19 +333,3 @@ resource "aws_route53_record" "minube_aaaa" {
   ttl     = 300
   records = aws_instance.instance.ipv6_addresses
 }
-
-resource "aws_route53_record" "mail_a" {
-  name    = "mail.${aws_route53_zone.zone.name}"
-  zone_id = aws_route53_zone.zone.id
-  type    = "A"
-  ttl     = 300
-  records = [aws_eip.eip.public_ip]
-}
-
-resource "aws_route53_record" "mail_aaaa" {
-  name    = "mail.${aws_route53_zone.zone.name}"
-  zone_id = aws_route53_zone.zone.id
-  type    = "AAAA"
-  ttl     = 300
-  records = aws_instance.instance.ipv6_addresses
-}

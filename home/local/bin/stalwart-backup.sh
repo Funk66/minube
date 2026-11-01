@@ -4,7 +4,7 @@ set -Eeuo pipefail
 
 BUCKET=minube-backups
 PREFIX=stalwart
-DATA_DIR=/data/stalwart
+DATA_DIR=~/.local/state/stalwart
 NOTIFY=/opt/scripts/send-notification.sh
 MIN_SIZE=10000000
 SHRINK_THRESHOLD=70 # alert when the new snapshot is <70% the size of the previous one
@@ -16,7 +16,9 @@ flock -n 200 || {
 }
 
 aws() {
-  podman run --rm -i --network host docker.io/amazon/aws-cli \
+  podman run --rm \
+    --env-file ~/.config/aws/credentials \
+    -i docker.io/amazon/aws-cli \
     --region eu-central-1 "$@"
 }
 

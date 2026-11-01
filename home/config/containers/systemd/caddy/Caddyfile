@@ -49,7 +49,7 @@ guirao.net {
 }
 
 pihole.guirao.net {
-	import private 8080
+	import private 8053
 }
 
 photos.guirao.net {
@@ -101,4 +101,23 @@ academy.guirao.net {
 	import private 8181
 	@compressible path *.js *.css *.html *.json *.svg *.txt
 	encode @compressible zstd gzip
+}
+
+mail.guirao.net,
+mta-sts.guirao.net,
+autoconfig.guirao.net,
+autodiscover.guirao.net {
+	reverse_proxy 127.0.0.1:8080 {
+
+		transport http {
+			proxy_protocol v2
+		}
+	}
+	log {
+		output file /var/log/caddy/stalwart.log
+	}
+}
+
+http://, https:// {
+	abort
 }

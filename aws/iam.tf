@@ -184,7 +184,7 @@ data "aws_iam_policy_document" "office" {
   }
 
   statement {
-    sid    = "BackupDawarich"
+    sid    = "GetPutBackup"
     effect = "Allow"
 
     actions = [
@@ -196,11 +196,12 @@ data "aws_iam_policy_document" "office" {
     resources = [
       "${aws_s3_bucket.backups.arn}/dawarich/*",
       "${aws_s3_bucket.backups.arn}/immich/*",
+      "${aws_s3_bucket.backups.arn}/stalwart/*",
     ]
   }
 
   statement {
-    sid    = "ListBackupsDawarich"
+    sid    = "ListBackups"
     effect = "Allow"
 
     actions = [
@@ -217,6 +218,7 @@ data "aws_iam_policy_document" "office" {
       variable = "s3:prefix"
       values = [
         "dawarich/*",
+        "stalwart/*",
       ]
     }
   }
