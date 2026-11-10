@@ -73,6 +73,14 @@ bulwark.guirao.net {
 	reverse_proxy 127.0.0.1:3333
 }
 
+share.guirao.net {
+	log {
+		output file /var/log/caddy/gokapi.log
+	}
+	import public
+	reverse_proxy 127.0.0.1:53842
+}
+
 calibre.guirao.net {
 	import private 8083
 }
@@ -108,7 +116,6 @@ mta-sts.guirao.net,
 autoconfig.guirao.net,
 autodiscover.guirao.net {
 	reverse_proxy 127.0.0.1:8080 {
-
 		transport http {
 			proxy_protocol v2
 		}

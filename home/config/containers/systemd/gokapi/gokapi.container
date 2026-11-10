@@ -1,0 +1,34 @@
+# vim: ft=systemd
+
+[Unit]
+Description=Gokapi
+
+[Container]
+ContainerName=gokapi
+Image=docker.io/f0rc3/gokapi:latest
+UserNS=keep-id:uid=1000,gid=1000
+NoNewPrivileges=true
+ReadOnly=true
+ReadOnlyTmpfs=true
+PublishPort=127.0.0.1:53842:53842/tcp
+Environment=TZ=Europe/Berlin
+Environment=GOKAPI_PORT=53842
+Environment=GOKAPI_DATA_DIR=/app/data
+Environment=GOKAPI_CONFIG_DIR=/app/config
+Environment=GOKAPI_TRUSTED_PROXIES=127.0.0.1
+Volume=%S/gokapi/data:/app/data:Z
+Volume=%S/gokapi/config:/app/config:Z
+HealthCmd=curl -f http://127.0.0.1:53842
+HealthInterval=30s
+HealthTimeout=5s
+HealthRetries=3
+HealthStartPeriod=10s
+Label="io.containers.autoupdate=registry"
+
+[Service]
+Restart=always
+RestartSec=5
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target
