@@ -43,19 +43,6 @@ data "aws_iam_policy_document" "grafana" {
   }
 
   statement {
-    sid    = "AllowReadingTagsInstancesRegionsFromEC2"
-    effect = "Allow"
-
-    actions = [
-      "ec2:DescribeTags",
-      "ec2:DescribeInstances",
-      "ec2:DescribeRegions",
-    ]
-
-    resources = ["*"]
-  }
-
-  statement {
     sid    = "AllowReadingResourcesForTags"
     effect = "Allow"
 
